@@ -85,13 +85,13 @@ const Dashboard = () => {
     }
   };
 
-  const [role, setRole] = useState(decryptData(localStorage.getItem("role")));
+  const [role, setRole] = useState();
   const [darkMode, setDarkMode] = useState(false);
   const [activeComponent, setActiveComponent] = useState("defaultPage");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [userImage, setUserImage] = useState(null);
   const [isSideOpen, setIsSideOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isMessagingOpen, setIsMessagingOpen] = useState(false);
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   const [isWebsiteManagementOpen, setIsWebsiteManagementOpen] = useState(false);
@@ -166,7 +166,7 @@ const Dashboard = () => {
     }
   };
   useEffect(() => {
-    fetchUserProfile();
+    // fetchUserProfile();
   }, [isProfilePopupOpen]);
 
   const fetchUnreadMsg = async () => {
@@ -564,7 +564,6 @@ const Dashboard = () => {
         </div>
         <div className="flex items-center gap-x-4">
           <p className=" font-serif text-2xl text-white font-bold">
-            {decryptData(localStorage.getItem("username"))}
           </p>
           {/* <ModeToggle /> */}
           <div
@@ -603,68 +602,6 @@ const Dashboard = () => {
             >
               <FaBars />
             </button>
-            {role[0] == 0 && (
-              <li className="flex flex-col space-y-1 ">
-                <div
-                  className={`flex items-center justify-between font-bold pr-2 py-2  hover:bg-green hover:text-white rounded cursor-pointer`}
-                  onClick={() => {
-                    setIsWebsiteManagementOpen((prev) => !prev);
-                  }}
-                >
-                  <div className="flex items-center font-bold gap-x-4">
-                    <span
-                      className={`
-                  ${isSidebarExpanded ? "text-xl" : " text-2xl"}
-                  `}
-                    >
-                      <FaUsers />
-                    </span>
-
-                    <span
-                      className={`  ml-5 text-md font-bold flex items-center  ${
-                        isSidebarExpanded ? "block" : " hidden"
-                      } `}
-                    >
-                      مدیریت وبسایت
-                    </span>
-                  </div>
-
-                  <span
-                    className={`text-sm flex pl-3 ${
-                      isSidebarExpanded ? "block" : " hidden"
-                    } `}
-                  >
-                    <FaChevronDown
-                      className={`transition-transform duration-300 ${
-                        isWebsiteManagementOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </span>
-                </div>
-                {isWebsiteManagementOpen &&
-                  websiteManagementItems.map((item) => (
-                    <div
-                      key={item.component}
-                      className={`flex items-center gap-x-3 space-y-1 py-2 font-bold  px-5  hover:bg-green hover:text-white rounded cursor-pointer ${
-                        activeComponent === item.component
-                          ? "bg-green text-white"
-                          : ""
-                      }`}
-                      onClick={() => {
-                        setActiveComponent(item.component);
-                        setIsSideOpen(false);
-                      }}
-                    >
-                      <span className="text-xl">{item.icon}</span>
-
-                      {isSidebarExpanded && (
-                        <span className="ml-4 text-md ">{item.label}</span>
-                      )}
-                    </div>
-                  ))}
-              </li>
-            )}
-            {role[0] == 3 && (
               <li className="flex flex-col space-y-1">
                 <div
                   className="flex p-2 items-center gap-x-3 hover:text-white hover:bg-green rounded cursor-pointer"
@@ -706,7 +643,7 @@ const Dashboard = () => {
                     </div>
                   ))}
               </li>
-            )}
+          
             <ul className="space-y-1  ">
               {filteredMenuItems.map((item) => (
                 <li

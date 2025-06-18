@@ -28,10 +28,10 @@ schema_view = get_schema_view(
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
-    
     path("api/v1/auth/user/", CustomUserDetailsView.as_view(), name="user-details"),
     path("api/v1/auth/", include("dj_rest_auth.urls")),
     path("api/v1/auth/register/", include("apps.users.urls"), name="register"),
+    path("api/v1/auth/category/", include("apps.category.urls"), name="category"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Optional: Customize admin UI

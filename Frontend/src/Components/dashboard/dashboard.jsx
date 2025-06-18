@@ -304,13 +304,7 @@ const Dashboard = () => {
       label: "مشخصه",
       icon: <FaTags />,
       element: <Attribute />,
-    },
-    {
-      component: "valueForAttributes",
-      label: "مقدار مشخصه‌ها",
-      icon: <FaListOl />,
-      element: <ValueForAttributes />,
-    },
+    }
   ];
 
   const menuItems = {

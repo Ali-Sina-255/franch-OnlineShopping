@@ -11,12 +11,12 @@ from .views import (
 
 urlpatterns = [
     path("", CategoryListView.as_view(), name="category-list"),
-    path("<uuid:id>/", CategoryDetailView.as_view(), name="category-detail"),
+    path("<int:pk>/", CategoryDetailView.as_view(), name="category-detail"),
     path(
         "attribute-types/", AttributeTypeListView.as_view(), name="attribute-type-list"
     ),
     path(
-        "attribute-types/<uuid:id>/",
+        "attribute-types/<int:pk>/",
         AttributeTypeDetailView.as_view(),
         name="attribute-type-detail",
     ),
@@ -26,7 +26,7 @@ urlpatterns = [
         name="attribute-value-list",
     ),
     path(
-        "attribute-values/<uuid:id>/",
+        "attribute-values/<int:pk>/",
         AttributeValueDetailView.as_view(),
         name="attribute-value-detail",
     ),

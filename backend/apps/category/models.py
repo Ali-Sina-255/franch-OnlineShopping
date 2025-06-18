@@ -1,22 +1,23 @@
-from apps.common.models import TimeStampedModel
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class Category(TimeStampedModel):
+class Category(models.Model):
     name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
-    class Meta: # type: ignore
+    class Meta:  # type: ignore
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
         ordering = ["name"]
 
 
-class AttributeType(TimeStampedModel):
+class AttributeType(models.Model):
     class AttributeChoiceType(models.TextChoices):
         DROPDOWN = "dropdown", "Dropdown"
         DATE = "date", "Date"
@@ -32,6 +33,8 @@ class AttributeType(TimeStampedModel):
         choices=AttributeChoiceType.choices,
         default=AttributeChoiceType.INPUT,
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name} ({self.category.name})"
@@ -51,13 +54,16 @@ class AttributeType(TimeStampedModel):
         ordering = ["-category"]
 
 
-class AttributeValue(TimeStampedModel):
+class AttributeValue(models.Model):
     attribute = models.ForeignKey(
         AttributeType,
         on_delete=models.CASCADE,
         related_name="attribute_values",
     )
     attribute_value = models.CharField(max_length=255)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         attr_name = self.attribute.name if self.attribute else "N/A"
@@ -74,6 +80,6 @@ class AttributeValue(TimeStampedModel):
             )
         super().clean()
 
-    class Meta: # type: ignore
+    class Meta:  # type: ignore
         unique_together = ["attribute", "attribute_value"]
         ordering = ["-attribute"]

@@ -1,4 +1,6 @@
 from rest_framework import serializers  # type: ignore
+from rest_framework.exceptions import ValidationError
+from rest_framework.fields import UUIDField
 
 from .models import AttributeType, AttributeValue, Category
 
@@ -10,7 +12,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class AttributeTypeSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
 
     class Meta:
         model = AttributeType

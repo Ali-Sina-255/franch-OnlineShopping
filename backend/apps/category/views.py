@@ -16,7 +16,6 @@ class CategoryListView(generics.ListCreateAPIView):
 class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    lookup_field = "id"
 
 
 class AttributeTypeListView(generics.ListCreateAPIView):
@@ -27,7 +26,6 @@ class AttributeTypeListView(generics.ListCreateAPIView):
 class AttributeTypeDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = AttributeType.objects.select_related("category").all()
     serializer_class = AttributeTypeSerializer
-    lookup_field = "id"
 
 
 class AttributeValueListView(generics.ListCreateAPIView):
@@ -38,4 +36,3 @@ class AttributeValueListView(generics.ListCreateAPIView):
 class AttributeValueDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = AttributeValue.objects.select_related("attribute").all()
     serializer_class = AttributeValueSerializer
-    lookup_field = "id"

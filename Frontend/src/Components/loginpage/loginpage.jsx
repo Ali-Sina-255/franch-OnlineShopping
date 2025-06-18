@@ -75,7 +75,7 @@ function LoginPage() {
       async function signIn() {
         try {
           const response = await axios.post(
-            `${BASE_URL}/users/user/token/`,
+            `${BASE_URL}/api/v1/auth/api/token/`,
             {
               email: state.emailValue,
               password: state.passwordValue,

@@ -20,20 +20,6 @@ const CategoryManagement = () => {
   const [categoryList, setCategoryList] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const roles = [
-    { id: 0, name: "Admin" },
-    { id: 1, name: "Designer" },
-    { id: 2, name: "Reception" },
-    { id: 3, name: "Head_of_designers" },
-    { id: 4, name: "Printer" },
-    { id: 5, name: "Delivery" },
-    { id: 6, name: "Digital" },
-    { id: 7, name: "Bill" },
-    { id: 8, name: "Chaspak" },
-    { id: 9, name: "Shop_role" },
-    { id: 10, name: "Laser" },
-    { id: 11, name: "Completed" },
-  ];
   const secretKey = "TET4-1"; // Use a strong secret key
   const decryptData = (hashedData) => {
     if (!hashedData) {
@@ -51,9 +37,8 @@ const CategoryManagement = () => {
   };
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/group/categories/`);
-      setCategories(response.data);
-      setFilteredCategories(response.data);
+      const response = await axios.get(`${BASE_URL}/api/v1/category/`);
+      setCategories(response.data.results);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -68,7 +53,7 @@ const CategoryManagement = () => {
     const actionType = editingCategory ? "ویرایش" : "اضافه کردن";
 
     try {
-      let response;
+      let response;      
       const authToken = decryptData(localStorage.getItem("auth_token")); // ✅ Retrieve token from localStorage
       const headers = {
         Authorization: `Bearer ${authToken}`, // ✅ Add token to headers
@@ -76,11 +61,9 @@ const CategoryManagement = () => {
 
       if (editingCategory) {
         response = await axios.put(
-          `${BASE_URL}/group/categories/${editingCategory.id}/`,
+          `${BASE_URL}/api/v1/category/${editingCategory.id}/`,
           {
-            name: categoryName,
-            stages: selectedRoles,
-            category_list: categoryList, // ✅ Include category list in update
+            name: categoryName, // ✅ Include category list in update
           },
           { headers } // ✅ Pass headers
         );
@@ -100,12 +83,9 @@ const CategoryManagement = () => {
         }
       } else {
         response = await axios.post(
-          `${BASE_URL}/group/categories/`,
+          `${BASE_URL}/api/v1/category/`,
           {
-            name: categoryName,
-            stages: selectedRoles, 
-            category_list: categoryList, // ✅ Include category list in creation
-
+            name: categoryName,// ✅ Include category list in creation
           },
           { headers } // ✅ Pass headers
         );
@@ -151,7 +131,7 @@ const CategoryManagement = () => {
     if (confirmDelete.isConfirmed) {
       try {
         const response = await axios.delete(
-          `${BASE_URL}/group/categories/${id}/`
+          `${BASE_URL}/api/v1/category/${id}/`
         );
         if (response.status === 204) {
           Swal.fire({
@@ -187,38 +167,6 @@ const handleEdit = (category) => {
   setEditingCategory(category);
 };
 
-
-  const handleSearch = (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-    setFilteredCategories(
-      term
-        ? categories.filter((category) =>
-            category.name.toLowerCase().includes(term.toLowerCase())
-          )
-        : categories
-    );
-  };
-
-  const handleSort = () => {
-    const sortedCategories = [...filteredCategories].sort((a, b) =>
-      sortOrder === "asc"
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
-    );
-    setFilteredCategories(sortedCategories);
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
-  const handleRoleChange = (roleId, e) => {
-    e.stopPropagation();
-    setSelectedRoles((prevRoles) =>
-      prevRoles.includes(roleId)
-        ? prevRoles.filter((id) => id !== roleId)
-        : [...prevRoles, roleId]
-    );
-  };
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
@@ -251,67 +199,6 @@ const handleEdit = (category) => {
             />
           </div>
 
-          {/* Category List - Select Field */}
-          <div>
-            <label className="block text-lg font-medium text-gray-700 mb-1">
-              نوع کتگوری
-            </label>
-            <select
-              value={categoryList}
-              onChange={(e) => setCategoryList(e.target.value)}
-              required
-              className="w-full px-3 py-2 border rounded bg-gray-200 text-black focus:outline-none"
-            >
-              <option value="">انتخاب کنید</option>
-              <option value="CF">Color Full</option>
-              <option value="WC">Without Color</option>
-            </select>
-          </div>
-
-          {/* Steps */}
-          <label className="block text-lg font-medium text-gray-700 mb-1">
-            مراحل
-          </label>
-          <div className="bg-gray-200 p-3 grid grid-cols-2 rounded-lg">
-            {roles.map((role) => (
-              <div
-                key={role.id}
-                className="flex items-center gap-x-3 border-b p-2 last:border-b-0"
-              >
-                <input
-                  type="checkbox"
-                  value={role.name}
-                  checked={selectedRoles.includes(role.name)}
-                  onChange={(e) => handleRoleChange(role.name, e)}
-                  className="form-checkbox h-5 w-5 text-green-500 focus:ring-green-500"
-                />
-                <span className="text-gray-700">{role.name}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Selected Steps */}
-          {selectedRoles.length > 0 && (
-            <div className="mt-4 bg-white p-4">
-              <h3 className="text-gray-800 font-semibold mb-3 text-lg">
-                ترتیب مراحل انتخاب شده:
-              </h3>
-              <ul className="list-decimal space-y-2 pl-5">
-                {selectedRoles.map((roleId) => {
-                  const role = roles.find((r) => r.id === roleId);
-                  return (
-                    <li
-                      key={roleId}
-                      className="text-gray-700 bg-gray-100 p-2 rounded-md hover:bg-gray-200 transition-colors duration-200"
-                    >
-                      {roleId}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
-
           {/* Submit Buttons */}
           <div className="flex justify-center gap-4 mt-4">
             <button type="submit" className="secondry-btn">
@@ -339,40 +226,20 @@ const handleEdit = (category) => {
                 نام کتگوری
               </th>
               <th className="border border-gray-300 px-6 py-2.5 text-sm font-semibold">
-                مراحل
-              </th>
-              <th className="border border-gray-300 px-6 py-2.5 text-sm font-semibold">
                 عملیات
               </th>{" "}
-              <th className="border border-gray-300 px-6 py-2.5 text-sm font-semibold">
-                نوع کتگوری
-              </th>
+            
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(paginatedCategories) &&
-              paginatedCategories.map((category) => (
+            {Array.isArray(categories) &&
+              categories.map((category) => (
                 <tr
                   key={category.id}
                   className="text-center border-b border-gray-200 bg-white hover:bg-gray-200 transition-all"
                 >
                   <td className="border-gray-300 px-6 py-2 text-gray-700">
                     {category.name}
-                  </td>
-                  <td className="border-gray-300 px-6 py-2 text-gray-700">
-                    <td className="border-gray-300 px-6 py-2 text-gray-700">
-                      {Array.isArray(category.stages) &&
-                      category.stages.length > 0
-                        ? category.stages
-                            .map((stageId) => {
-                              return stageId; // Ensure a valid name is returned
-                            })
-                            .join(", ") // Convert the array to a readable string
-                        : "ندارد"}
-                    </td>
-                  </td>{" "}
-                  <td className="border-gray-300 px-6 py-2 text-gray-700">
-                    {category.category_list}
                   </td>
                   <td className="flex items-center justify-center gap-x-5 border-gray-300 px-6 py-2 text-gray-700">
                     <button

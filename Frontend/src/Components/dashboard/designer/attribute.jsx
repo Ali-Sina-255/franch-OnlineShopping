@@ -30,8 +30,8 @@ const Attribute = () => {
   // Fetch categories from the API
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/group/categories/`);
-      setCategories(response.data);
+      const response = await axios.get(`${BASE_URL}/api/v1/category/`);
+      setCategories(response.data.results);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -51,18 +51,15 @@ const Attribute = () => {
       const fetchAttributes = async () => {
         try {
           const response = await axios.get(
-            `${BASE_URL}/group/attribute-types/`
+            `${BASE_URL}/api/v1/category/attribute/`
           );
-          console.log(response);
-
-          const attributeTypes = response.data;
+          const attributeTypes = response.data.results;
 
           if (Array.isArray(attributeTypes)) {
             const filteredAttributes = attributeTypes.filter(
               (att) => att.category === selectedCategory
             );
             setShownAttributes(filteredAttributes);
-            console.log("Filtered Attributes:", filteredAttributes);
           } else {
             console.warn("attribute_types is not an array:", attributeTypes);
             setShownAttributes([]); // optionally reset
@@ -85,7 +82,7 @@ const Attribute = () => {
     // Prepare the data
     const data = {
       name: attribute,
-      attribute_type: type, // Send the ID of the selected attribute type
+      attribute_type: "input", // Send the ID of the selected attribute type
       category: selectedCategory, // Send the ID of the selected category
     };
 
@@ -95,9 +92,8 @@ const Attribute = () => {
 
       if (editingAttributeId) {
         // Update the existing attribute
-        console.log(data);
         response = await axios.put(
-          `${BASE_URL}/group/attribute-types/${editingAttributeId}/`,
+          `${BASE_URL}/api/v1/category/attribute/${editingAttributeId}/`,
           data
         );
         if (response.status === 200) {
@@ -107,10 +103,12 @@ const Attribute = () => {
         }
       } else {
         // Add a new attribute
-        response = await axios.post(`${BASE_URL}/group/attribute-types/`, data);
+        response = await axios.post(
+          `${BASE_URL}/api/v1/category/attribute/`,
+          data
+        );
 
-          successMessage = "اطلاعات با موفقیت ثبت شد.";
-        
+        successMessage = "اطلاعات با موفقیت ثبت شد.";
       }
 
       // Show success Swal
@@ -158,7 +156,7 @@ const Attribute = () => {
     if (!confirmDelete.isConfirmed) return;
 
     try {
-      await axios.delete(`${BASE_URL}/group/attribute-types/${id}/`);
+      await axios.delete(`${BASE_URL}/api/v1/category/attribute/${id}/`);
 
       // Remove deleted attribute from state
       setShownAttributes((prev) => prev.filter((attr) => attr.id !== id));
@@ -194,9 +192,7 @@ const Attribute = () => {
   };
   // category section
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Filter categories based on search input
-  const filteredCategories = categories.filter((category) =>
+  const filteredCategories = (categories || []).filter((category) =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -281,45 +277,6 @@ const Attribute = () => {
             required
           />
         </div>
-
-        {/* Type Dropdown */}
-        <div>
-          <div className="w-full">
-            <label htmlFor="type" className="block font-medium mb-2">
-              نوع
-            </label>
-            <div className="">
-              {/* Dropdown Button */}
-              <div
-                className="mt-1 flex justify-between  w-full p-2 border bg-gray-200 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-              >
-                {type || "-- لطفاً انتخاب کنید --"}
-                <FaChevronDown
-                  className={` transition-all duration-300 ${
-                    isTypeDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
-
-              {/* Dropdown List */}
-              {isTypeDropdownOpen && (
-                <ul className=" w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-10">
-                  {attributeTypes.map((attributeType) => (
-                    <li
-                      key={attributeType}
-                      className="p-2 hover:bg-gray-200 border-b cursor-pointer"
-                      onClick={() => handleTypeSelect(attributeType)}
-                    >
-                      {attributeType}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Submit Button */}
         <div className="flex w-full items-center justify-center">
           <button type="submit " className="secondry-btn">
@@ -328,36 +285,45 @@ const Attribute = () => {
         </div>
       </form>
 
-      <ul className="mt-4 space-y-2">
-        {shownAttributes.length > 0 ? (
-          shownAttributes.map((attr) => (
-            <li
-              key={attr.id}
-              className="px-4 py-2 hover:bg-gray-200 border border-gray-300 rounded-md flex justify-between items-center"
-            >
-              <span>{attr.name}</span>
-              {/* Map attribute_type ID to the corresponding name */}
-              <span>{attr.attribute_type || "نامشخص"}</span>
-              <div className="flex gap-x-5 items-center">
-                <button
-                  onClick={() => handleEdit(attr)}
-                  className="text-green hover:scale-105 transition-all duration-300"
-                >
-                  <FaRegEdit size={24} />
-                </button>
-                <button
-                  onClick={() => handleDelete(attr.id)}
-                  className="text-red-600 hover:scale-105 transition-all duration-300"
-                >
-                  <IoTrashSharp size={24} />
-                </button>
-              </div>
-            </li>
-          ))
-        ) : (
-          <p className="text-gray-600"></p>
-        )}
-      </ul>
+      <table className="min-w-full mt-4 border border-gray-300 rounded-md">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="px-4 py-2 text-right border-b">نام ویژگی</th>
+            <th className="px-4 py-2 text-right border-b">عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          {shownAttributes.length > 0 ? (
+            shownAttributes.map((attr) => (
+              <tr key={attr.id} className="hover:bg-gray-100">
+                <td className="px-4 py-2 border-b">{attr.name}</td>
+                <td className="px-4 py-2 border-b">
+                  <div className="flex gap-x-4 items-center">
+                    <button
+                      onClick={() => handleEdit(attr)}
+                      className="text-green-600 hover:scale-105 transition-all duration-300"
+                    >
+                      <FaRegEdit size={20} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(attr.id)}
+                      className="text-red-600 hover:scale-105 transition-all duration-300"
+                    >
+                      <IoTrashSharp size={20} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="2" className="text-center text-gray-500 py-4">
+                هیچ ویژگی‌ای موجود نیست.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };

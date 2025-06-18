@@ -142,6 +142,12 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # for allauth account
 SITE_ID = 1
 
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 
 # rest framework  settings
 
@@ -168,22 +174,6 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend",
     "django.contrib.auth.backends.ModelBackend",  # Corrected typo: 'backend' instead of 'backend'
 )
-REST_AUTH_REGISTER_SERIALIZERS = {
-    "REGISTER_SERIALIZER": "apps.user.serializers.CustomRegisterSerializer"
-}
-
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-# ACCOUNT_USERNAME_REQUIRED = False
-# ACCOUNT_AUTHENTICATION_METHOD = "email"
-# ACCOUNT_EMAIL_REQUIRED = True
-# ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_LOGIN_METHODS = {"email"}  # Use email as the only login method
-
-# Signup fields: 'email*', 'password1*', 'password2*' (required fields)
-ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-
-# This one remains valid
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),  # Corrected to be a tuple

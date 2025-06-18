@@ -1,6 +1,6 @@
 from os import getenv, path
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 
 from .base import *  # noqa
 from .base import ROOT_DIR

@@ -29,7 +29,7 @@ import {
 import jwtDecode from "jwt-decode";
 import { MdDashboard, MdMenu } from "react-icons/md";
 import ReportDashboard from "./designer/Ddashboard";
-import AddOrder from "./designer/AddOrder";
+import AddOrder from "./designer/ProductManager.jsx";
 import TokenOrders from "./Reception/TokenOrders";
 import Services from "./Admin/Services";
 import WebBlog from "./Admin/WebBlog";
@@ -67,6 +67,7 @@ import BillTotal from "./Reception/BillTotal.jsx";
 import PTokenOrders from "./Reception/PTokenOrders.jsx";
 import OneColorList from "./Reception/oneColorList.jsx";
 import ColorFullList from "./Reception/colorFullList.jsx";
+import ProductManager from "./designer/ProductManager.jsx";
 const Dashboard = () => {
   // Modal visibility state
   const secretKey = "TET4-1"; // Use a strong secret key
@@ -219,41 +220,12 @@ const Dashboard = () => {
   const access = {
     1: [
       "defaultPage",
-      "Add Order",
+      "Add_Product",
       "defaultPage",
       "pastOrders",
       "designerChart",
       "Logout",
-    ],
-    3: [
-      "defaultPage",
-      "category management",
-      "pastOrders",
-      "Add Order",
-      "designerChart",
-      // "token",
-      "Logout",
-      "ReceivedList",
-      "OrderListSuperDesigner",
-    ],
-    0: ["defaultPage", "User Management", "data", "designerChart", "Logout"],
-    2: [
-      "defaultPage",
-      "OrderList",
-      "TokenOrders",
-      "PTokenOrders",
-      "OneColorList",
-      "ColorFullList",
-      "Logout",
-    ],
-    4: ["defaultPage", "ReceivedList", "Logout"],
-    5: ["defaultPage", "deliver", "ReceivedList", "Logout"],
-    6: ["defaultPage", "ReceivedList", "Logout"],
-    7: ["defaultPage", "ReceivedList", "Logout"],
-    8: ["defaultPage", "ReceivedList", "Logout"],
-    9: ["defaultPage", "ReceivedList", "Logout"],
-    10: ["defaultPage", "ReceivedList", "Logout"],
-  };
+    ]  };
   const websiteManagementItems = [
     {
       component: "Services",
@@ -313,6 +285,12 @@ const Dashboard = () => {
       icon: <MdHome />,
       label: " صفحه اصلی",
     },
+
+    Add_Product: {
+      component: "Add_Product",
+      icon: <FaPlusCircle />,
+      label: "افزودن محصول",
+    },
     OrderList: {
       component: "OrderList",
       icon: <FaClipboardList />,
@@ -337,12 +315,6 @@ const Dashboard = () => {
       component: "ColorFullList",
       icon: <FaClipboardList />,
       label: " لیست سفارشات رنگی",
-    },
-
-    "Add Order": {
-      component: "AddOrder",
-      icon: <FaPlusCircle />,
-      label: "سفارشات",
     },
     pastOrders: {
       component: "pastOrders",
@@ -433,7 +405,7 @@ const Dashboard = () => {
 
   // Filter menu items based on user role
   const filteredMenuItems = Object.keys(menuItems).filter((item) =>
-    (access[role] || []).includes(item)
+    (access[1] || []).includes(item)
   );
 
   // Function to toggle the sidebar
@@ -459,8 +431,8 @@ const Dashboard = () => {
     if (activeComponent === "Gallery") return <Gallery />;
     if (activeComponent === "Slider") return <Slider />;
     switch (activeComponent) {
-      case "DoneList":
-        return <DoneList />;
+      case "Add_Product":
+        return <ProductManager />;
       case "deliver":
         return <Deliver />;
       case "OrderList":

@@ -113,7 +113,8 @@ body::-webkit-scrollbar-track {
 
   /* 2. Make the printable area and ALL its children visible */
   #printableTableArea,
-  #printableTableArea * { /* The '*' is important to affect all descendants */
+  #printableTableArea * {
+    /* The '*' is important to affect all descendants */
     visibility: visible;
   }
 
@@ -125,10 +126,16 @@ body::-webkit-scrollbar-track {
     width: 100%;
     margin: 15px; /* Adjust printer margins as needed */
     padding: 0;
-    background-color: rgb(255, 255, 255) !important; /* Ensure background is white for print */
+    background-color: rgb(
+      255,
+      255,
+      255
+    ) !important; /* Ensure background is white for print */
   }
 
-  .no-print, .no-print * { /* Also hide children of no-print elements */
+  .no-print,
+  .no-print * {
+    /* Also hide children of no-print elements */
     display: none !important;
     visibility: hidden !important; /* Belt and suspenders */
   }
@@ -163,12 +170,12 @@ body::-webkit-scrollbar-track {
     background-color: #e0e0e0 !important; /* Light gray background for header */
     color: #000 !important;
     -webkit-print-color-adjust: exact; /* For Chrome/Safari to print backgrounds */
-    print-color-adjust: exact;         /* Standard property */
+    print-color-adjust: exact; /* Standard property */
   }
 
   /* Ensure table body rows have a white background (or alternating if you prefer) */
   #printableTableArea tbody tr {
-     background-color: #fff !important;
+    background-color: #fff !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -179,7 +186,6 @@ body::-webkit-scrollbar-track {
     print-color-adjust: exact;
   }
   */
-
 
   /* Style the title for printing */
   #printableTableArea h2 {
@@ -200,4 +206,7 @@ body::-webkit-scrollbar-track {
   #printableTableArea tfoot {
     display: table-footer-group !important; /* If you had a tfoot */
   }
+}
+.input-field {
+  @apply border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
 }

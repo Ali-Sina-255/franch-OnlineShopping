@@ -25,3 +25,6 @@ urlpatterns = [
 admin.site.site_header = "Online Shopping Center  Admin"
 admin.site.site_title = "Online Shopping Center  Admin Portal"
 admin.site.index_title = "Welcome to Online Shopping Center  API Portal"
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

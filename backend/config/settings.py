@@ -1,27 +1,25 @@
 import os
-from datetime import date, timedelta
-from os import getenv, path
+from datetime import timedelta
 from pathlib import Path
 
-from dotenv import load_dotenv
-from loguru import logger
+import environ
 
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-BASE_DIR = ROOT_DIR / "apps"
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1", "api"]
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = "django-insecure-d6@458wn=(mb%4b8gl@%6rwgmjb+=(18jzfkmv_-m1-(b!d4tj"
 
-local_env_file = path.join(ROOT_DIR, ".env", ".env")
-if path.isfile(local_env_file):
-    load_dotenv(local_env_file)
-else:
-    logger.warning(f".env.local file not found at {local_env_file}")
-SECRET_KEY = getenv("DJANGO_SECRET_KEY")
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
-# DEBUG mode
+ALLOWED_HOSTS = []
 
-# Application definition
+
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -29,39 +27,33 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_extensions",
 ]
 
-
-LOCAL_APPS = ["apps.users", "apps.common", "apps.category","apps.product"]
+LOCAL_APPS = [
+    "apps.staff",
+    "apps.users",
+    "apps.expenditure",
+    "apps.carpet",
+    "apps.worker",
+]
 
 THIRD_PARTY_APPS = [
-    'drf_spectacular',
+    "jazzmin",
+    "drf_yasg",
     "rest_framework",
-    "django_filters",
     "corsheaders",
-    "rest_framework.authtoken",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "dj_rest_auth",
-    "dj_rest_auth.registration",
-    
 ]
 
-
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
-
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -69,10 +61,11 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -83,17 +76,35 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# Database settings
-# Update these according to your setup, for now this is a placeholder
+
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ROOT_DIR
-        / "db.sqlite3",  # Creates the SQLite database in the base directory
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "carpet",
+        "USER": "root",
+        "PASSWORD": env.str("PASSWORD"),
+        "HOST": "localhost",
+        "PORT": "3306",
     }
 }
 
-# Password validation settings
+
+AUTH_USER_MODEL = "users.User"
+
+
+# Password validation
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -109,45 +120,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Localization settings
+
+# Internationalization
+# https://docs.djangoproject.com/en/5.1/topics/i18n/
+
 LANGUAGE_CODE = "en-us"
+
 TIME_ZONE = "UTC"
+
 USE_I18N = True
+
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = "/static/"
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_ROOT = str(ROOT_DIR / "staticfiles")
-
-# Media files (uploads)
-MEDIA_URL = "/media/"
-
-MEDIA_ROOT = str(ROOT_DIR / "mediafile")
+STATIC_URL = "static/"
+MEDIA_URL = "media/"
+MEDIA_URL = "media/"  # Note: Duplicate line was present in your original
+MEDIA_ROOT = BASE_DIR / "media/"
 
 # Default primary key field type
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# CORS settings (Optional)
-CORS_URLS_REGEX = r"^api/.*$"
-
-AUTH_USER_MODEL = "users.User"
-
-ADMIN_URL = "supersecret/"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-
-# for allauth account
-SITE_ID = 1
-
-EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
-
-# rest framework  settings
+# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -169,10 +164,6 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
-     "DEFAULT_FILTER_BACKEND": [
-        "django_filters.rest_framework.DjangoFilterBackend",
-    ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 

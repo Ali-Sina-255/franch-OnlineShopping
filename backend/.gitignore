@@ -14,8 +14,8 @@ customer
 # Distribution / packaging
 
 staticfiles/
-media/
-
+mediafile/
+mediafile/
 .Python
 build/
 develop-eggs/

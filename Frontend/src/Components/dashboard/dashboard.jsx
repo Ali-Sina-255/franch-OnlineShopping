@@ -649,20 +649,6 @@ const Dashboard = () => {
         </main>
       </div>
 
-      <div
-        className="fixed bottom-6 left-6 flex items-center gap-3 px-4 py-2 bg-blue-600 text-white rounded-full shadow-lg cursor-pointer hover:bg-blue-700 transition-all duration-300 z-50"
-        onClick={() => setIsMessagingOpen(true)}
-      >
-        <IoChatbubbleEllipses className="text-3xl" />
-        <span className="hidden md:flex items-center gap-2">
-          پیام‌رسانی
-          {unreadMsg.length > 0 && (
-            <span className="bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
-              {unreadMsg.length}
-            </span>
-          )}
-        </span>
-      </div>
 
       {/* Conditionally render the UpdateProfile modal */}
       {isProfilePopupOpen && (

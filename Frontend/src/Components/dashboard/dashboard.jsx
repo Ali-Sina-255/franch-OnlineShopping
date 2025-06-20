@@ -13,6 +13,18 @@ const Dashboard = () => {
       <div className="mt-6">
         <FinancialReports />
       </div>
+
+
+      {/* Conditionally render the UpdateProfile modal */}
+      {/* {(
+        <UpdateProfile
+          setIsProfilePopupOpen={setIsProfilePopupOpen}
+          userImage={userImage}
+        />
+      )} */}
+      {/* {isMessagingOpen && (
+        <MessagingComponent setIsMessagingOpen={setIsMessagingOpen} />
+      )} */}
     </div>
   );
 };

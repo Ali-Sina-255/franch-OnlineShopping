@@ -4,19 +4,20 @@ import Product from "../../Pages/dashboard/Product";
 
 import Dashboard from "./dashboard";
 import Profile from "../../Pages/dashboard/Profiles.jsx";
-import Orders from "../../Pages/dashboard/Orders.jsx";
+import Attribute from "./pages/attribute.jsx";
+import ProductManager from "./pages/ProductManager.jsx";
 
 const MainContent = ({ activeComponent }) => {
   const renderContent = () => {
     switch (activeComponent) {
       case "dashboard":
         return <Dashboard />;
-      case "cate":
-        return <Categories />;
-      case "order":
-        return <Orders />;
-      case "product":
-        return <Product />;
+      case "category":
+        return <CategoryManagement />;
+      case "attribute":
+        return <Attribute />;
+      case "products":
+        return <ProductManager />;
       // case "report":
       //   return <Report />;
       case "proflie":

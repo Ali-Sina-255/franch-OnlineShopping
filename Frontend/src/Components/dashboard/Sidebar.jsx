@@ -44,10 +44,10 @@ const Sidebar = ({ setActiveComponent }) => {
   };
 
   const AllComponents = [
-    { name: "صفحه اصلی", value: "home", icon: <LuActivity /> },
-    { name: "دوکان‌دار ها", value: "cate", icon: <LucideUserRoundPlus /> },
-    { name: "قراردادها", value: "order", icon: <FaBuilding /> },
-    { name: "خدمات", value: "product", icon: <MdLocalLaundryService /> },
+    { name: "home", value: "home", icon: <LuActivity /> },
+    { name: "category management", value: "category", icon: <LucideUserRoundPlus /> },
+    { name: "attribute management", value: "attribute", icon: <FaBuilding /> },
+    { name: "products", value: "products", icon: <MdLocalLaundryService /> },
     { name: "کرایه‌", value: "proflie", icon: <GiTakeMyMoney /> },
   
     { name: "خروج", value: "signout", icon: <FaSignOutAlt /> },
@@ -95,7 +95,7 @@ const Sidebar = ({ setActiveComponent }) => {
       </header>
 
       <ul className=" mr-1">
-        {accessibleComponents.map((component, index) => (
+        {AllComponents .map((component, index) => (
           <li key={index} className="relative group cursor-pointer">
             {component.value === "signout" ? (
               <a

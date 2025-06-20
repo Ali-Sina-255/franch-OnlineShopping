@@ -20,7 +20,9 @@ urlpatterns = [
     path("api/v1/auth/", include("apps.users.urls"), name="category"),
     path("api/v1/category/", include("apps.category.urls"), name="category"),
     path("api/v1/product/", include("apps.product.urls"), name="product"),
-    path("api/v1/profiles/", include("apps.profiles.urls")),
+    path("api/v1/profiles/", include("apps.profiles.urls"), name="profiles"),
+    path("api/v1/orders/", include("apps.orders.urls"), name="orders"),
+    path("api/v1/cart/", include("apps.cart.urls"), name="cart"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Optional: Customize admin UI

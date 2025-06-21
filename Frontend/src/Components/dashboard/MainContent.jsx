@@ -1,5 +1,5 @@
 // import Customer from "./pages/ServiceManger";
-import Categories from "../../Pages/dashboard/Categories";
+import CategoryManagement from './pages/categoryManager.jsx'
 import Product from "../../Pages/dashboard/Product";
 
 import Dashboard from "./dashboard";

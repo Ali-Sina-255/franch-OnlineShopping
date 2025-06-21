@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-
+import { useSelector } from "react-redux";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function ProductManager() {
+  const token = useSelector((state) => state.user.accessToken);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -38,17 +39,29 @@ export default function ProductManager() {
   }, []);
 
   const fetchProducts = async () => {
-    const res = await axios.get(`${BASE_URL}/api/v1/product/product/`);
+    const res = await axios.get(`${BASE_URL}/api/v1/product/product/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     setProducts(res.data);
   };
 
   const fetchCategories = async () => {
-    const res = await axios.get(`${BASE_URL}/api/v1/category/`);
+    const res = await axios.get(`${BASE_URL}/api/v1/category/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     setCategories(res.data.results);
   };
 
   const fetchBrands = async () => {
-    const res = await axios.get(`${BASE_URL}/api/v1/product/brand/`);
+    const res = await axios.get(`${BASE_URL}/api/v1/product/brand/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     setBrands(res.data);
   };
 
@@ -75,11 +88,20 @@ export default function ProductManager() {
       if (editingId) {
         await axios.put(
           `${BASE_URL}/api/v1/product/product/${editingId}/`,
-          data
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         Swal.fire("ویرایش شد", "محصول با موفقیت ویرایش شد", "success");
       } else {
-        await axios.post(`${BASE_URL}/api/v1/product/product/`, data);
+        await axios.post(`${BASE_URL}/api/v1/product/product/`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         Swal.fire("اضافه شد", "محصول با موفقیت اضافه شد", "success");
       }
       setFormData({
@@ -120,7 +142,11 @@ export default function ProductManager() {
       confirmButtonText: "بله، حذف کن",
     });
     if (result.isConfirmed) {
-      await axios.delete(`${BASE_URL}/api/v1/product/product/${id}/`);
+      await axios.delete(`${BASE_URL}/api/v1/product/product/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       Swal.fire("حذف شد", "محصول با موفقیت حذف شد", "success");
       fetchProducts();
     }
@@ -154,7 +180,7 @@ export default function ProductManager() {
           value={formData.brand}
           onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
           className="input-field w-full"
-        >{console.log(brands) }
+        >
           <option value="">انتخاب برند</option>
           {brands && brands.length>0 && brands.map((b) => (
             <option key={b.id} value={b.id}>

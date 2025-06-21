@@ -4,9 +4,11 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { IoTrashSharp } from "react-icons/io5";
 import { FaRegEdit } from "react-icons/fa";
+import { useSelector } from "react-redux";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const Attribute = () => {
+  const token = useSelector((state) => state.user.accessToken);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [attributeTypes, setAttributeTypes] = useState([
@@ -30,7 +32,11 @@ const Attribute = () => {
   // Fetch categories from the API
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/v1/category/`);
+      const response = await axios.get(`${BASE_URL}/api/v1/category/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       setCategories(response.data.results);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -51,7 +57,12 @@ const Attribute = () => {
       const fetchAttributes = async () => {
         try {
           const response = await axios.get(
-            `${BASE_URL}/api/v1/category/attribute/`
+            `${BASE_URL}/api/v1/category/attribute/`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
           );
           const attributeTypes = response.data.results;
 
@@ -94,7 +105,12 @@ const Attribute = () => {
         // Update the existing attribute
         response = await axios.put(
           `${BASE_URL}/api/v1/category/attribute/${editingAttributeId}/`,
-          data
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         if (response.status === 200) {
           successMessage = "ویژگی با موفقیت ویرایش شد.";
@@ -105,7 +121,12 @@ const Attribute = () => {
         // Add a new attribute
         response = await axios.post(
           `${BASE_URL}/api/v1/category/attribute/`,
-          data
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         successMessage = "اطلاعات با موفقیت ثبت شد.";
@@ -156,7 +177,11 @@ const Attribute = () => {
     if (!confirmDelete.isConfirmed) return;
 
     try {
-      await axios.delete(`${BASE_URL}/api/v1/category/attribute/${id}/`);
+      await axios.delete(`${BASE_URL}/api/v1/category/attribute/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       // Remove deleted attribute from state
       setShownAttributes((prev) => prev.filter((attr) => attr.id !== id));

@@ -9,7 +9,7 @@ from .serializers import CustomRegisterSerializer, UserSerializer
 
 
 class CustomUserDetailsView(RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = CustomRegisterSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
@@ -17,15 +17,3 @@ class CustomUserDetailsView(RetrieveUpdateAPIView):
 
     def get_queryset(self):
         return get_user_model().objects.none()
-
-
-class CustomRegisterView(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = CustomRegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save(request)
-            return Response(
-                {"message": "User registered successfully."},
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

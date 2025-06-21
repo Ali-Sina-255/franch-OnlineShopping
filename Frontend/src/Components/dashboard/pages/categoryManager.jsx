@@ -4,9 +4,11 @@ import Swal from "sweetalert2";
 import { FaChevronDown, FaRegEdit } from "react-icons/fa";
 import { IoTrashSharp } from "react-icons/io5";
 import CryptoJS from "crypto-js";
+import { useSelector } from "react-redux";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const CategoryManagement = () => {
+  const token = useSelector((state) => state.user.accessToken);
   const [categoryName, setCategoryName] = useState("");
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -18,7 +20,6 @@ const CategoryManagement = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [categoryList, setCategoryList] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const secretKey = "TET4-1"; // Use a strong secret key
   const decryptData = (hashedData) => {
     if (!hashedData) {
@@ -36,7 +37,11 @@ const CategoryManagement = () => {
   };
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/v1/category/`);
+      const response = await axios.get(`${BASE_URL}/api/v1/category/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setCategories(response.data.results);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -54,9 +59,7 @@ const CategoryManagement = () => {
     try {
       let response;      
       const authToken = decryptData(localStorage.getItem("auth_token")); // ✅ Retrieve token from localStorage
-      const headers = {
-        Authorization: `Bearer ${authToken}`, // ✅ Add token to headers
-      };
+
 
       if (editingCategory) {
         response = await axios.put(
@@ -64,7 +67,11 @@ const CategoryManagement = () => {
           {
             name: categoryName, // ✅ Include category list in update
           },
-          { headers } // ✅ Pass headers
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         if (response.status === 200) {
@@ -84,9 +91,13 @@ const CategoryManagement = () => {
         response = await axios.post(
           `${BASE_URL}/api/v1/category/`,
           {
-            name: categoryName,// ✅ Include category list in creation
+            name: categoryName, // ✅ Include category list in creation
           },
-          { headers } // ✅ Pass headers
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         if (response.status === 201) {
@@ -130,7 +141,12 @@ const CategoryManagement = () => {
     if (confirmDelete.isConfirmed) {
       try {
         const response = await axios.delete(
-          `${BASE_URL}/api/v1/category/${id}/`
+          `${BASE_URL}/api/v1/category/${id}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         if (response.status === 204) {
           Swal.fire({

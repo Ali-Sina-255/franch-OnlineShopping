@@ -16,6 +16,7 @@ customer
 staticfiles/
 mediafile/
 mediafile/
+
 .Python
 build/
 develop-eggs/

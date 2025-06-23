@@ -48,9 +48,9 @@ const Sidebar = ({ setActiveComponent }) => {
     { name: "category management", value: "category", icon: <LucideUserRoundPlus /> },
     { name: "attribute management", value: "attribute", icon: <FaBuilding /> },
     { name: "products", value: "products", icon: <MdLocalLaundryService /> },
-    { name: "کرایه‌", value: "proflie", icon: <GiTakeMyMoney /> },
+    // { name: "کرایه‌", value: "proflie", icon: <GiTakeMyMoney /> },
   
-    { name: "خروج", value: "signout", icon: <FaSignOutAlt /> },
+    { name: "logout", value: "signout", icon: <FaSignOutAlt /> },
   ];
 
   let accessibleComponents = [];
@@ -90,7 +90,7 @@ const Sidebar = ({ setActiveComponent }) => {
         </div>
 
         <span className="text-lg font-semibold  text-white whitespace-nowrap">
-          مارکیت حسین زاده
+         Chiqfrip
         </span>
       </header>
 

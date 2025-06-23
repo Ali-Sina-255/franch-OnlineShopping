@@ -69,7 +69,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "details",
             "seller_notes",
             "tags",
-            "brand",
+            # "brand",
             "price",
             "stock",
             "is_available",

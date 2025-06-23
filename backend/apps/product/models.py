@@ -24,9 +24,9 @@ class Product(models.Model):
         O = "wo", "Woman"
 
     product_name = models.CharField(max_length=255)
-    brand = models.ForeignKey(
-        Brand, on_delete=models.PROTECT, related_name="product_brand"
-    )
+    # brand = models.ForeignKey(
+    #     Brand, on_delete=models.PROTECT, related_name="product_brand"
+    # )
 
     description = models.TextField()
     details = models.JSONField(default=list, blank=True)
@@ -43,8 +43,8 @@ class Product(models.Model):
 
     price = models.IntegerField()
     stock = models.IntegerField()
-    image_url = models.ImageField(upload_to="product/image")
-    hover_image_url = models.ImageField(upload_to="product/image")
+    image_url = models.ImageField(upload_to="product/image",blank=True,null=True)
+    hover_image_url = models.ImageField(upload_to="product/image", null=True, blank=True) 
     seller_notes = models.TextField()
     material = models.CharField(max_length=500)
     image = models.ImageField(upload_to="product/image", null=True, blank=True)

@@ -8,6 +8,7 @@ export default function ProductManager() {
   const token = useSelector((state) => state.user.accessToken);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [Attributes, setAttributes] = useState([]);
   const [brands, setBrands] = useState([]);
   const [formData, setFormData] = useState({
     product_name: "",
@@ -44,7 +45,7 @@ export default function ProductManager() {
         Authorization: `Bearer ${token}`,
       },
     });
-    setProducts(res.data);
+    setProducts(res.data.results);
   };
 
   const fetchCategories = async () => {
@@ -54,6 +55,14 @@ export default function ProductManager() {
       },
     });
     setCategories(res.data.results);
+  };
+  const fetchAttributes = async () => {
+    const res = await axios.get(`${BASE_URL}/api/v1/category/attribute/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setAttributes(res.data.results);
   };
 
   const fetchBrands = async () => {
@@ -85,6 +94,7 @@ export default function ProductManager() {
     });
 
     try {
+      console.log(data);
       if (editingId) {
         await axios.put(
           `${BASE_URL}/api/v1/product/product/${editingId}/`,
@@ -154,268 +164,305 @@ export default function ProductManager() {
 
   return (
     <div className=" p-4 mt-10 max-w-lg mx-auto bg-white shadow-md rounded-md">
-    <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
-      {/* Product Name */}
-      <div>
-        <label className="block mb-1 font-medium">نام محصول</label>
-        <input
-          type="text"
-          value={formData.product_name}
-          onChange={(e) =>
-            setFormData({ ...formData, product_name: e.target.value })
-          }
-          className="input-field w-full"
-          required
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
+        {/* Product Name */}
+        <div>
+          <label className="block mb-1 font-medium">نام محصول</label>
+          <input
+            type="text"
+            value={formData.product_name}
+            onChange={(e) =>
+              setFormData({ ...formData, product_name: e.target.value })
+            }
+            className="input-field w-full"
+            required
+          />
+        </div>
+        {/* Category */}
+        <div>
+          <label className="block mb-1 font-medium">کتگوری</label>
+          <select
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+            className="input-field w-full"
+          >
+            <option value="">انتخاب کتگوری</option>
+            {categories?.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {/* SKU */}
-      <div>
-        <label className="block mb-1 font-medium">شناسه انبار</label>
-        <input
-          type="text"
-          value={formData.sku}
-          onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-          className="input-field w-full"
-          required
-        />
-      </div>
+        {/* Description */}
+        <div>
+          <label className="block mb-1 font-medium">توضیحات</label>
+          <textarea
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            className="input-field w-full"
+            required
+          />
+        </div>
 
-      {/* Brand */}
-      <div>
-        <label className="block mb-1 font-medium">برند</label>
-        <select
-          value={formData.brand}
-          onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-          className="input-field w-full"
+        {/* Seller Notes */}
+        <div>
+          <label className="block mb-1 font-medium">یادداشت فروشنده</label>
+          <textarea
+            value={formData.seller_notes}
+            onChange={(e) =>
+              setFormData({ ...formData, seller_notes: e.target.value })
+            }
+            className="input-field w-full"
+          />
+        </div>
+
+        {/* Material */}
+        <div>
+          <label className="block mb-1 font-medium">مواد</label>
+          <input
+            type="text"
+            value={formData.material}
+            onChange={(e) =>
+              setFormData({ ...formData, material: e.target.value })
+            }
+            className="input-field w-full"
+          />
+        </div>
+
+        {/* Price */}
+        <div>
+          <label className="block mb-1 font-medium">قیمت</label>
+          <input
+            type="number"
+            value={formData.price}
+            onChange={(e) =>
+              setFormData({ ...formData, price: e.target.value })
+            }
+            className="input-field w-full"
+            required
+          />
+        </div>
+
+        {/* Stock */}
+        <div>
+          <label className="block mb-1 font-medium">موجودی</label>
+          <input
+            type="number"
+            value={formData.stock}
+            onChange={(e) =>
+              setFormData({ ...formData, stock: e.target.value })
+            }
+            className="input-field w-full"
+            required
+          />
+        </div>
+
+        {/* Details */}
+        <div>
+          <label className="block mb-1 font-medium">
+            جزییات (با , جدا شود)
+          </label>
+          <input
+            type="text"
+            value={formData.details}
+            onChange={(e) =>
+              setFormData({ ...formData, details: e.target.value })
+            }
+            className="input-field w-full"
+          />
+        </div>
+
+        {/* Tags */}
+        <div>
+          <label className="block mb-1 font-medium">
+            برچسب‌ها (با , جدا شود)
+          </label>
+          <input
+            type="text"
+            value={formData.tags}
+            onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+            className="input-field w-full"
+          />
+        </div>
+
+        {/* Attributes */}
+        <div>
+          <label className="block mb-1 font-medium">ویژگی‌ها (JSON)</label>
+          <input
+            type="text"
+            value={formData.attributes}
+            onChange={(e) =>
+              setFormData({ ...formData, attributes: e.target.value })
+            }
+            className="input-field w-full"
+          />
+        </div>
+
+        {/* Type */}
+        <div>
+          <label className="block mb-1 font-medium">نوع</label>
+          <select
+            value={formData.type}
+            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+            className="input-field w-full"
+          >
+            <option value="ma">مردانه</option>
+            <option value="wo">زنانه</option>
+          </select>
+        </div>
+
+        {/* Condition */}
+        <div>
+          <label className="block mb-1 font-medium">وضعیت</label>
+          <select
+            value={formData.condition}
+            onChange={(e) =>
+              setFormData({ ...formData, condition: e.target.value })
+            }
+            className="input-field w-full"
+          >
+            <option value="New">نو</option>
+            <option value="Use">استفاده‌شده</option>
+            <option value="Other">دیگر</option>
+          </select>
+        </div>
+
+        {/* Images */}
+        <div>
+          <label className="block mb-1 font-medium">تصویر اصلی</label>
+          <input
+            type="file"
+            onChange={(e) =>
+              setFormData({ ...formData, image_url: e.target.files[0] })
+            }
+            className="input-field w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">تصویر هاور</label>
+          <input
+            type="file"
+            onChange={(e) =>
+              setFormData({ ...formData, hover_image_url: e.target.files[0] })
+            }
+            className="input-field w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">تصویر نمایشی</label>
+          <input
+            type="file"
+            onChange={(e) =>
+              setFormData({ ...formData, image: e.target.files[0] })
+            }
+            className="input-field w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">چند تصویر</label>
+          <input
+            type="file"
+            multiple
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                multi_images: Array.from(e.target.files),
+              })
+            }
+            className="input-field w-full"
+          />
+        </div>
+
+        {/* Availability */}
+        <div className="flex items-center gap-2 col-span-2">
+          <input
+            type="checkbox"
+            checked={formData.is_available}
+            onChange={(e) =>
+              setFormData({ ...formData, is_available: e.target.checked })
+            }
+          />
+          <label className="font-medium">در دسترس؟</label>
+        </div>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          className="col-span-2 bg-blue-600 text-white py-2 rounded"
         >
-          <option value="">انتخاب برند</option>
-          {brands?.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Category */}
-      <div>
-        <label className="block mb-1 font-medium">کتگوری</label>
-        <select
-          value={formData.category}
-          onChange={(e) =>
-            setFormData({ ...formData, category: e.target.value })
-          }
-          className="input-field w-full"
-        >
-          <option value="">انتخاب کتگوری</option>
-          {categories?.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Description */}
-      <div>
-        <label className="block mb-1 font-medium">توضیحات</label>
-        <textarea
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-          className="input-field w-full"
-          required
-        />
-      </div>
-
-      {/* Seller Notes */}
-      <div>
-        <label className="block mb-1 font-medium">یادداشت فروشنده</label>
-        <textarea
-          value={formData.seller_notes}
-          onChange={(e) =>
-            setFormData({ ...formData, seller_notes: e.target.value })
-          }
-          className="input-field w-full"
-        />
-      </div>
-
-      {/* Material */}
-      <div>
-        <label className="block mb-1 font-medium">مواد</label>
-        <input
-          type="text"
-          value={formData.material}
-          onChange={(e) =>
-            setFormData({ ...formData, material: e.target.value })
-          }
-          className="input-field w-full"
-        />
-      </div>
-
-      {/* Price */}
-      <div>
-        <label className="block mb-1 font-medium">قیمت</label>
-        <input
-          type="number"
-          value={formData.price}
-          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-          className="input-field w-full"
-          required
-        />
-      </div>
-
-      {/* Stock */}
-      <div>
-        <label className="block mb-1 font-medium">موجودی</label>
-        <input
-          type="number"
-          value={formData.stock}
-          onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-          className="input-field w-full"
-          required
-        />
-      </div>
-
-      {/* Details */}
-      <div>
-        <label className="block mb-1 font-medium">جزییات (با , جدا شود)</label>
-        <input
-          type="text"
-          value={formData.details}
-          onChange={(e) =>
-            setFormData({ ...formData, details: e.target.value })
-          }
-          className="input-field w-full"
-        />
-      </div>
-
-      {/* Tags */}
-      <div>
-        <label className="block mb-1 font-medium">
-          برچسب‌ها (با , جدا شود)
-        </label>
-        <input
-          type="text"
-          value={formData.tags}
-          onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-          className="input-field w-full"
-        />
-      </div>
-
-      {/* Attributes */}
-      <div>
-        <label className="block mb-1 font-medium">ویژگی‌ها (JSON)</label>
-        <input
-          type="text"
-          value={formData.attributes}
-          onChange={(e) =>
-            setFormData({ ...formData, attributes: e.target.value })
-          }
-          className="input-field w-full"
-        />
-      </div>
-
-      {/* Type */}
-      <div>
-        <label className="block mb-1 font-medium">نوع</label>
-        <select
-          value={formData.type}
-          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-          className="input-field w-full"
-        >
-          <option value="ma">مردانه</option>
-          <option value="wo">زنانه</option>
-        </select>
-      </div>
-
-      {/* Condition */}
-      <div>
-        <label className="block mb-1 font-medium">وضعیت</label>
-        <select
-          value={formData.condition}
-          onChange={(e) =>
-            setFormData({ ...formData, condition: e.target.value })
-          }
-          className="input-field w-full"
-        >
-          <option value="New">نو</option>
-          <option value="Use">استفاده‌شده</option>
-          <option value="Other">دیگر</option>
-        </select>
-      </div>
-
-      {/* Images */}
-      <div>
-        <label className="block mb-1 font-medium">تصویر اصلی</label>
-        <input
-          type="file"
-          onChange={(e) =>
-            setFormData({ ...formData, image_url: e.target.files[0] })
-          }
-          className="input-field w-full"
-        />
-      </div>
-
-      <div>
-        <label className="block mb-1 font-medium">تصویر هاور</label>
-        <input
-          type="file"
-          onChange={(e) =>
-            setFormData({ ...formData, hover_image_url: e.target.files[0] })
-          }
-          className="input-field w-full"
-        />
-      </div>
-
-      <div>
-        <label className="block mb-1 font-medium">تصویر نمایشی</label>
-        <input
-          type="file"
-          onChange={(e) =>
-            setFormData({ ...formData, image: e.target.files[0] })
-          }
-          className="input-field w-full"
-        />
-      </div>
-
-      <div>
-        <label className="block mb-1 font-medium">چند تصویر</label>
-        <input
-          type="file"
-          multiple
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              multi_images: Array.from(e.target.files),
-            })
-          }
-          className="input-field w-full"
-        />
-      </div>
-
-      {/* Availability */}
-      <div className="flex items-center gap-2 col-span-2">
-        <input
-          type="checkbox"
-          checked={formData.is_available}
-          onChange={(e) =>
-            setFormData({ ...formData, is_available: e.target.checked })
-          }
-        />
-        <label className="font-medium">در دسترس؟</label>
-      </div>
-
-      {/* Submit */}
-      <button
-        type="submit"
-        className="col-span-2 bg-blue-600 text-white py-2 rounded"
-      >
-        {editingId ? "ویرایش محصول" : "اضافه کردن محصول"}
-      </button>
+          {editingId ? "ویرایش محصول" : "اضافه کردن محصول"}
+        </button>
       </form>
+      {/* Product Table */}
+      <div className="mt-10 overflow-x-auto">
+        <table className="min-w-full table-auto border border-gray-300 text-sm">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border p-2">#</th>
+              <th className="border p-2">نام</th>
+              <th className="border p-2">قیمت</th>
+              <th className="border p-2">موجودی</th>
+              <th className="border p-2">وضعیت</th>
+              <th className="border p-2">عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="text-center p-4">
+                  محصولی یافت نشد
+                </td>
+              </tr>
+            ) : (
+              products.map((product, index) => (
+                <tr key={product.id} className="hover:bg-gray-50">
+                  <td className="border p-2 text-center">{index + 1}</td>
+                  <td className="border p-2">{product.product_name}</td>
+                  <td className="border p-2">{product.price}</td>
+                  <td className="border p-2">{product.stock}</td>
+                  <td className="border p-2">
+                    {product.is_available ? "✅" : "❌"}
+                  </td>
+                  <td className="border p-2 flex justify-center gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingId(product.id);
+                        setFormData({
+                          ...formData,
+                          ...product,
+                          brand: product.brand, // Ensure brand ID is used
+                          category: product.category,
+                          tags: product.tags?.join(", "),
+                          details: product.details?.join(", "),
+                          attributes: JSON.stringify(product.attributes || {}),
+                        });
+                      }}
+                      className="text-blue-500 hover:underline"
+                    >
+                      ویرایش
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="text-red-500 hover:underline"
+                    >
+                      حذف
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
+    </div>
   );
 }

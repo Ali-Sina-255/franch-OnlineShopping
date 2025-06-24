@@ -222,15 +222,15 @@ const Attribute = () => {
   );
 
   return (
-    <div className=" p-4 mt-10 max-w-lg mx-auto bg-white shadow-md rounded-md">
-      <h2 className="text-lg font-bold mb-4">انتخاب کتگوری و ویژگی‌ها</h2>
+    <div className="p-4 mt-10 max-w-lg mx-auto bg-white shadow-md rounded-md">
+      <h2 className="text-lg font-bold mb-4">Select Category and Attribute</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Select Category */}
-
         <div className="relative w-full">
           <label htmlFor="category" className="block font-medium mb-2">
-            کتگوری
+            Category
           </label>
+
           {/* Dropdown Button */}
           <div
             className="bg-gray-200 w-full px-3 py-2 flex justify-between items-center border border-gray-300 rounded-md shadow-sm cursor-pointer"
@@ -238,8 +238,8 @@ const Attribute = () => {
           >
             {selectedCategory
               ? categories.find((cat) => cat.id === selectedCategory)?.name ||
-                "-- لطفاً کتگوری را انتخاب کنید --"
-              : "لطفاً کتگوری را انتخاب کنید"}
+                "-- Please select a category --"
+              : "Please select a category"}
             <FaChevronDown
               className={`transition-all duration-300 ${
                 isDropdownOpen ? "rotate-180" : ""
@@ -249,12 +249,12 @@ const Attribute = () => {
 
           {/* Dropdown List */}
           {isDropdownOpen && (
-            <div className=" w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-10">
+            <div className="w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-10">
               {/* Search Input */}
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="جستجو نمودن کتگوری..."
+                  placeholder="Search categories..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full p-2 border-b pl-10 pr-5 outline-none bg-gray-300 placeholder-gray-700"
@@ -277,7 +277,7 @@ const Attribute = () => {
                   </li>
                 ))}
                 {filteredCategories.length === 0 && (
-                  <li className="p-3 text-gray-500">نتیجه‌ای یافت نشد</li>
+                  <li className="p-3 text-gray-500">No results found</li>
                 )}
               </ul>
             </div>
@@ -290,22 +290,23 @@ const Attribute = () => {
             htmlFor="attribute"
             className="block text-sm font-medium text-gray-700"
           >
-            ویژگی
+            Attribute
           </label>
           <input
             type="text"
             id="attribute"
             value={attribute}
             onChange={(e) => setAttribute(e.target.value)}
-            placeholder="ویژگی را وارد کنید"
+            placeholder="Enter attribute"
             className="mt-1 block w-full p-2 bg-gray-200 border-gray-300 rounded-md shadow-sm focus:ring-green"
             required
           />
         </div>
+
         {/* Submit Button */}
         <div className="flex w-full items-center justify-center">
-          <button type="submit " className="secondry-btn">
-            {editingAttributeId ? "ویرایش" : "ارسال"}
+          <button type="submit" className="secondry-btn">
+            {editingAttributeId ? "Update" : "Submit"}
           </button>
         </div>
       </form>
@@ -313,8 +314,8 @@ const Attribute = () => {
       <table className="min-w-full mt-4 border border-gray-300 rounded-md">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 text-right border-b">نام ویژگی</th>
-            <th className="px-4 py-2 text-right border-b">عملیات</th>
+            <th className="px-4 py-2 text-left border-b">Attribute Name</th>
+            <th className="px-4 py-2 text-left border-b">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -322,8 +323,8 @@ const Attribute = () => {
             shownAttributes.map((attr) => (
               <tr key={attr.id} className="hover:bg-gray-100">
                 <td className="px-4 py-2 border-b">{attr.name}</td>
-                <td className="px-4 py-2 border-b">
-                  <div className="flex gap-x-4 items-center">
+                <td className="px-4 py-2  border-b">
+                  <div className="flex gap-x-4 ">
                     <button
                       onClick={() => handleEdit(attr)}
                       className="text-green-600 hover:scale-105 transition-all duration-300"
@@ -343,7 +344,7 @@ const Attribute = () => {
           ) : (
             <tr>
               <td colSpan="2" className="text-center text-gray-500 py-4">
-                هیچ ویژگی‌ای موجود نیست.
+                No attributes available.
               </td>
             </tr>
           )}

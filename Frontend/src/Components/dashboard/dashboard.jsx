@@ -4,7 +4,7 @@ import { GrGallery } from "react-icons/gr";
 import { MdPermDeviceInformation } from "react-icons/md";
 import { RxArrowLeft, RxArrowRight } from "react-icons/rx";
 import { PiUsersFour } from "react-icons/pi";
-import Tamadon from "../../../public/tamadon.png";
+// import Tamadon from "../../../public/tamadon.png";
 import { MdHome } from "react-icons/md";
 import {
   FaSun,

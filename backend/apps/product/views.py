@@ -1,8 +1,14 @@
-from rest_framework import viewsets
+from rest_framework import generics, permissions, viewsets
 from rest_framework.parsers import FormParser, MultiPartParser
 
-from .models import Product
-from .serializers import ProductSerializer
+from .models import Brand, Product
+from .serializers import BrandSerializer, ProductSerializer
+
+
+class BrandAPIViewSet(generics.ListCreateAPIView):
+    queryset = Brand.objects.all()
+    serializer_class = BrandSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class ProductViewSet(viewsets.ModelViewSet):

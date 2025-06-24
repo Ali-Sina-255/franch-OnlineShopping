@@ -46,6 +46,7 @@ const AccordionFilterSection = ({
               className="w-full mb-4 rounded-xl border border-indigo-200 bg-white py-2 px-3 text-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all duration-200"
             />
           )}
+          
           <div className="space-y-4 max-h-60 overflow-y-auto pr-2">
             {filteredOptions.map((option, index) => (
               <div key={index} className="flex items-center">

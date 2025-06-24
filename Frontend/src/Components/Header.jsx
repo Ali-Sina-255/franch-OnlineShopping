@@ -53,7 +53,7 @@ const Header = ({
                 to="/"
                 className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent"
               >
-                CoolThrift
+                CHIC FRIP
               </Link>
             </div>
 

@@ -18,6 +18,10 @@ class Product(models.Model):
         US = "Use", "Use"
         OTHER = "Other", "Other"
 
+    class TypeChoices(models.TextChoices):
+        M = "ma", "Man"
+        O = "wo", "Woman"
+
     product_name = models.CharField(max_length=255, unique=True)
     sku = models.CharField(max_length=255)
     brand = models.ForeignKey(
@@ -27,9 +31,16 @@ class Product(models.Model):
     description = models.TextField()
     details = models.JSONField(default=list, blank=True)
     tags = TaggableManager()
+    attributes = models.JSONField(default=dict, null=True, blank=True)
+    type = models.CharField(
+        max_length=2,
+        choices=TypeChoices.choices,
+        default=TypeChoices.M,
+    )
     condition = models.CharField(
         max_length=20, choices=ConditionChoices.choices, default=ConditionChoices.NW
     )
+
     price = models.IntegerField()
     stock = models.IntegerField()
     image_url = models.ImageField(upload_to="product/image")

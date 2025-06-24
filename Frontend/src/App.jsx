@@ -4,31 +4,34 @@ import React, { useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 
-import Header from "./components/Header";
-import ProductListPage from "./Pages/ProductListPage";
+import Header from "./Components/Header";
+import Footer from "./Components/Footer"; // Import the new Footer
+import HomePage from "./Pages/HomePage"; // Import the new HomePage
 import ProductDetailPage from "./Pages/ProductDetailPage";
 import CartPage from "./Pages/CartPage";
 import WishlistPage from "./Pages/WishlistPage";
 import QuickViewModal from "./Components/QuickViewModal";
-import CartDrawer from "./Components/CartDrawer"; // ADD THIS IMPORT
+import CartDrawer from "./Components/CartDrawer";
 
 function App() {
+  // All state variables remain the same
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [isCartOpen, setIsCartOpen] = useState(false); // ADD CART DRAWER STATE
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
+  // This effect runs whenever the user navigates to a new page
   React.useEffect(() => {
-    // This effect runs whenever the user navigates to a new page
     if (location.pathname !== "/") {
       setSearchQuery("");
     }
-    setQuickViewProduct(null); // Always close the Quick View modal on navigation
-    setIsCartOpen(false); // Always close the Cart Drawer on navigation
+    setQuickViewProduct(null); // Always close Quick View on navigation
+    setIsCartOpen(false); // Always close Cart Drawer on navigation
   }, [location.pathname]);
 
+  // Handler for adding a product to the cart
   const handleAddToCart = (productToAdd) => {
     if (cart.find((item) => item.id === productToAdd.id)) {
       toast.error(`${productToAdd.name} is already in your bag.`);
@@ -36,14 +39,16 @@ function App() {
     }
     setCart((prevCart) => [...prevCart, productToAdd]);
     toast.success(`${productToAdd.name} added to bag!`);
-    setIsCartOpen(true); // OPEN CART DRAWER ON ADD
+    setIsCartOpen(true);
   };
 
+  // Handler for removing a product from the cart
   const handleRemoveFromCart = (productId) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
     toast.error("Item removed from bag.");
   };
 
+  // Handler for adding/removing a product from the wishlist
   const handleToggleWishlist = (productId) => {
     setWishlist((prevWishlist) => {
       if (prevWishlist.includes(productId)) {
@@ -57,7 +62,8 @@ function App() {
   };
 
   return (
-    <>
+    // We wrap the entire app in a flex container to make the footer sticky
+    <div className="flex flex-col min-h-screen bg-white">
       <Toaster
         position="bottom-center"
         toastOptions={{
@@ -72,7 +78,6 @@ function App() {
         onAddToCart={handleAddToCart}
       />
 
-      {/* RENDER THE CART DRAWER GLOBALLY */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -85,15 +90,18 @@ function App() {
         wishlistCount={wishlist.length}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        onCartClick={() => setIsCartOpen(true)} // PASS DRAWER OPENER FUNCTION
+        onCartClick={() => setIsCartOpen(true)}
       />
 
-      <main>
+      {/* The main content area will grow to fill available space */}
+      <main className="flex-grow">
         <Routes>
+          {/* The root path "/" now renders the HomePage component */}
           <Route
             path="/"
             element={
-              <ProductListPage
+              <HomePage
+                // We pass down all the props that the embedded ProductListPage needs
                 searchQuery={searchQuery}
                 onQuickView={setQuickViewProduct}
                 wishlist={wishlist}
@@ -101,6 +109,7 @@ function App() {
               />
             }
           />
+
           <Route
             path="/product/:id"
             element={
@@ -111,12 +120,14 @@ function App() {
               />
             }
           />
+
           <Route
             path="/cart"
             element={
               <CartPage cartItems={cart} onRemoveItem={handleRemoveFromCart} />
             }
           />
+
           <Route
             path="/wishlist"
             element={
@@ -129,7 +140,10 @@ function App() {
           />
         </Routes>
       </main>
-    </>
+
+      {/* The Footer is now part of the main app layout */}
+      <Footer />
+    </div>
   );
 }
 

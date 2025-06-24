@@ -158,6 +158,7 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+# Simple JWT settings
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": (
         "Bearer",

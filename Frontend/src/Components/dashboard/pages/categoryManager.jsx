@@ -196,20 +196,20 @@ const handleEdit = (category) => {
     <div className="py-10 bg-gray-200 w-full min-h-[91vh] px-5">
       <div className="max-w-3xl mx-auto py-4 px-5 shadow-lg bg-white rounded-md">
         <h2 className="text-xl text-center font-bold mb-4">
-          {editingCategory ? "ویرایش کتگوری" : "افزودن کتگوری"}
+          {editingCategory ? "Edit Category" : "Add New Category"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Category Name */}
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-1">
-              نام کتگوری
+              Category Name
             </label>
             <input
               type="text"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
               className="w-full px-3 py-2 border rounded bg-gray-200 text-black focus:outline-none"
-              placeholder="نام کتگوری را وارد کنید"
+              placeholder="Enter category name"
               required
             />
           </div>
@@ -217,7 +217,7 @@ const handleEdit = (category) => {
           {/* Submit Buttons */}
           <div className="flex justify-center gap-4 mt-4">
             <button type="submit" className="secondry-btn">
-              {editingCategory ? "ویرایش" : "اضافه کردن"}
+              {editingCategory ? "Update" : "Add"}
             </button>
             {editingCategory && (
               <button
@@ -225,7 +225,7 @@ const handleEdit = (category) => {
                 onClick={() => setEditingCategory(null)}
                 className="tertiary-btn"
               >
-                انصراف
+                Cancel
               </button>
             )}
           </div>
@@ -238,12 +238,11 @@ const handleEdit = (category) => {
           <thead>
             <tr className="bg-green text-gray-100 text-center">
               <th className="border border-gray-300 px-6 py-2.5 text-sm font-semibold">
-                نام کتگوری
+                Category Name
               </th>
               <th className="border border-gray-300 px-6 py-2.5 text-sm font-semibold">
-                عملیات
-              </th>{" "}
-            
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -275,6 +274,7 @@ const handleEdit = (category) => {
           </tbody>
         </table>
       </div>
+
       {/* Pagination Component */}
       {totalPages > 1 && (
         <Pagination

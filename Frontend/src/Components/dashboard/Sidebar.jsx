@@ -81,7 +81,7 @@ const Sidebar = ({ setActiveComponent }) => {
   }
 
   return (
-    <div
+    <div 
       className={`h-full transition-all duration-300 ease-in-out w-64 bg-gradient-to-b from-[#2a2185] to-[#3a32a8] overflow-y-auto `}
     >
       <header className="flex items-center gap-5 p-5 text-white font-bold text-xl">

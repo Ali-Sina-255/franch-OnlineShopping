@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useSelector } from "react-redux";
+import AttributeInput from "./AttributeInput";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function ProductManager() {
+  const imageRef = useRef(null);
+  const hoverImageRef = useRef(null);
+  const multiImageRef = useRef(null);
   const token = useSelector((state) => state.user.accessToken);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -94,7 +98,6 @@ export default function ProductManager() {
     });
 
     try {
-      console.log(data);
       if (editingId) {
         await axios.put(
           `${BASE_URL}/api/v1/product/product/${editingId}/`,
@@ -106,6 +109,10 @@ export default function ProductManager() {
           }
         );
         Swal.fire("ویرایش شد", "محصول با موفقیت ویرایش شد", "success");
+        // Clear file inputs visually
+        if (imageRef.current) imageRef.current.value = "";
+        if (hoverImageRef.current) hoverImageRef.current.value = "";
+        if (multiImageRef.current) multiImageRef.current.value = "";
       } else {
         await axios.post(`${BASE_URL}/api/v1/product/product/`, data, {
           headers: {
@@ -114,6 +121,12 @@ export default function ProductManager() {
         });
         Swal.fire("اضافه شد", "محصول با موفقیت اضافه شد", "success");
       }
+      // Clear file inputs visually
+      if (imageRef.current) imageRef.current.value = "";
+      if (hoverImageRef.current) hoverImageRef.current.value = "";
+      if (multiImageRef.current) multiImageRef.current.value = "";
+
+      // ✅ Reset form
       setFormData({
         product_name: "",
         sku: "",
@@ -121,7 +134,7 @@ export default function ProductManager() {
         description: "",
         details: "",
         tags: "",
-        attributes: "",
+        attributes: "", // reset attributes
         type: "ma",
         condition: "New",
         price: 0,
@@ -137,6 +150,11 @@ export default function ProductManager() {
       });
       setEditingId(null);
       fetchProducts();
+
+      // ✅ Clear file input elements
+      if (imageRef.current) imageRef.current.value = "";
+      if (hoverImageRef.current) hoverImageRef.current.value = "";
+      if (multiImageRef.current) multiImageRef.current.value = "";
     } catch (error) {
       console.error(error);
       Swal.fire("خطا", "درخواست ناموفق بود", "error");
@@ -291,18 +309,16 @@ export default function ProductManager() {
           />
         </div>
 
-        {/* Attributes */}
-        <div>
-          <label className="block mb-1 font-medium">ویژگی‌ها (JSON)</label>
-          <input
-            type="text"
-            value={formData.attributes}
-            onChange={(e) =>
-              setFormData({ ...formData, attributes: e.target.value })
-            }
-            className="input-field w-full"
-          />
-        </div>
+        <AttributeInput
+          token={token}
+          categoryId={formData.category}
+          onChange={(val) => {
+            setFormData((prev) => ({
+              ...prev,
+              attributes: JSON.stringify(val),
+            }));
+          }}
+        />
 
         {/* Type */}
         <div>
@@ -338,6 +354,7 @@ export default function ProductManager() {
           <label className="block mb-1 font-medium">تصویر اصلی</label>
           <input
             type="file"
+            ref={imageRef}
             onChange={(e) =>
               setFormData({ ...formData, image_url: e.target.files[0] })
             }
@@ -349,19 +366,9 @@ export default function ProductManager() {
           <label className="block mb-1 font-medium">تصویر هاور</label>
           <input
             type="file"
+            ref={hoverImageRef}
             onChange={(e) =>
               setFormData({ ...formData, hover_image_url: e.target.files[0] })
-            }
-            className="input-field w-full"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">تصویر نمایشی</label>
-          <input
-            type="file"
-            onChange={(e) =>
-              setFormData({ ...formData, image: e.target.files[0] })
             }
             className="input-field w-full"
           />
@@ -371,6 +378,7 @@ export default function ProductManager() {
           <label className="block mb-1 font-medium">چند تصویر</label>
           <input
             type="file"
+            ref={multiImageRef}
             multiple
             onChange={(e) =>
               setFormData({

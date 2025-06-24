@@ -1,28 +1,29 @@
 // src/pages/ProductDetailPage.jsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { products } from "../data/products";
-import { ShieldCheck, AlertTriangle, Tag, Heart } from "lucide-react"; // Import Heart icon
+import { ShieldCheck, AlertTriangle, Tag, Heart } from "lucide-react";
 
-// Component now accepts wishlist and onToggleWishlist props
 const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
   const { id } = useParams();
   const product = products.find((p) => p.id == id);
-
   const [currentImage, setCurrentImage] = useState("");
-
-  // Check if the current product's ID is in the wishlist array
   const isWishlisted = product ? wishlist.includes(product.id) : false;
 
-  // Set the main image when the component loads or the product changes
+  const imageRef = useRef(null); // Create a ref for the image
+
   useEffect(() => {
     if (product) {
       setCurrentImage(product.imageUrl);
     }
   }, [product]);
 
-  // Handle case where no product is found for the given ID
+  const handleAddToCartClick = () => {
+    // Pass the product AND the image element's ref to the handler
+    onAddToCart(product, imageRef);
+  };
+
   if (!product) {
     return (
       <div className="text-center py-20">
@@ -41,10 +42,10 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
-          {/* Image Gallery */}
           <div className="flex flex-col-reverse">
             <div className="aspect-h-1 aspect-w-1 w-full mt-4">
               <img
+                ref={imageRef} // Attach the ref to the main image
                 src={currentImage}
                 alt={product.name}
                 className="h-full w-full object-cover object-center rounded-lg shadow-lg"
@@ -58,7 +59,7 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                     onClick={() => setCurrentImage(image)}
                     className={`relative flex h-24 cursor-pointer items-center justify-center rounded-md bg-white text-sm font-medium uppercase text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring focus:ring-opacity-50 focus:ring-offset-4 ${
                       currentImage === image
-                        ? "ring-2 ring-indigo-500" // Ring color for active thumbnail
+                        ? "ring-2 ring-indigo-500"
                         : "ring-1 ring-gray-300"
                     }`}
                   >
@@ -74,8 +75,6 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
               </div>
             </div>
           </div>
-
-          {/* Product Info Section */}
           <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">
               {product.name}
@@ -86,8 +85,6 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 2
               )}`}</p>
             </div>
-
-            {/* Tags Section */}
             <div className="mt-4 flex items-center flex-wrap gap-2">
               <Tag className="h-5 w-5 text-gray-400" />
               {product.tags.map((tag) => (
@@ -99,8 +96,6 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 </span>
               ))}
             </div>
-
-            {/* Condition Section */}
             <div className="mt-8">
               <div className="flex items-center">
                 <ShieldCheck className="h-6 w-6 text-green-600 mr-2" />
@@ -109,8 +104,6 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 </p>
               </div>
             </div>
-
-            {/* Seller Notes Section (Conditional) */}
             {product.sellerNotes && (
               <div className="mt-4 rounded-lg bg-yellow-50 p-4">
                 <div className="flex">
@@ -131,16 +124,12 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 </div>
               </div>
             )}
-
-            {/* Description Section */}
             <div className="mt-8">
               <h3 className="text-lg font-medium text-gray-900">Description</h3>
               <div className="mt-4 space-y-6 text-base text-gray-700">
                 <p>{product.description}</p>
               </div>
             </div>
-
-            {/* Details List */}
             <div className="mt-8">
               <h3 className="text-lg font-medium text-gray-900">Details</h3>
               <ul
@@ -152,8 +141,6 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 ))}
               </ul>
             </div>
-
-            {/* Color, Material, Size Info */}
             <div className="mt-8 flex justify-between text-sm">
               <div>
                 <span className="font-medium text-gray-900">Color:</span>{" "}
@@ -168,12 +155,10 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 {product.size}
               </div>
             </div>
-
-            {/* Action Buttons: Add to Bag and Wishlist */}
             <div className="mt-10 flex items-center gap-x-4">
               <button
                 type="button"
-                onClick={() => onAddToCart(product)}
+                onClick={handleAddToCartClick} // Use the new handler
                 className="flex-1 flex items-center justify-center rounded-md border border-transparent bg-gray-900 px-8 py-3 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
               >
                 Add to bag

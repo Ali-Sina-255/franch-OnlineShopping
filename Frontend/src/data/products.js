@@ -38,7 +38,7 @@ export const products = [
     id: 2,
     sku: "CT-00002",
     name: "Silk Blouse",
-    brand: "Maje", 
+    brand: "Maje",
     price: 65.5,
     category: "Apparel",
     imageUrl: "./public/1.jpeg",
@@ -72,9 +72,8 @@ export const products = [
     brand: "Jonak",
     price: 120.0,
     category: "Shoes",
-    imageUrl: "./public/image1.jpg",
-    hoverImageUrl:
-      "https://placehold.co/800x1200/D4C5A5/FFFFFF?text=Boots+Side",
+    imageUrl: "./public/562013_2gris_500x.webp",
+    hoverImageUrl: "./public/562062_2gris_500x.webp",
     images: [
       "https://placehold.co/800x1200/C5D4A5/FFFFFF?text=Boots",
       "https://placehold.co/800x1200/D4C5A5/FFFFFF?text=Boots+Side",
@@ -101,9 +100,8 @@ export const products = [
     brand: "Polène",
     price: 250.0,
     category: "Bags",
-    imageUrl: "https://placehold.co/800x1200/D4D4A5/FFFFFF?text=Bag",
-    hoverImageUrl:
-      "https://placehold.co/800x1200/A5D4B4/FFFFFF?text=Bag+Detail",
+    imageUrl: "./public/4.webp",
+    hoverImageUrl: "./public/5.webp",
     images: [
       "https://placehold.co/800x1200/D4D4A5/FFFFFF?text=Bag",
       "https://placehold.co/800x1200/A5D4B4/FFFFFF?text=Bag+Detail",
@@ -132,9 +130,8 @@ export const products = [
     brand: "Levi's",
     price: 95.0,
     category: "Apparel",
-    imageUrl: "https://placehold.co/800x1200/A5B4D4/FFFFFF?text=Jeans+Front",
-    hoverImageUrl:
-      "https://placehold.co/800x1200/D4A5C5/FFFFFF?text=Jeans+Back",
+    imageUrl: "./public/6.webp",
+    hoverImageUrl: "./public/7.webp",
     images: [
       "https://placehold.co/800x1200/A5B4D4/FFFFFF?text=Jeans+Front",
       "https://placehold.co/800x1200/D4A5C5/FFFFFF?text=Jeans+Back",
@@ -160,9 +157,8 @@ export const products = [
     brand: "Sandro",
     price: 180.0,
     category: "Apparel",
-    imageUrl: "https://placehold.co/800x1200/333333/FFFFFF?text=Peacoat",
-    hoverImageUrl:
-      "https://placehold.co/800x1200/555555/FFFFFF?text=Peacoat+Back",
+    imageUrl: "./public/8.webp",
+    hoverImageUrl: "./public/10.webp",
     images: [
       "https://placehold.co/800x1200/333333/FFFFFF?text=Peacoat",
       "https://placehold.co/800x1200/555555/FFFFFF?text=Peacoat+Back",
@@ -190,9 +186,8 @@ export const products = [
     brand: "Tod's",
     price: 150.0,
     category: "Shoes",
-    imageUrl: "https://placehold.co/800x1200/8B4513/FFFFFF?text=Loafers",
-    hoverImageUrl:
-      "https://placehold.co/800x1200/A0522D/FFFFFF?text=Loafers+Top",
+    imageUrl: "./public/12.webp",
+    hoverImageUrl: "./public/13.webp",
     images: [
       "https://placehold.co/800x1200/8B4513/FFFFFF?text=Loafers",
       "https://placehold.co/800x1200/A0522D/FFFFFF?text=Loafers+Top",
@@ -217,7 +212,7 @@ export const products = [
     brand: "Polène",
     price: 250.0,
     category: "Bags",
-    imageUrl: "https://placehold.co/800x1200/D4D4A5/FFFFFF?text=Bag",
+    imageUrl: "./public/90.webp",
     hoverImageUrl:
       "https://placehold.co/800x1200/A5D4B4/FFFFFF?text=Bag+Detail",
     images: [

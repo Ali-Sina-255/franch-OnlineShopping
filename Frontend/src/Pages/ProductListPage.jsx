@@ -1,6 +1,8 @@
 // src/pages/ProductListPage.jsx
-import React, { useState, useEffect, useMemo } from "react";
+
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import ProductCard from "../Components/ProductCard";
+import ProductCardSkeleton from "../Components/ProductCardSkeleton"; // --- 1. IMPORT SKELETON ---
 import Filters from "../Components/Filters";
 import Pagination from "../Components/Pagination";
 import { products as allProducts } from "../data/products";
@@ -9,11 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const ITEMS_PER_PAGE = 9;
 
-const Spinner = () => (
-  <div className="flex justify-center items-center h-96">
-    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
-  </div>
-);
+// --- 2. REMOVE THE OLD SPINNER ---
+// const Spinner = () => ( ... );
 
 const ProductListPage = ({
   searchQuery,
@@ -27,6 +26,8 @@ const ProductListPage = ({
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const sortRef = useRef(null);
 
   const { minPrice, maxPrice } = useMemo(() => {
     if (allProducts.length === 0) return { minPrice: 0, maxPrice: 0 };
@@ -42,6 +43,20 @@ const ProductListPage = ({
   useEffect(() => {
     setPriceRange([minPrice, maxPrice]);
   }, [minPrice, maxPrice]);
+
+  // Close sort dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sortRef.current && !sortRef.current.contains(event.target)) {
+        setIsSortOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleFilterChange = (filterType, value) => {
     setCurrentPage(1);
@@ -115,7 +130,7 @@ const ProductListPage = ({
       );
       setProductsToShow(paginatedProducts);
       setIsLoading(false);
-    }, 300);
+    }, 800); // Increased delay to better see the effect
     return () => clearTimeout(timer);
   }, [
     activeFilters,
@@ -127,6 +142,19 @@ const ProductListPage = ({
     currentPage,
   ]);
 
+  const getSortText = (option) => {
+    switch (option) {
+      case "newest":
+        return "Newest";
+      case "price-asc":
+        return "Price: Low to High";
+      case "price-desc":
+        return "Price: High to Low";
+      default:
+        return "Newest";
+    }
+  };
+
   return (
     <div className="bg-gradient-to-b from-indigo-50/20 to-white">
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -134,54 +162,61 @@ const ProductListPage = ({
           <h1 className="text-4xl font-bold tracking-tight text-indigo-900">
             Premium Secondhand Fashion
           </h1>
-          <div className="flex items-center">
+          <div className="flex items-center" ref={sortRef}>
             <div className="relative inline-block text-left">
               <div>
                 <button
                   type="button"
                   className="group inline-flex justify-center text-sm font-medium text-indigo-700 hover:text-indigo-900"
                   id="menu-button"
-                  aria-expanded="false"
+                  aria-expanded={isSortOpen}
                   aria-haspopup="true"
+                  onClick={() => setIsSortOpen(!isSortOpen)}
                 >
-                  Sort
+                  {getSortText(sortOption)}
                   <ChevronDown
-                    className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-indigo-500 group-hover:text-indigo-700"
+                    className={`-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-indigo-500 group-hover:text-indigo-700 transition-transform ${
+                      isSortOpen ? "rotate-180" : ""
+                    }`}
                     aria-hidden="true"
                   />
                 </button>
               </div>
-              <div
-                className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-indigo-200 ring-opacity-80 focus:outline-none"
-                role="menu"
-                aria-orientation="vertical"
-                aria-labelledby="menu-button"
-                tabIndex="-1"
-              >
-                <div className="py-1" role="none">
-                  {["Newest", "Price: Low to High", "Price: High to Low"].map(
-                    (option) => (
-                      <button
-                        key={option}
-                        className={`block px-4 py-2 text-sm w-full text-left ${
-                          sortOption === option.toLowerCase().replace(/: /g, "-")
-                            ? "bg-indigo-50 text-indigo-700 font-medium"
-                            : "text-gray-700 hover:bg-indigo-50 hover:text-indigo-700"
-                        }`}
-                        role="menuitem"
-                        tabIndex="-1"
-                        onClick={() =>
-                          setSortOption(
-                            option.toLowerCase().replace(/: /g, "-")
-                          )
-                        }
-                      >
-                        {option}
-                      </button>
-                    )
-                  )}
-                </div>
-              </div>
+              <AnimatePresence>
+                {isSortOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-xl bg-white shadow-xl ring-1 ring-indigo-100 focus:outline-none"
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="menu-button"
+                    tabIndex="-1"
+                  >
+                    <div className="py-1" role="none">
+                      {["newest", "price-asc", "price-desc"].map((option) => (
+                        <button
+                          key={option}
+                          className={`block px-4 py-2.5 text-sm w-full text-left ${
+                            sortOption === option
+                              ? "bg-indigo-50 text-indigo-700 font-medium"
+                              : "text-gray-700 hover:bg-indigo-50 hover:text-indigo-700"
+                          }`}
+                          role="menuitem"
+                          tabIndex="-1"
+                          onClick={() => {
+                            setSortOption(option);
+                            setIsSortOpen(false);
+                          }}
+                        >
+                          {getSortText(option)}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -197,8 +232,13 @@ const ProductListPage = ({
               activeFilters={activeFilters}
             />
             <div className="lg:col-span-3">
+              {/* --- 3. THIS IS THE ONLY CHANGE --- */}
               {isLoading ? (
-                <Spinner />
+                <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+                  {[...Array(ITEMS_PER_PAGE)].map((_, i) => (
+                    <ProductCardSkeleton key={i} />
+                  ))}
+                </div>
               ) : (
                 <motion.div layout>
                   <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
@@ -263,4 +303,4 @@ const ProductListPage = ({
   );
 };
 
-export default ProductListPage;
+export default ProductListPage;C

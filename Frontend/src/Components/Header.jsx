@@ -6,13 +6,14 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { filters } from "../data/products";
 
-// --- ACCEPT onCartClick PROP ---
+// Component now accepts the `cartRef` prop
 const Header = ({
   cartCount,
   wishlistCount,
   searchQuery,
   setSearchQuery,
   onCartClick,
+  cartRef, // The new prop for the reference
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -53,7 +54,7 @@ const Header = ({
                 to="/"
                 className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent"
               >
-                CHIC FRIP
+                CoolThrift
               </Link>
             </div>
 
@@ -146,9 +147,8 @@ const Header = ({
                 )}
               </Link>
 
-              {/* --- THIS IS THE ONLY CHANGE --- */}
-              {/* It is now a button that opens the side drawer */}
               <button
+                ref={cartRef} // Attach the ref to the cart button
                 type="button"
                 onClick={onCartClick}
                 className="flex items-center p-2 text-indigo-700 hover:text-indigo-900 transition-colors duration-200"

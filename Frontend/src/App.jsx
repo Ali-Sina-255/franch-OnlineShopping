@@ -1,20 +1,20 @@
 // src/App.jsx
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 
 import Header from "./Components/Header";
-import Footer from "./Components/Footer"; // Import the new Footer
-import HomePage from "./Pages/HomePage"; // Import the new HomePage
+import Footer from "./Components/Footer";
+import HomePage from "./Pages/HomePage";
 import ProductDetailPage from "./Pages/ProductDetailPage";
 import CartPage from "./Pages/CartPage";
 import WishlistPage from "./Pages/WishlistPage";
 import QuickViewModal from "./Components/QuickViewModal";
 import CartDrawer from "./Components/CartDrawer";
+import FlyingImage from "./Components/FlyingImage";
 
 function App() {
-  // All state variables remain the same
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,33 +22,41 @@ function App() {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // This effect runs whenever the user navigates to a new page
+  // State and Ref for the animation
+  const [animationData, setAnimationData] = useState(null);
+  const cartRef = useRef(null);
+
   React.useEffect(() => {
-    if (location.pathname !== "/") {
-      setSearchQuery("");
-    }
-    setQuickViewProduct(null); // Always close Quick View on navigation
-    setIsCartOpen(false); // Always close Cart Drawer on navigation
+    if (location.pathname !== "/") setSearchQuery("");
+    setQuickViewProduct(null);
+    setIsCartOpen(false);
   }, [location.pathname]);
 
-  // Handler for adding a product to the cart
-  const handleAddToCart = (productToAdd) => {
+  const handleAddToCart = (productToAdd, imageRef) => {
     if (cart.find((item) => item.id === productToAdd.id)) {
       toast.error(`${productToAdd.name} is already in your bag.`);
       return;
     }
-    setCart((prevCart) => [...prevCart, productToAdd]);
-    toast.success(`${productToAdd.name} added to bag!`);
-    setIsCartOpen(true);
+
+    // Trigger the animation by setting its data
+    if (imageRef?.current && cartRef?.current) {
+      const startRect = imageRef.current.getBoundingClientRect();
+      const endRect = cartRef.current.getBoundingClientRect();
+      setAnimationData({ startRect, endRect, imgSrc: productToAdd.imageUrl });
+    }
+
+    // Use a small timeout to let the animation start before the cart state updates
+    setTimeout(() => {
+      setCart((prevCart) => [...prevCart, productToAdd]);
+      toast.success(`${productToAdd.name} added to bag!`);
+    }, 150);
   };
 
-  // Handler for removing a product from the cart
   const handleRemoveFromCart = (productId) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
     toast.error("Item removed from bag.");
   };
 
-  // Handler for adding/removing a product from the wishlist
   const handleToggleWishlist = (productId) => {
     setWishlist((prevWishlist) => {
       if (prevWishlist.includes(productId)) {
@@ -62,7 +70,6 @@ function App() {
   };
 
   return (
-    // We wrap the entire app in a flex container to make the footer sticky
     <div className="flex flex-col min-h-screen bg-white">
       <Toaster
         position="bottom-center"
@@ -77,12 +84,16 @@ function App() {
         onClose={() => setQuickViewProduct(null)}
         onAddToCart={handleAddToCart}
       />
-
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cartItems={cart}
         onRemoveItem={handleRemoveFromCart}
+      />
+
+      <FlyingImage
+        animationData={animationData}
+        onAnimationComplete={() => setAnimationData(null)}
       />
 
       <Header
@@ -91,17 +102,15 @@ function App() {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         onCartClick={() => setIsCartOpen(true)}
+        cartRef={cartRef} // Pass the ref down
       />
 
-      {/* The main content area will grow to fill available space */}
       <main className="flex-grow">
         <Routes>
-          {/* The root path "/" now renders the HomePage component */}
           <Route
             path="/"
             element={
               <HomePage
-                // We pass down all the props that the embedded ProductListPage needs
                 searchQuery={searchQuery}
                 onQuickView={setQuickViewProduct}
                 wishlist={wishlist}
@@ -109,7 +118,6 @@ function App() {
               />
             }
           />
-
           <Route
             path="/product/:id"
             element={
@@ -120,14 +128,12 @@ function App() {
               />
             }
           />
-
           <Route
             path="/cart"
             element={
               <CartPage cartItems={cart} onRemoveItem={handleRemoveFromCart} />
             }
           />
-
           <Route
             path="/wishlist"
             element={
@@ -141,10 +147,9 @@ function App() {
         </Routes>
       </main>
 
-      {/* The Footer is now part of the main app layout */}
       <Footer />
     </div>
   );
 }
 
-export default App;
+export default App;C

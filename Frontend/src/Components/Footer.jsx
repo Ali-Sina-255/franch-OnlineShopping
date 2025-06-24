@@ -23,7 +23,10 @@ const Footer = () => {
                 <span className="sr-only">Facebook</span>
                 <Facebook />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a
+                href="https://www.instagram.com/chiqfrip.vibes?igsh=MWZhZ29iajBva2Jybg=="
+                className="text-gray-400 hover:text-white"
+              >
                 <span className="sr-only">Instagram</span>
                 <Instagram />
               </a>
@@ -143,7 +146,7 @@ const Footer = () => {
         </div>
         <div className="mt-12 border-t border-gray-700 pt-8">
           <p className="text-base text-gray-400 xl:text-center">
-            © {new Date().getFullYear()} CoolThrift, Inc. All rights reserved.
+            © {new Date().getFullYear()} TETTEAM, Inc. All rights reserved.
           </p>
         </div>
       </div>

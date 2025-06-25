@@ -13,6 +13,13 @@ import WishlistPage from "./Pages/WishlistPage";
 import QuickViewModal from "./Components/QuickViewModal";
 import CartDrawer from "./Components/CartDrawer";
 import FlyingImage from "./Components/FlyingImage";
+import PrivateRoute from "./Components/common/PrivateRoute";
+import Signin from "./features/authentication/components/Signin";
+import SignUp from "./features/authentication/components/Signup";
+
+import DashboardPage from "./Components/dashboard/DashboardPage";
+import SignUpPage from "./features/authentication/components/Signup";
+
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -144,6 +151,14 @@ function App() {
               />
             }
           />
+
+          <Route element={<PrivateRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
+          <Route path="/" element={<Signin />} />
+          <Route path="/sign-up" element={<SignUp />} />
+
+          <Route path="*" element={<Signin />} />
         </Routes>
       </main>
 
@@ -152,4 +167,4 @@ function App() {
   );
 }
 
-export default App;C
+export default App;

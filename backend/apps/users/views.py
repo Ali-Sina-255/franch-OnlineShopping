@@ -22,5 +22,8 @@ class CustomUserDetailsView(generics.RetrieveUpdateAPIView):
 
 class UserRegisterAPIView(generics.ListCreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = CustomRegisterSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(request=self.request)

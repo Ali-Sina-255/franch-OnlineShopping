@@ -58,9 +58,9 @@ export default function AttributeInput({ token, categoryId, onChange }) {
 
   return (
     <div className="col-span-2 space-y-4">
-      {relevantAttributes.length == 0 ? (
+      {relevantAttributes.length === 0 ? (
         <p className="text-sm text-gray-500">
-          ویژگی‌ای برای این کتگوری موجود نیست.
+          No attributes available for this category.
         </p>
       ) : (
         relevantAttributes.map((attr) => (

@@ -9,6 +9,12 @@ export default function ProductManager() {
   const imageRef = useRef(null);
   const hoverImageRef = useRef(null);
   const multiImageRef = useRef(null);
+  const [previewImages, setPreviewImages] = useState({
+    main: null,
+    hover: null,
+    multi: [],
+  });
+
   const token = useSelector((state) => state.user.accessToken);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -82,6 +88,12 @@ export default function ProductManager() {
     e.preventDefault();
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
+      if (formData.image_url) {
+        data.append("image_url", formData.image_url);
+      }
+      if (formData.hover_image_url) {
+        data.append("hover_image_url", formData.hover_image_url);
+      }      
       if (key === "multi_images") {
         value.forEach((file) => data.append("uploaded_images", file));
       } else if (["tags", "details"].includes(key)) {
@@ -181,11 +193,11 @@ export default function ProductManager() {
   };
 
   return (
-    <div className=" p-4 mt-10 max-w-lg mx-auto bg-white shadow-md rounded-md">
+    <div className="p-4 mt-10 max-w-lg mx-auto bg-white shadow-md rounded-md">
       <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
         {/* Product Name */}
         <div>
-          <label className="block mb-1 font-medium">نام محصول</label>
+          <label className="block mb-1 font-medium">Product Name</label>
           <input
             type="text"
             value={formData.product_name}
@@ -196,9 +208,10 @@ export default function ProductManager() {
             required
           />
         </div>
+
         {/* Category */}
         <div>
-          <label className="block mb-1 font-medium">کتگوری</label>
+          <label className="block mb-1 font-medium">Category</label>
           <select
             value={formData.category}
             onChange={(e) =>
@@ -206,7 +219,7 @@ export default function ProductManager() {
             }
             className="input-field w-full"
           >
-            <option value="">انتخاب کتگوری</option>
+            <option value="">Select Category</option>
             {categories?.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -217,7 +230,7 @@ export default function ProductManager() {
 
         {/* Description */}
         <div>
-          <label className="block mb-1 font-medium">توضیحات</label>
+          <label className="block mb-1 font-medium">Description</label>
           <textarea
             value={formData.description}
             onChange={(e) =>
@@ -230,7 +243,7 @@ export default function ProductManager() {
 
         {/* Seller Notes */}
         <div>
-          <label className="block mb-1 font-medium">یادداشت فروشنده</label>
+          <label className="block mb-1 font-medium">Seller Notes</label>
           <textarea
             value={formData.seller_notes}
             onChange={(e) =>
@@ -242,7 +255,7 @@ export default function ProductManager() {
 
         {/* Material */}
         <div>
-          <label className="block mb-1 font-medium">مواد</label>
+          <label className="block mb-1 font-medium">Material</label>
           <input
             type="text"
             value={formData.material}
@@ -255,7 +268,7 @@ export default function ProductManager() {
 
         {/* Price */}
         <div>
-          <label className="block mb-1 font-medium">قیمت</label>
+          <label className="block mb-1 font-medium">Price</label>
           <input
             type="number"
             value={formData.price}
@@ -269,7 +282,7 @@ export default function ProductManager() {
 
         {/* Stock */}
         <div>
-          <label className="block mb-1 font-medium">موجودی</label>
+          <label className="block mb-1 font-medium">Stock</label>
           <input
             type="number"
             value={formData.stock}
@@ -284,7 +297,7 @@ export default function ProductManager() {
         {/* Details */}
         <div>
           <label className="block mb-1 font-medium">
-            جزییات (با , جدا شود)
+            Details (separated by comma)
           </label>
           <input
             type="text"
@@ -299,7 +312,7 @@ export default function ProductManager() {
         {/* Tags */}
         <div>
           <label className="block mb-1 font-medium">
-            برچسب‌ها (با , جدا شود)
+            Tags (separated by comma)
           </label>
           <input
             type="text"
@@ -309,6 +322,7 @@ export default function ProductManager() {
           />
         </div>
 
+        {/* AttributeInput */}
         <AttributeInput
           token={token}
           categoryId={formData.category}
@@ -322,20 +336,20 @@ export default function ProductManager() {
 
         {/* Type */}
         <div>
-          <label className="block mb-1 font-medium">نوع</label>
+          <label className="block mb-1 font-medium">Type</label>
           <select
             value={formData.type}
             onChange={(e) => setFormData({ ...formData, type: e.target.value })}
             className="input-field w-full"
           >
-            <option value="ma">مردانه</option>
-            <option value="wo">زنانه</option>
+            <option value="ma">Men</option>
+            <option value="wo">Women</option>
           </select>
         </div>
 
         {/* Condition */}
         <div>
-          <label className="block mb-1 font-medium">وضعیت</label>
+          <label className="block mb-1 font-medium">Condition</label>
           <select
             value={formData.condition}
             onChange={(e) =>
@@ -343,15 +357,52 @@ export default function ProductManager() {
             }
             className="input-field w-full"
           >
-            <option value="New">نو</option>
-            <option value="Use">استفاده‌شده</option>
-            <option value="Other">دیگر</option>
+            <option value="New">New</option>
+            <option value="Use">Used</option>
+            <option value="Other">Other</option>
           </select>
         </div>
+        {previewImages.main && (
+          <div>
+            <p className="text-sm text-gray-600">Current Main Image:</p>
+            <img
+              src={previewImages.main}
+              alt="Main"
+              className="h-16 object-cover my-1"
+            />
+          </div>
+        )}
+
+        {previewImages.hover && (
+          <div>
+            <p className="text-sm text-gray-600">Current Hover Image:</p>
+            <img
+              src={previewImages.hover}
+              alt="Hover"
+              className="h-16 object-cover my-1"
+            />
+          </div>
+        )}
+
+        {previewImages.multi.length > 0 && (
+          <div>
+            <p className="text-sm text-gray-600">Current Multi Images:</p>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {previewImages.multi.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={`Multi ${idx}`}
+                  className="h-16 object-cover"
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Images */}
         <div>
-          <label className="block mb-1 font-medium">تصویر اصلی</label>
+          <label className="block mb-1 font-medium">Main Image</label>
           <input
             type="file"
             ref={imageRef}
@@ -363,7 +414,7 @@ export default function ProductManager() {
         </div>
 
         <div>
-          <label className="block mb-1 font-medium">تصویر هاور</label>
+          <label className="block mb-1 font-medium">Hover Image</label>
           <input
             type="file"
             ref={hoverImageRef}
@@ -375,7 +426,7 @@ export default function ProductManager() {
         </div>
 
         <div>
-          <label className="block mb-1 font-medium">چند تصویر</label>
+          <label className="block mb-1 font-medium">Multiple Images</label>
           <input
             type="file"
             ref={multiImageRef}
@@ -399,7 +450,7 @@ export default function ProductManager() {
               setFormData({ ...formData, is_available: e.target.checked })
             }
           />
-          <label className="font-medium">در دسترس؟</label>
+          <label className="font-medium">Available?</label>
         </div>
 
         {/* Submit */}
@@ -407,27 +458,28 @@ export default function ProductManager() {
           type="submit"
           className="col-span-2 bg-blue-600 text-white py-2 rounded"
         >
-          {editingId ? "ویرایش محصول" : "اضافه کردن محصول"}
+          {editingId ? "Update Product" : "Add Product"}
         </button>
       </form>
+
       {/* Product Table */}
       <div className="mt-10 overflow-x-auto">
         <table className="min-w-full table-auto border border-gray-300 text-sm">
           <thead className="bg-gray-100">
             <tr>
               <th className="border p-2">#</th>
-              <th className="border p-2">نام</th>
-              <th className="border p-2">قیمت</th>
-              <th className="border p-2">موجودی</th>
-              <th className="border p-2">وضعیت</th>
-              <th className="border p-2">عملیات</th>
+              <th className="border p-2">Name</th>
+              <th className="border p-2">Price</th>
+              <th className="border p-2">Stock</th>
+              <th className="border p-2">Available</th>
+              <th className="border p-2">Actions</th>
             </tr>
           </thead>
           <tbody>
             {products.length === 0 ? (
               <tr>
-                <td colSpan="7" className="text-center p-4">
-                  محصولی یافت نشد
+                <td colSpan="6" className="text-center p-4">
+                  No products found
                 </td>
               </tr>
             ) : (
@@ -447,22 +499,33 @@ export default function ProductManager() {
                         setFormData({
                           ...formData,
                           ...product,
-                          brand: product.brand, // Ensure brand ID is used
+                          brand: product.brand,
                           category: product.category,
                           tags: product.tags?.join(", "),
                           details: product.details?.join(", "),
                           attributes: JSON.stringify(product.attributes || {}),
                         });
+                        setPreviewImages({
+                          main: product.image_url,
+                          hover: product.hover_image_url,
+                          multi: product.multi_images || [],
+                        });
+                        // Clear file inputs
+                        if (imageRef.current) imageRef.current.value = "";
+                        if (hoverImageRef.current)
+                          hoverImageRef.current.value = "";
+                        if (multiImageRef.current)
+                          multiImageRef.current.value = "";
                       }}
                       className="text-blue-500 hover:underline"
                     >
-                      ویرایش
+                      Edit
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
                       className="text-red-500 hover:underline"
                     >
-                      حذف
+                      Delete
                     </button>
                   </td>
                 </tr>

@@ -65,7 +65,6 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "product_name",
-            "sku",
             "description",
             "details",
             "seller_notes",

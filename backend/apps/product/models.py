@@ -23,7 +23,6 @@ class Product(models.Model):
         O = "wo", "Woman"
 
     product_name = models.CharField(max_length=255, unique=True)
-    sku = models.CharField(max_length=255)
     brand = models.ForeignKey(
         Brand, on_delete=models.PROTECT, related_name="product_brand"
     )

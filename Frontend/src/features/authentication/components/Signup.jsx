@@ -1,4 +1,3 @@
-// frontend/src/pages/Signup.jsx
 import { motion } from "framer-motion";
 import Input from "../components/Input";
 import { Loader, Lock, Mail, User } from "lucide-react";
@@ -8,6 +7,10 @@ import useSignup from "../hooks/useSignup";
 
 const SignUpPage = () => {
   const {
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
     username,
     setUsername,
     email,
@@ -21,24 +24,22 @@ const SignUpPage = () => {
 
   return (
     <div
-      className="w-full h-screen flex justify-center items-center"
+      className="w-full min-h-screen flex justify-center items-center py-8"
       dir="rtl"
       style={{
         backgroundImage: 'url("/eur.png")',
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundAttachment: "fixed",
       }}
     >
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50"
-        style={{ zIndex: 1 }}
-      ></div>
+      <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-md w-full bg-gray-900 bg-opacity-70 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden relative z-10 border border-gray-700"
+        className="max-w-md w-full bg-gray-900/70 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden relative z-20 border border-gray-700"
       >
         <div className="p-8">
           <motion.h2
@@ -51,19 +52,36 @@ const SignUpPage = () => {
           </motion.h2>
 
           <form onSubmit={handleSignup}>
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <Input
-                icon={User}
-                type="text"
-                placeholder="نام کاربری"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </motion.div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <Input
+                  icon={User}
+                  type="text"
+                  placeholder="نام"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
+                <Input
+                  icon={User}
+                  type="text"
+                  placeholder="نام خانوادگی"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </motion.div>
+            </div>
 
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -71,11 +89,27 @@ const SignUpPage = () => {
               transition={{ duration: 0.5, delay: 0.6 }}
             >
               <Input
+                icon={User}
+                type="text"
+                placeholder="نام کاربری"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+            >
+              <Input
                 icon={Mail}
                 type="email"
                 placeholder="آدرس ایمیل"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </motion.div>
 
@@ -90,6 +124,7 @@ const SignUpPage = () => {
                 placeholder="رمز عبور"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </motion.div>
 
@@ -97,25 +132,27 @@ const SignUpPage = () => {
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="text-red-500 font-semibold mt-2"
+                className="text-red-400 font-semibold mt-2 text-sm text-right bg-red-900/50 p-2 rounded-md"
               >
                 {error}
               </motion.p>
             )}
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 1 }}
-            >
-              <PasswordStrengthMeter password={password} />
-            </motion.div>
+            {password && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mt-4"
+              >
+                <PasswordStrengthMeter password={password} />
+              </motion.div>
+            )}
 
             <motion.button
-              className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-700 text-white font-bold rounded-lg shadow-lg hover:from-cyan-600 hover:via-blue-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              className="w-full mt-6 py-3 px-4 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-700 text-white font-bold rounded-lg shadow-lg hover:from-cyan-600 hover:via-blue-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               type="submit"
               disabled={isLoading}
             >
@@ -131,12 +168,15 @@ const SignUpPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 1.2 }}
-          className="px-8 py-4 bg-gray-800 bg-opacity-70 flex justify-center"
+          transition={{ duration: 0.5, delay: 1 }}
+          className="px-8 py-4 bg-gray-800/70 flex justify-center"
         >
           <p className="text-sm text-gray-300">
             حساب دارید؟{" "}
-            <Link to={"/sign-in"} className="text-cyan-400 hover:underline">
+            <Link
+              to={"/sign-in"}
+              className="text-cyan-400 hover:underline font-semibold"
+            >
               ورود
             </Link>
           </p>

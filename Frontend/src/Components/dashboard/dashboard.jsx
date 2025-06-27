@@ -11,7 +11,7 @@ const Dashboard = () => {
 
       {/* Render the FinancialReports component */}
       <div className="mt-6">
-        <FinancialReports />
+        {/* <FinancialReports /> */}
       </div>
     </div>
   );

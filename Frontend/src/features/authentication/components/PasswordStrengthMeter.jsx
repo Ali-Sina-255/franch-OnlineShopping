@@ -10,7 +10,6 @@ const PasswordCriteria = ({ password }) => {
     { label: "حاوی عدد", met: /\d/.test(password) },
     { label: "حاوی کاراکترهای خاص", met: /[^A-Za-z0-9]/.test(password) },
   ];
-
   return (
     <div className="mt-2 space-y-1" dir="rtl">
       {criteria.map((item, index) => (

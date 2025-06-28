@@ -1,6 +1,7 @@
-from apps.category.models import Category
 from django.db import models
 from taggit.managers import TaggableManager
+
+from apps.category.models import Category
 
 
 class Brand(models.Model):
@@ -22,7 +23,7 @@ class Product(models.Model):
         M = "ma", "Man"
         O = "wo", "Woman"
 
-    product_name = models.CharField(max_length=255, unique=True)
+    product_name = models.CharField(max_length=255)
     brand = models.ForeignKey(
         Brand, on_delete=models.PROTECT, related_name="product_brand"
     )
@@ -62,4 +63,5 @@ class MultiProductImages(models.Model):
     )
     image = models.ImageField(upload_to="product/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)

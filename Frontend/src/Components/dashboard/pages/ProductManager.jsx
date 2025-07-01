@@ -3,7 +3,6 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useSelector } from "react-redux";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-
 export default function ProductManager() {
   const token = useSelector((state) => state.user.accessToken);
   const [products, setProducts] = useState([]);
@@ -83,7 +82,6 @@ export default function ProductManager() {
         data.append(key, value);
       }
     });
-
     try {
       if (editingId) {
         await axios.put(
@@ -104,6 +102,7 @@ export default function ProductManager() {
         });
         Swal.fire("اضافه شد", "محصول با موفقیت اضافه شد", "success");
       }
+      
       setFormData({
         product_name: "",
         sku: "",
@@ -408,7 +407,6 @@ export default function ProductManager() {
         <label className="font-medium">در دسترس؟</label>
       </div>
 
-      {/* Submit */}
       <button
         type="submit"
         className="col-span-2 bg-blue-600 text-white py-2 rounded"

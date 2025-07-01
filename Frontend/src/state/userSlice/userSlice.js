@@ -25,10 +25,7 @@ const initialState = {
   loading: false,
 };
 
-/**
- * ASYNC THUNK: User Registration
- * Corresponds to your backend's `/api/v1/auth/register/` endpoint.
- */
+
 export const createUser = createAsyncThunk(
   "user/createUser",
   async (userData, { rejectWithValue }) => {
@@ -66,9 +63,12 @@ export const signIn = createAsyncThunk(
       // Step 2: Use the access token to get user details.
       // NOTE: Ensure '/api/user/' is a valid endpoint in your Django urls.py
       // pointing to a view like `CustomUserDetailsView`.
-      const userDetailsResponse = await axios.get(`${BASE_URL}/api/user/`, {
-        headers: { Authorization: `Bearer ${access}` },
-      });
+      const userDetailsResponse = await axios.get(
+        `${BASE_URL}/api/v1/auth/register/`,
+        {
+          headers: { Authorization: `Bearer ${access}` },
+        }
+      );
 
       return {
         accessToken: access,
@@ -128,10 +128,8 @@ const userSlice = createSlice({
       state.error = null;
     },
   },
-  // Handles state changes for asynchronous actions
   extraReducers: (builder) => {
     builder
-      // Sign In Reducers
       .addCase(signIn.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -148,15 +146,12 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Create User (Registration) Reducers
       .addCase(createUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(createUser.fulfilled, (state) => {
         state.loading = false;
-        // Successful registration, but we don't log the user in here.
-        // The user is redirected to the login page by the UI.
       })
       .addCase(createUser.rejected, (state, action) => {
         state.loading = false;

@@ -414,6 +414,7 @@ export default function ProductManager() {
         {editingId ? "ویرایش محصول" : "اضافه کردن محصول"}
       </button>
       </form>
-      </div>
+    </div>
+    // new chenges 
   );
 }

@@ -22,7 +22,7 @@ const AccordionFilterSection = ({
       <h3 className="-my-3 flow-root">
         <button
           type="button"
-          className="flex w-full items-center justify-between bg-white py-3 text-sm text-indigo-400 hover:text-indigo-600 transition-colors duration-150"
+          className="flex w-full items-center justify-between bg-white py-3 px-2 rounded-md text-sm text-indigo-400 hover:text-indigo-600 transition-colors duration-150"
           onClick={() => setIsOpen(!isOpen)}
         >
           <span className="font-medium text-indigo-900">{title}</span>

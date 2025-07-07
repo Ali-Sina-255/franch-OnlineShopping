@@ -52,7 +52,7 @@ body {
 }
 
 /* Scrollbar styling for the main page */
-body::-webkit-scrollbar {
+/* body::-webkit-scrollbar {
   width: 10px;
 }
 
@@ -63,7 +63,7 @@ body::-webkit-scrollbar-thumb {
 
 body::-webkit-scrollbar-track {
   background-color: #8a93a7;
-}
+} */
 
 /* custome style for paganition on  */
 .custom-pagination .swiper-pagination-bullet {

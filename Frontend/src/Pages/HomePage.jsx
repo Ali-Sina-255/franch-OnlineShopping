@@ -152,34 +152,6 @@ const HomePage = (props) => {
             ))}
           </div>
         </div>
-
-        {/* Scroll Indicator */}
-        {animationComplete && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
-            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10"
-          >
-            <div className="animate-bounce flex flex-col items-center">
-              <span className="text-xs text-white/80 mb-1">Scroll</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-white/80"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                />
-              </svg>
-            </div>
-          </motion.div>
-        )}
       </div>
 
       <div id="product-grid">

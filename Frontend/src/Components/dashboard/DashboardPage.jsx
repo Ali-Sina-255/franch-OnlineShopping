@@ -12,7 +12,7 @@ const Dashboard = () => {
       </div>
 
       <div className="flex flex-col flex-1 h-screen overflow-hidden">
-        <Navbar />
+        {/* <Navbar /> */}
         <main className="flex-1 overflow-y-auto   custom-scrollbar">
           <MainContent activeComponent={activeComponent} />
         </main>

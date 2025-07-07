@@ -48,7 +48,7 @@ const Sidebar = ({ setActiveComponent }) => {
     { name: "category management", value: "category", icon: <LucideUserRoundPlus /> },
     { name: "attribute management", value: "attribute", icon: <FaBuilding /> },
     { name: "products", value: "products", icon: <MdLocalLaundryService /> },
-    // { name: "کرایه‌", value: "proflie", icon: <GiTakeMyMoney /> },
+    { name: "profile", value: "proflie", icon: <GiTakeMyMoney /> },
   
     { name: "logout", value: "signout", icon: <FaSignOutAlt /> },
   ];
@@ -90,12 +90,12 @@ const Sidebar = ({ setActiveComponent }) => {
         </div>
 
         <span className="text-lg font-semibold  text-white whitespace-nowrap">
-         Chiqfrip
+          CHIQ FRIP
         </span>
       </header>
 
       <ul className=" mr-1">
-        {AllComponents .map((component, index) => (
+        {AllComponents.map((component, index) => (
           <li key={index} className="relative group cursor-pointer">
             {component.value === "signout" ? (
               <a

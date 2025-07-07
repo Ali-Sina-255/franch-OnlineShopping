@@ -1,24 +1,34 @@
-// src/components/Header.jsx
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, User, ShoppingBag, Menu, X, Heart } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { filters } from "../data/products";
 
-// Component now accepts the `cartRef` prop
+
+
 const Header = ({
   cartCount,
   wishlistCount,
   searchQuery,
   setSearchQuery,
   onCartClick,
-  cartRef, // The new prop for the reference
+  cartRef,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isShopMenuOpen, setShopMenuOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -36,9 +46,16 @@ const Header = ({
 
   return (
     <>
-      <header className="bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm border-b border-indigo-100 sticky top-0 z-30">
+      <header
+        className={`sticky top-0 z-30 transition-all duration-300 ${
+          isScrolled
+            ? "bg-white/80 backdrop-blur-lg border-b border-indigo-100 shadow-sm"
+            : "bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm border-b border-indigo-100"
+        }`}
+      >
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
+            {/* Mobile menu button */}
             <div className="flex items-center lg:hidden">
               <button
                 onClick={() => setMobileMenuOpen(true)}
@@ -67,7 +84,9 @@ const Header = ({
               >
                 <Link
                   to="/"
-                  className="text-sm font-medium text-indigo-900 ml-4 hover:text-indigo-600 transition-colors duration-200 flex items-center"
+                  className={`text-sm font-medium ${
+                    isScrolled ? "text-indigo-800" : "text-indigo-900"
+                  } ml-4 hover:text-indigo-600 transition-colors duration-200 flex items-center`}
                 >
                   Shop
                 </Link>
@@ -100,13 +119,17 @@ const Header = ({
               </div>
               <a
                 href="#"
-                className="text-sm font-medium text-indigo-900 hover:text-indigo-600 transition-colors duration-200"
+                className={`text-sm font-medium ${
+                  isScrolled ? "text-indigo-800" : "text-indigo-900"
+                } hover:text-indigo-600 transition-colors duration-200`}
               >
                 New Arrivals
               </a>
               <a
                 href="#"
-                className="text-sm font-medium text-indigo-900 hover:text-indigo-600 transition-colors duration-200"
+                className={`text-sm font-medium ${
+                  isScrolled ? "text-indigo-800" : "text-indigo-900"
+                } hover:text-indigo-600 transition-colors duration-200`}
               >
                 Brands
               </a>
@@ -148,7 +171,7 @@ const Header = ({
               </Link>
 
               <button
-                ref={cartRef} // Attach the ref to the cart button
+                ref={cartRef}
                 type="button"
                 onClick={onCartClick}
                 className="flex items-center p-2 text-indigo-700 hover:text-indigo-900 transition-colors duration-200"
@@ -164,8 +187,10 @@ const Header = ({
           </div>
         </nav>
       </header>
-
+    
       {/* Mobile Menu Slide-out */}
+
+
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>

@@ -22,7 +22,6 @@ class CustomUserManager(BaseUserManager):
             self.email_validator(email)
         else:
             raise ValueError(_("Users must have an email address."))
-
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
 

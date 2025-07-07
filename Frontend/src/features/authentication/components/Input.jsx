@@ -11,6 +11,7 @@ const Input = ({ icon: Icon, ...props }) => {
         {...props}
         className="w-full pl-10 pr-3 py-2 bg-gray-900 bg-opacity-70 rounded-lg border border-gray-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 text-white placeholder-gray-400 transition duration-200"
       />
+
     </div>
   );
 };

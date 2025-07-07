@@ -56,14 +56,14 @@ const HomePage = (props) => {
   return (
     <div className="relative">
       {/* --- Modern Hero Slider --- */}
-      <div className="relative h-screen max-h-[800px] w-full overflow-hidden">
+      <div className="relative h-screen max-h-[600px] w-full overflow-hidden">
         <AnimatePresence initial={false}>
           <motion.div
             key={currentSlide}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: [0.6, 0.05, -0.01, 0.9] }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
             className="absolute inset-0 w-full h-full"
             style={{
               backgroundImage: `${slides[currentSlide].overlay}, url(${slides[currentSlide].image})`,
@@ -82,7 +82,7 @@ const HomePage = (props) => {
               transition={{
                 delay: 0.3,
                 duration: 0.8,
-                ease: [0.6, 0.05, -0.01, 0.9],
+                ease: "easeOut",
               }}
               className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight"
             >
@@ -96,7 +96,7 @@ const HomePage = (props) => {
               transition={{
                 delay: 0.6,
                 duration: 0.8,
-                ease: [0.6, 0.05, -0.01, 0.9],
+                ease: "easeOut",
               }}
               className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-10"
             >
@@ -110,7 +110,7 @@ const HomePage = (props) => {
               transition={{
                 delay: 0.9,
                 duration: 0.5,
-                ease: [0.6, 0.05, -0.01, 0.9],
+                ease: "easeOut",
               }}
             >
               <a

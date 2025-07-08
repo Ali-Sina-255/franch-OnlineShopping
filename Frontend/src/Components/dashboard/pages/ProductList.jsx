@@ -7,7 +7,6 @@ import { IoTrashSharp } from "react-icons/io5";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-// This component now takes 'setCurrentView' to control the parent dashboard's state
 export default function ProductList({ setCurrentView }) {
   const token = useSelector((state) => state.user.accessToken);
 

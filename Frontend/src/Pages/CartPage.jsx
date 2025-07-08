@@ -105,6 +105,7 @@ const CartPage = ({ cartItems, onRemoveItem }) => {
             </ul>
           </section>
 
+
           {/* Order summary */}
           <section
             aria-labelledby="summary-heading"
@@ -160,3 +161,5 @@ const CartPage = ({ cartItems, onRemoveItem }) => {
 };
 
 export default CartPage;
+
+

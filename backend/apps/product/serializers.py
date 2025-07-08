@@ -76,6 +76,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "category",
             "material",
             "attributes",
+            "condition",
             "type",
             "image_url",
             "hover_image_url",

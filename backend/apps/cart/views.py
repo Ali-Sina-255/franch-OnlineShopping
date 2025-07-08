@@ -3,6 +3,7 @@ import uuid
 from django.db.models import F, Sum, Value
 from django.db.models.functions import Coalesce
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Cart, CartItem
@@ -23,6 +24,9 @@ class CartListCreateView(generics.ListCreateAPIView):
         )
 
     def perform_create(self, serializer):
+        user = self.request.user
+        if Cart.objects.filter(user=user).exists():
+            raise ValidationError("Cart already exists for this user.")
         serializer.save()
 
 

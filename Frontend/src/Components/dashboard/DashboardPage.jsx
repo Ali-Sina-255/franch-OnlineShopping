@@ -1,19 +1,20 @@
+// Dashboard.js
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
 import MainContent from "./MainContent";
 
 const Dashboard = () => {
-  const [activeComponent, setActiveComponent] = useState(null);
+  const [activeComponent, setActiveComponent] = useState("dashboard");
+
   return (
-    <div className="flex h-screen w-full overflow-hidden">
-      <div className="h-screen flex-shrink-0">
-        <Sidebar setActiveComponent={setActiveComponent} />
-      </div>
+    <div className="flex h-screen w-full overflow-hidden bg-gray-50">
+      <Sidebar
+        setActiveComponent={setActiveComponent}
+        activeComponent={activeComponent}
+      />
 
       <div className="flex flex-col flex-1 h-screen overflow-hidden">
-        {/* <Navbar /> */}
-        <main className="flex-1 overflow-y-auto   custom-scrollbar">
+        <main className="flex-1 overflow-y-auto custom-scrollbar p-4">
           <MainContent activeComponent={activeComponent} />
         </main>
       </div>

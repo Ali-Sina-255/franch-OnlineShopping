@@ -6,6 +6,7 @@ import Dashboard from "./dashboard";
 import Profile from "../../Pages/dashboard/Profiles.jsx";
 import Attribute from "./pages/attribute.jsx";
 import ProductManager from "./pages/ProductManager.jsx";
+import ProductList from './pages/ProductList.jsx';
 
 const MainContent = ({ activeComponent }) => {
   const renderContent = () => {
@@ -18,12 +19,13 @@ const MainContent = ({ activeComponent }) => {
         return <Attribute />;
       case "products":
         return <ProductManager />;
+      case "porductlist":
+        return <ProductList />;
       // case "report":
       //   return <Report />;
       case "proflie":
         return <Profile />;
-    
-   
+
       default:
         return <Dashboard />;
     }

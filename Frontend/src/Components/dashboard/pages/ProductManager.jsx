@@ -1,28 +1,26 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useSelector } from "react-redux";
+import AttributeInput from "./AttributeInput";
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default function ProductManager() {
   const token = useSelector((state) => state.user.accessToken);
-  const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [brands, setBrands] = useState([]);
   const [formData, setFormData] = useState({
     product_name: "",
-    sku: "",
-    brand: "",
     description: "",
     details: "",
     tags: "",
-    attributes: "",
-    type: "ma",
-    condition: "New",
-    price: 0,
-    stock: 0,
+    attributes: "{}",
+    type: "ma", 
+    condition: "New", 
+    price: "",
+    stock: "",
     image_url: null,
     hover_image_url: null,
-    image: null,
     seller_notes: "",
     material: "",
     is_available: true,
@@ -31,186 +29,122 @@ export default function ProductManager() {
   });
   const [editingId, setEditingId] = useState(null);
 
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-    fetchBrands();
-  }, []);
 
-  const fetchProducts = async () => {
-    const res = await axios.get(`${BASE_URL}/api/v1/product/product/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setProducts(res.data);
-  };
+  useEffect(() => {
+    if (token) {
+      fetchCategories();
+    }
+  }, [token]);
 
   const fetchCategories = async () => {
-    const res = await axios.get(`${BASE_URL}/api/v1/category/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setCategories(res.data.results);
+    try {
+      const res = await axios.get(`${BASE_URL}/api/v1/category/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCategories(res.data.results || []);
+    } catch (error) {
+      console.error("Error fetching categories", error);
+    }
   };
 
-  const fetchBrands = async () => {
-    const res = await axios.get(`${BASE_URL}/api/v1/product/brand/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setBrands(res.data);
+  const handleFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    if (name === "multi_images") {
+      setFormData((prev) => ({ ...prev, [name]: Array.from(files) }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    }
+  };
+
+  const handleAttributeChange = (attributeValues) => {
+    setFormData((prev) => ({
+      ...prev,
+      attributes: JSON.stringify(attributeValues),
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      if (key === "multi_images") {
+      if (key === "multi_images" && Array.isArray(value)) {
         value.forEach((file) => data.append("uploaded_images", file));
-      } else if (["tags", "details"].includes(key)) {
-        data.append(key, JSON.stringify(value.split(",").map((i) => i.trim())));
-      } else if (key === "attributes") {
-        try {
-          data.append("attributes", JSON.stringify(JSON.parse(value)));
-        } catch {
-          data.append("attributes", JSON.stringify({}));
-        }
-      } else {
+      } else if (key === "details") {
+        const detailList = value
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean);
+        data.append(key, JSON.stringify(detailList));
+      } else if (value !== null && value !== undefined) {
         data.append(key, value);
       }
     });
+
+    const url = editingId
+      ? `${BASE_URL}/api/v1/product/product/${editingId}/`
+      : `${BASE_URL}/api/v1/product/product/`;
+    const method = editingId ? "put" : "post";
+
     try {
-      if (editingId) {
-        await axios.put(
-          `${BASE_URL}/api/v1/product/product/${editingId}/`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        Swal.fire("ویرایش شد", "محصول با موفقیت ویرایش شد", "success");
-      } else {
-        await axios.post(`${BASE_URL}/api/v1/product/product/`, data, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        Swal.fire("اضافه شد", "محصول با موفقیت اضافه شد", "success");
-      }
-
-      setFormData({
-        product_name: "",
-        sku: "",
-        brand: "",
-        description: "",
-        details: "",
-        tags: "",
-        attributes: "",
-        type: "ma",
-        condition: "New",
-        price: 0,
-        stock: 0,
-        image_url: null,
-        hover_image_url: null,
-        image: null,
-        seller_notes: "",
-        material: "",
-        is_available: true,
-        category: "",
-        multi_images: [],
-      });
-      setEditingId(null);
-      fetchProducts();
-    } catch (error) {
-      console.error(error);
-      Swal.fire("خطا", "درخواست ناموفق بود", "error");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: "آیا مطمئن هستید؟",
-      text: "این عملیات قابل بازگشت نیست!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "بله، حذف کن",
-    });
-    if (result.isConfirmed) {
-      await axios.delete(`${BASE_URL}/api/v1/product/product/${id}/`, {
+      await axios[method](url, data, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
-      Swal.fire("حذف شد", "محصول با موفقیت حذف شد", "success");
-      fetchProducts();
+      Swal.fire(
+        "Success!",
+        `Product successfully ${editingId ? "updated" : "added"}.`,
+        "success"
+      );
+      setEditingId(null);
+    } catch (error) {
+      console.error("Product submission error:", error.response?.data || error);
+      Swal.fire(
+        "Error",
+        "Submission failed. Check the developer console and backend server logs for more details.",
+        "error"
+      );
     }
   };
 
   return (
-    <div className=" p-4 mt-10 max-w-lg mx-auto bg-white shadow-md rounded-md">
+    <div className="p-4 mt-10 max-w-4xl mx-auto bg-white shadow-md rounded-md">
+      <h2 className="text-2xl font-bold text-center mb-6">
+        {editingId ? "Edit Product" : "Add New Product"}
+      </h2>
       <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
-        {/* Product Name */}
         <div>
-          <label className="block mb-1 font-medium">نام محصول</label>
+          <label className="block mb-1 font-medium">Product Name</label>
           <input
             type="text"
+            name="product_name"
             value={formData.product_name}
-            onChange={(e) =>
-              setFormData({ ...formData, product_name: e.target.value })
-            }
+            onChange={handleFormChange}
             className="input-field w-full"
             required
           />
         </div>
 
-        {/* SKU */}
         <div>
-          <label className="block mb-1 font-medium">شناسه انبار</label>
-          <input
-            type="text"
-            value={formData.sku}
-            onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-            className="input-field w-full"
-            required
-          />
-        </div>
-
-        {/* Brand */}
-        <div>
-          <label className="block mb-1 font-medium">برند</label>
+          <label className="block mb-1 font-medium">Category</label>
           <select
-            value={formData.brand}
-            onChange={(e) =>
-              setFormData({ ...formData, brand: e.target.value })
-            }
-            className="input-field w-full"
-          >
-            <option value="">انتخاب برند</option>
-            {brands?.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Category */}
-        <div>
-          <label className="block mb-1 font-medium">کتگوری</label>
-          <select
+            name="category"
             value={formData.category}
-            onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
-            }
+            onChange={handleFormChange}
             className="input-field w-full"
+            required
           >
-            <option value="">انتخاب کتگوری</option>
-            {categories?.map((c) => (
+            <option value="">Select Category</option>
+            {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
@@ -218,211 +152,185 @@ export default function ProductManager() {
           </select>
         </div>
 
-        {/* Description */}
         <div>
-          <label className="block mb-1 font-medium">توضیحات</label>
-          <textarea
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            className="input-field w-full"
-            required
-          />
-        </div>
-
-        {/* Seller Notes */}
-        <div>
-          <label className="block mb-1 font-medium">یادداشت فروشنده</label>
-          <textarea
-            value={formData.seller_notes}
-            onChange={(e) =>
-              setFormData({ ...formData, seller_notes: e.target.value })
-            }
-            className="input-field w-full"
-          />
-        </div>
-
-        {/* Material */}
-        <div>
-          <label className="block mb-1 font-medium">مواد</label>
-          <input
-            type="text"
-            value={formData.material}
-            onChange={(e) =>
-              setFormData({ ...formData, material: e.target.value })
-            }
-            className="input-field w-full"
-          />
-        </div>
-
-        {/* Price */}
-        <div>
-          <label className="block mb-1 font-medium">قیمت</label>
+          <label className="block mb-1 font-medium">Price</label>
           <input
             type="number"
+            name="price"
             value={formData.price}
-            onChange={(e) =>
-              setFormData({ ...formData, price: e.target.value })
-            }
+            onChange={handleFormChange}
             className="input-field w-full"
             required
           />
         </div>
 
-        {/* Stock */}
         <div>
-          <label className="block mb-1 font-medium">موجودی</label>
+          <label className="block mb-1 font-medium">Stock Quantity</label>
           <input
             type="number"
+            name="stock"
             value={formData.stock}
-            onChange={(e) =>
-              setFormData({ ...formData, stock: e.target.value })
-            }
+            onChange={handleFormChange}
             className="input-field w-full"
             required
           />
         </div>
 
-        {/* Details */}
         <div>
-          <label className="block mb-1 font-medium">
-            جزییات (با , جدا شود)
-          </label>
-          <input
-            type="text"
-            value={formData.details}
-            onChange={(e) =>
-              setFormData({ ...formData, details: e.target.value })
-            }
-            className="input-field w-full"
-          />
-        </div>
-
-        {/* Tags */}
-        <div>
-          <label className="block mb-1 font-medium">
-            برچسب‌ها (با , جدا شود)
-          </label>
-          <input
-            type="text"
-            value={formData.tags}
-            onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-            className="input-field w-full"
-          />
-        </div>
-
-        {/* Attributes */}
-        <div>
-          <label className="block mb-1 font-medium">ویژگی‌ها (JSON)</label>
-          <input
-            type="text"
-            value={formData.attributes}
-            onChange={(e) =>
-              setFormData({ ...formData, attributes: e.target.value })
-            }
-            className="input-field w-full"
-          />
-        </div>
-
-        {/* Type */}
-        <div>
-          <label className="block mb-1 font-medium">نوع</label>
+          <label className="block mb-1 font-medium">Type</label>
           <select
+            name="type"
             value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+            onChange={handleFormChange}
             className="input-field w-full"
+            required
           >
-            <option value="ma">مردانه</option>
-            <option value="wo">زنانه</option>
+            <option value="ma">Man</option>
+            <option value="wo">Woman</option>
           </select>
         </div>
 
-        {/* Condition */}
         <div>
-          <label className="block mb-1 font-medium">وضعیت</label>
+          <label className="block mb-1 font-medium">Condition</label>
           <select
+            name="condition"
             value={formData.condition}
-            onChange={(e) =>
-              setFormData({ ...formData, condition: e.target.value })
-            }
+            onChange={handleFormChange}
             className="input-field w-full"
+            required
           >
-            <option value="New">نو</option>
-            <option value="Use">استفاده‌شده</option>
-            <option value="Other">دیگر</option>
+            <option value="New">New</option>
+            <option value="Use">Use</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 
-        {/* Images */}
-        <div>
-          <label className="block mb-1 font-medium">تصویر اصلی</label>
+        <div className="col-span-2">
+          <label className="block mb-1 font-medium">Material</label>
           <input
-            type="file"
-            onChange={(e) =>
-              setFormData({ ...formData, image_url: e.target.files[0] })
-            }
+            type="text"
+            name="material"
+            value={formData.material}
+            onChange={handleFormChange}
             className="input-field w-full"
+            required
           />
         </div>
 
-        <div>
-          <label className="block mb-1 font-medium">تصویر هاور</label>
+        <div className="col-span-2">
+          <label className="block mb-1 font-medium">
+            Tags (comma-separated)
+          </label>
           <input
-            type="file"
-            onChange={(e) =>
-              setFormData({ ...formData, hover_image_url: e.target.files[0] })
-            }
+            type="text"
+            name="tags"
+            value={formData.tags}
+            onChange={handleFormChange}
             className="input-field w-full"
+            placeholder="e.g. summer, casual, cotton"
           />
         </div>
 
-        <div>
-          <label className="block mb-1 font-medium">تصویر نمایشی</label>
-          <input
-            type="file"
-            onChange={(e) =>
-              setFormData({ ...formData, image: e.target.files[0] })
-            }
+        <div className="col-span-2">
+          <label className="block mb-1 font-medium">Description</label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleFormChange}
             className="input-field w-full"
+            rows="4"
+            required
           />
         </div>
 
-        <div>
-          <label className="block mb-1 font-medium">چند تصویر</label>
+        <div className="col-span-2">
+          <label className="block mb-1 font-medium">
+            Details (comma-separated list)
+          </label>
           <input
-            type="file"
-            multiple
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                multi_images: Array.from(e.target.files),
-              })
-            }
+            type="text"
+            name="details"
+            value={formData.details}
+            onChange={handleFormChange}
             className="input-field w-full"
+            placeholder="e.g. 100% Cotton, Machine Washable"
           />
         </div>
 
-        {/* Availability */}
+        <div className="col-span-2">
+          <label className="block mb-1 font-medium">Seller Notes</label>
+          <textarea
+            name="seller_notes"
+            value={formData.seller_notes}
+            onChange={handleFormChange}
+            className="input-field w-full"
+            rows="3"
+            required
+          />
+        </div>
+
+        <AttributeInput
+          categoryId={formData.category}
+          onAttributeChange={handleAttributeChange}
+        />
+
+        <div className="col-span-2 p-4 border rounded-md space-y-4">
+          <h3 className="font-medium text-lg">Product Images</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-1 font-medium">
+                Main Image (image_url)
+              </label>
+              <input
+                type="file"
+                name="image_url"
+                onChange={handleFileChange}
+                className="input-field w-full"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-medium">
+                Hover Image (hover_image_url)
+              </label>
+              <input
+                type="file"
+                name="hover_image_url"
+                onChange={handleFileChange}
+                className="input-field w-full"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-medium">
+                Additional Images (for Gallery)
+              </label>
+              <input
+                type="file"
+                name="multi_images"
+                multiple
+                onChange={handleFileChange}
+                className="input-field w-full"
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="flex items-center gap-2 col-span-2">
           <input
             type="checkbox"
+            name="is_available"
             checked={formData.is_available}
-            onChange={(e) =>
-              setFormData({ ...formData, is_available: e.target.checked })
-            }
+            onChange={handleFormChange}
+            className="h-5 w-5"
           />
-          <label className="font-medium">در دسترس؟</label>
+          <label className="font-medium">
+            Is this product available for sale?
+          </label>
         </div>
 
-        <button
-          type="submit"
-          className="col-span-2 bg-blue-600 text-white py-2 rounded"
-        >
-          {editingId ? "ویرایش محصول" : "اضافه کردن محصول"}
+        <button type="submit" className="col-span-2 primary-btn">
+          {editingId ? "Update Product" : "Add Product"}
         </button>
       </form>
     </div>
-    // new chenges
   );
 }

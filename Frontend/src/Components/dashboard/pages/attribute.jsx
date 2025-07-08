@@ -1,355 +1,417 @@
 import React, { useState, useEffect } from "react";
-import { FaChevronDown, FaSearch } from "react-icons/fa";
+import { FaChevronDown, FaSearch, FaRegEdit } from "react-icons/fa";
+import { IoTrashSharp } from "react-icons/io5";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { IoTrashSharp } from "react-icons/io5";
-import { FaRegEdit } from "react-icons/fa";
 import { useSelector } from "react-redux";
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+const ATTRIBUTE_TYPE_CHOICES = ["dropdown", "input", "date", "checkbox"];
 
 const Attribute = () => {
   const token = useSelector((state) => state.user.accessToken);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [attributeTypes, setAttributeTypes] = useState([
-    "dropdown",
-    "input",
-    "date",
-    "checkbox",
-  ]);
-  const [attribute, setAttribute] = useState("");
-  const [shownAttributes, setShownAttributes] = useState([]);
-  const [type, setType] = useState("");
-  const [editingAttributeId, setEditingAttributeId] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false); // To toggle the dropdown
 
-  const handleSelect = (category) => {
-    setSelectedCategory(category.id);
-    setIsDropdownOpen(false);
-    setSearchTerm("");
-  };
-  // Fetch categories from the API
+  // State for main form
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [attributeName, setAttributeName] = useState("");
+  const [attributeType, setAttributeType] = useState("input");
+  const [editingAttributeId, setEditingAttributeId] = useState(null);
+
+  // State for displaying attributes and their values
+  const [attributesForCategory, setAttributesForCategory] = useState([]);
+  const [allAttributeValues, setAllAttributeValues] = useState([]);
+  const [managingValuesFor, setManagingValuesFor] = useState(null); // Which attribute we are adding values to
+  const [newValue, setNewValue] = useState("");
+
+  // State for dropdowns
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const fetchCategories = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/v1/category/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setCategories(response.data.results);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
-  const handleTypeSelect = (selectedType) => {
-    setType(selectedType);
-    setIsTypeDropdownOpen(false);
+
+  const fetchAllAttributeValues = async () => {
+    try {
+      // NOTE: This assumes you have a URL for listing all attribute values.
+      // Based on your backend code, this view exists but might need to be added to urls.py.
+      // Assuming the URL is '/api/v1/category/attribute-value/'
+      const response = await axios.get(
+        `${BASE_URL}/api/v1/category/attribute-value/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setAllAttributeValues(response.data.results);
+    } catch (error) {
+      console.error("Error fetching all attribute values:", error);
+    }
   };
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // Fetch attributes based on selected category
-  useEffect(() => {
-    if (selectedCategory) {
-      const fetchAttributes = async () => {
-        try {
-          const response = await axios.get(
-            `${BASE_URL}/api/v1/category/attribute/`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          const attributeTypes = response.data.results;
-
-          if (Array.isArray(attributeTypes)) {
-            const filteredAttributes = attributeTypes.filter(
-              (att) => att.category === selectedCategory
-            );
-            setShownAttributes(filteredAttributes);
-          } else {
-            console.warn("attribute_types is not an array:", attributeTypes);
-            setShownAttributes([]); // optionally reset
-          }
-        } catch (error) {
-          console.error("Error fetching attributes:", error);
-        }
-      };
-
-      fetchAttributes();
-    } else {
-      setShownAttributes([]);
+    if (token) {
+      fetchCategories();
+      fetchAllAttributeValues();
     }
-  }, [selectedCategory]);
+  }, [token]);
 
-  // Handle form submission (Add or Update)
+  const fetchAttributesForCategory = async () => {
+    if (!selectedCategory) {
+      setAttributesForCategory([]);
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/api/v1/category/attribute/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { category: selectedCategory.id }, // More efficient if backend supports filtering
+        }
+      );
+      const filtered = response.data.results.filter(
+        (attr) => attr.category === selectedCategory.id
+      );
+      setAttributesForCategory(filtered);
+    } catch (error) {
+      console.error("Error fetching attributes:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAttributesForCategory();
+  }, [selectedCategory, token]);
+
+  const resetForm = () => {
+    setAttributeName("");
+    setAttributeType("input");
+    setEditingAttributeId(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!selectedCategory) {
+      Swal.fire("Validation Error", "Please select a category first.", "error");
+      return;
+    }
 
-    // Prepare the data
     const data = {
-      name: attribute,
-      attribute_type: "input", // Send the ID of the selected attribute type
-      category: selectedCategory, // Send the ID of the selected category
+      name: attributeName,
+      attribute_type: attributeType,
+      category: selectedCategory.id,
     };
 
+    const url = editingAttributeId
+      ? `${BASE_URL}/api/v1/category/attribute/${editingAttributeId}/`
+      : `${BASE_URL}/api/v1/category/attribute/`;
+    const method = editingAttributeId ? "put" : "post";
+
     try {
-      let response;
-      let successMessage = "";
-
-      if (editingAttributeId) {
-        // Update the existing attribute
-        response = await axios.put(
-          `${BASE_URL}/api/v1/category/attribute/${editingAttributeId}/`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (response.status === 200) {
-          successMessage = "ویژگی با موفقیت ویرایش شد.";
-        } else {
-          throw new Error("مشکلی در ویرایش ویژگی وجود دارد.");
-        }
-      } else {
-        // Add a new attribute
-        response = await axios.post(
-          `${BASE_URL}/api/v1/category/attribute/`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        successMessage = "اطلاعات با موفقیت ثبت شد.";
-      }
-
-      // Show success Swal
-      Swal.fire({
-        title: "موفقیت‌آمیز!",
-        text: successMessage,
-        icon: "success",
-        timer: 3000,
-        timerProgressBar: true,
+      await axios[method](url, data, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      // Clear the form
-      setSelectedCategory("");
-      setAttribute("");
-      setType("");
-      setEditingAttributeId(null);
+      Swal.fire(
+        "Success!",
+        `Attribute successfully ${editingAttributeId ? "updated" : "created"}.`,
+        "success"
+      );
+      resetForm();
+      fetchAttributesForCategory();
     } catch (error) {
-      console.error("Error sending data:", error);
-
-      // Show error Swal
-      Swal.fire({
-        title: "خطا!",
-        text: "ارسال اطلاعات با خطا مواجه شد.",
-        icon: "error",
-        timer: 3000,
-        timerProgressBar: true,
-      });
+      console.error("Error submitting attribute:", error);
+      Swal.fire(
+        "Error",
+        "There was a problem submitting the attribute.",
+        "error"
+      );
     }
   };
 
-  // Handle attribute deletion
+  const handleEdit = (attr) => {
+    setEditingAttributeId(attr.id);
+    setAttributeName(attr.name);
+    setAttributeType(attr.attribute_type);
+    setSelectedCategory(categories.find((c) => c.id === attr.category));
+    window.scrollTo(0, 0);
+  };
+
   const handleDelete = async (id) => {
-    // Show confirmation alert
-    const confirmDelete = await Swal.fire({
-      title: "آیا مطمئن هستید؟",
-      text: "این عملیات قابل بازگشت نیست!",
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This will delete the attribute and all its values!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "بله، حذف شود!",
-      cancelButtonText: "لغو",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`${BASE_URL}/api/v1/category/attribute/${id}/`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          Swal.fire("Deleted!", "The attribute has been deleted.", "success");
+          fetchAttributesForCategory();
+        } catch (error) {
+          Swal.fire("Error", "Could not delete the attribute.", "error");
+        }
+      }
     });
+  };
 
-    if (!confirmDelete.isConfirmed) return;
+  const handleAddValue = async (e) => {
+    e.preventDefault();
+    if (!newValue.trim()) return;
 
+    const data = {
+      attribute: managingValuesFor.id,
+      attribute_value: newValue,
+    };
     try {
-      await axios.delete(`${BASE_URL}/api/v1/category/attribute/${id}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.post(`${BASE_URL}/api/v1/category/attribute-value/`, data, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      // Remove deleted attribute from state
-      setShownAttributes((prev) => prev.filter((attr) => attr.id !== id));
-
-      // Show success alert
-      Swal.fire({
-        title: "حذف شد!",
-        text: "ویژگی با موفقیت حذف شد.",
-        icon: "success",
-        timer: 3000,
-        timerProgressBar: true,
-      });
+      setNewValue("");
+      fetchAllAttributeValues(); // Re-fetch all values to update list
     } catch (error) {
-      console.error("Error deleting attribute:", error);
-
-      // Show error alert
-      Swal.fire({
-        title: "خطا!",
-        text: "حذف ویژگی با خطا مواجه شد.",
-        icon: "error",
-        timer: 3000,
-        timerProgressBar: true,
-      });
+      console.error("Error adding value:", error);
+      Swal.fire(
+        "Error",
+        "Could not add the value. It might already exist.",
+        "error"
+      );
     }
   };
 
-  // Handle attribute editing
-  const handleEdit = (attr) => {
-    setEditingAttributeId(attr.id);
-    setAttribute(attr.name);
-    setType(attr.attribute_type);
-    setSelectedCategory(attr.category);
+  const handleDeleteValue = async (valueId) => {
+    try {
+      await axios.delete(
+        `${BASE_URL}/api/v1/category/attribute-value/${valueId}/`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchAllAttributeValues(); // Re-fetch to update list
+    } catch (error) {
+      console.error("Error deleting value:", error);
+      Swal.fire("Error", "Could not delete the value.", "error");
+    }
   };
-  // category section
-  const [searchTerm, setSearchTerm] = useState("");
-  const filteredCategories = (categories || []).filter((category) =>
-    category.name.toLowerCase().includes(searchTerm.toLowerCase())
+
+  const filteredCategories = categories.filter((cat) =>
+    cat.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="p-4 mt-10 max-w-lg mx-auto bg-white shadow-md rounded-md">
-      <h2 className="text-lg font-bold mb-4">Select Category and Attribute</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Select Category */}
-        <div className="relative w-full">
-          <label htmlFor="category" className="block font-medium mb-2">
-            Category
-          </label>
-
-          {/* Dropdown Button */}
-          <div
-            className="bg-gray-200 w-full px-3 py-2 flex justify-between items-center border border-gray-300 rounded-md shadow-sm cursor-pointer"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          >
-            {selectedCategory
-              ? categories.find((cat) => cat.id === selectedCategory)?.name ||
-                "-- Please select a category --"
-              : "Please select a category"}
-            <FaChevronDown
-              className={`transition-all duration-300 ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
+    <div className="p-4 mt-10 max-w-4xl mx-auto bg-white shadow-md rounded-md space-y-8">
+      {/* --- FORM SECTION --- */}
+      <div>
+        <h2 className="text-xl font-bold mb-4">
+          {editingAttributeId ? "Edit Attribute" : "Create New Attribute"}
+        </h2>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+        >
+          {/* Category Select */}
+          <div className="relative w-full">
+            <label className="block font-medium mb-2">Category</label>
+            <div
+              className="bg-gray-200 w-full px-3 py-2 flex justify-between items-center border rounded-md cursor-pointer"
+              onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+            >
+              {selectedCategory ? selectedCategory.name : "Select a category"}
+              <FaChevronDown
+                className={`transition-transform ${
+                  isCategoryDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+            {isCategoryDropdownOpen && (
+              <div className="absolute w-full bg-white border rounded-md shadow-lg mt-1 z-20">
+                <div className="relative p-2">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full p-2 border-b pl-8"
+                  />
+                  <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                </div>
+                <ul className="max-h-60 overflow-y-auto">
+                  {filteredCategories.map((cat) => (
+                    <li
+                      key={cat.id}
+                      className="py-2 px-4 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setSelectedCategory(cat);
+                        setIsCategoryDropdownOpen(false);
+                      }}
+                    >
+                      {cat.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          {/* Attribute Name Input */}
+          <div>
+            <label className="block font-medium mb-2">Attribute Name</label>
+            <input
+              type="text"
+              value={attributeName}
+              onChange={(e) => setAttributeName(e.target.value)}
+              placeholder="e.g., Color, Size"
+              className="mt-1 block w-full p-2 bg-gray-200 border-gray-300 rounded-md"
+              required
             />
           </div>
+          {/* Attribute Type Select */}
+          <div>
+            <label className="block font-medium mb-2">Attribute Type</label>
+            <select
+              value={attributeType}
+              onChange={(e) => setAttributeType(e.target.value)}
+              className="mt-1 block w-full p-2 bg-gray-200 border-gray-300 rounded-md"
+            >
+              {ATTRIBUTE_TYPE_CHOICES.map((type) => (
+                <option key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="md:col-span-3 flex justify-center">
+            <button type="submit" className="secondry-btn">
+              {editingAttributeId ? "Update Attribute" : "Create Attribute"}
+            </button>
+          </div>
+        </form>
+      </div>
 
-          {/* Dropdown List */}
-          {isDropdownOpen && (
-            <div className="w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-10">
-              {/* Search Input */}
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search categories..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full p-2 border-b pl-10 pr-5 outline-none bg-gray-300 placeholder-gray-700"
-                />
-                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700" />
-              </div>
-
-              {/* Categories List */}
-              <ul className="max-h-[300px] overflow-y-auto">
-                {filteredCategories.map((category) => (
-                  <li
-                    key={category.id}
-                    className="py-2 px-5 hover:bg-gray-200 border-b text-black cursor-pointer"
-                    onClick={() => {
-                      setIsDropdownOpen(true);
-                      handleSelect(category);
-                    }}
-                  >
-                    {category.name}
-                  </li>
-                ))}
-                {filteredCategories.length === 0 && (
-                  <li className="p-3 text-gray-500">No results found</li>
+      {/* --- TABLE & VALUE MANAGEMENT SECTION --- */}
+      <div>
+        <h2 className="text-xl font-bold mb-4">
+          Manage Attributes for:{" "}
+          <span className="text-green-600">
+            {selectedCategory?.name || "No Category Selected"}
+          </span>
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Attribute List */}
+          <div className="border rounded-md p-4">
+            <h3 className="font-semibold text-lg mb-2">Attribute List</h3>
+            <table className="min-w-full">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left">Name</th>
+                  <th className="px-4 py-2 text-left">Type</th>
+                  <th className="px-4 py-2 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attributesForCategory.length > 0 ? (
+                  attributesForCategory.map((attr) => (
+                    <tr key={attr.id} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-2">{attr.name}</td>
+                      <td className="px-4 py-2">
+                        <span className="bg-gray-200 text-gray-700 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
+                          {attr.attribute_type}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 flex gap-x-3">
+                        <button
+                          onClick={() => handleEdit(attr)}
+                          className="text-blue-600"
+                        >
+                          <FaRegEdit size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(attr.id)}
+                          className="text-red-600"
+                        >
+                          <IoTrashSharp size={18} />
+                        </button>
+                        {attr.attribute_type === "dropdown" && (
+                          <button
+                            onClick={() => setManagingValuesFor(attr)}
+                            className="text-sm text-green-600 font-semibold"
+                          >
+                            Values
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="text-center text-gray-500 py-4">
+                      No attributes for this category.
+                    </td>
+                  </tr>
                 )}
-              </ul>
-            </div>
-          )}
+              </tbody>
+            </table>
+          </div>
+          {/* Value Management */}
+          <div className="border rounded-md p-4">
+            <h3 className="font-semibold text-lg mb-2">
+              Manage Values for:{" "}
+              <span className="text-blue-600">
+                {managingValuesFor?.name || "None"}
+              </span>
+            </h3>
+            {managingValuesFor ? (
+              <div>
+                <form onSubmit={handleAddValue} className="flex gap-2 mb-4">
+                  <input
+                    type="text"
+                    value={newValue}
+                    onChange={(e) => setNewValue(e.target.value)}
+                    placeholder="Add new value"
+                    className="flex-grow p-2 border rounded-md"
+                  />
+                  <button
+                    type="submit"
+                    className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                  >
+                    Add
+                  </button>
+                </form>
+                <ul className="space-y-2 max-h-48 overflow-y-auto">
+                  {allAttributeValues
+                    .filter((v) => v.attribute === managingValuesFor.id)
+                    .map((val) => (
+                      <li
+                        key={val.id}
+                        className="flex justify-between items-center bg-gray-100 p-2 rounded-md"
+                      >
+                        <span>{val.attribute_value}</span>
+                        <button
+                          onClick={() => handleDeleteValue(val.id)}
+                          className="text-red-500"
+                        >
+                          <IoTrashSharp />
+                        </button>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            ) : (
+              <p className="text-gray-500">
+                Select an attribute of type 'dropdown' to manage its values.
+              </p>
+            )}
+          </div>
         </div>
-
-        {/* Attribute Input */}
-        <div>
-          <label
-            htmlFor="attribute"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Attribute
-          </label>
-          <input
-            type="text"
-            id="attribute"
-            value={attribute}
-            onChange={(e) => setAttribute(e.target.value)}
-            placeholder="Enter attribute"
-            className="mt-1 block w-full p-2 bg-gray-200 border-gray-300 rounded-md shadow-sm focus:ring-green"
-            required
-          />
-        </div>
-
-        {/* Submit Button */}
-        <div className="flex w-full items-center justify-center">
-          <button type="submit" className="secondry-btn">
-            {editingAttributeId ? "Update" : "Submit"}
-          </button>
-        </div>
-      </form>
-
-      <table className="min-w-full mt-4 border border-gray-300 rounded-md">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="px-4 py-2 text-left border-b">Attribute Name</th>
-            <th className="px-4 py-2 text-left border-b">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {shownAttributes.length > 0 ? (
-            shownAttributes.map((attr) => (
-              <tr key={attr.id} className="hover:bg-gray-100">
-                <td className="px-4 py-2 border-b">{attr.name}</td>
-                <td className="px-4 py-2  border-b">
-                  <div className="flex gap-x-4 ">
-                    <button
-                      onClick={() => handleEdit(attr)}
-                      className="text-green-600 hover:scale-105 transition-all duration-300"
-                    >
-                      <FaRegEdit size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(attr.id)}
-                      className="text-red-600 hover:scale-105 transition-all duration-300"
-                    >
-                      <IoTrashSharp size={20} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="2" className="text-center text-gray-500 py-4">
-                No attributes available.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      </div>
     </div>
   );
 };

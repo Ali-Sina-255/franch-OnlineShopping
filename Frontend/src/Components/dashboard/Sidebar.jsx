@@ -1,7 +1,7 @@
 // Sidebar.js (Corrected Role Handling)
 
 import React, { useState } from "react";
-import { FaHome, FaServicestack, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaServicestack, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { signOutSuccess } from "../../state/userSlice/userSlice"; // Make sure path is correct
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,8 @@ import { LuCable } from "react-icons/lu";
 import { FaUserGear } from "react-icons/fa6";
 import { IoMdSettings } from "react-icons/io";
 import { Home, LucideUserRoundPlus } from "lucide-react";
+import { IoIosHome } from "react-icons/io";
+
 
 const Sidebar = ({ setActiveComponent }) => {
   const [selectedC, setSelectedC] = useState("home");
@@ -44,7 +46,7 @@ const Sidebar = ({ setActiveComponent }) => {
   };
 
   const AllComponents = [
-    { name: "home", value: "home", icon: <LuActivity /> },
+    { name: "Home", value: "home", icon: <MdDashboardCustomize /> },
     {
       name: "category management",
       value: "category",
@@ -53,7 +55,7 @@ const Sidebar = ({ setActiveComponent }) => {
     { name: "attribute management", value: "attribute", icon: <FaBuilding /> },
     { name: "porductlist-table", value: "porductlist", icon: <FaBuilding /> },
     { name: "products", value: "products", icon: <MdLocalLaundryService /> },
-    { name: "profile", value: "proflie", icon: <GiTakeMyMoney /> },
+    { name: "profile", value: "proflie", icon: <FaUser /> },
 
     { name: "logout", value: "signout", icon: <FaSignOutAlt /> },
   ];
@@ -87,24 +89,27 @@ const Sidebar = ({ setActiveComponent }) => {
 
   return (
     <div
-      className={`h-full transition-all duration-300 ease-in-out w-64 bg-gradient-to-b from-[#2a2185] to-[#3a32a8] `}
+      className={`h-full transition-all duration-300 ease-in-out w-64 bg-[#7209b7] `}
     >
       <header className="flex items-center gap-5 p-5 text-white font-bold text-xl">
-        <div className="flex items-center justify-center p-1 bg-white rounded-full">
-          <img src="/logo.png" alt="Logo" className="h-10 w-10" />
+        <div className="flex items-center justify-center p-1 bg-white h-10 w-10 rounded-full">
+          {/* <img src="/logo.png" alt="Logo" className="h-10 w-10" /> */}
+          <FaUser className=" text-[#7209b7]" size={24} />
         </div>
 
         <span className="text-lg font-semibold  text-white whitespace-nowrap">
           CHIQ FRIP
         </span>
       </header>
-      <ul className="mr-1">
+      <ul className=" mx-2">
         {AllComponents.map((component, index) => (
-          <li key={index} className="relative group cursor-pointer">
+          <li key={index} className="relative group cursor-pointer ">
             {component.value === "signout" ? (
               <a
                 onClick={handleSignOut}
-                className={`relative flex items-center w-full px-6 py-3 transition-all duration-300
+                onMouseEnter={() => setActiveC(component.value)}
+                onMouseLeave={() => setActiveC(selectedC)}
+                className={`relative flex items-center w-full gap-x-3 px-4 rounded-md py-3 transition-all duration-300
             ${
               activeC === component.value
                 ? "bg-white text-primary"
@@ -112,7 +117,7 @@ const Sidebar = ({ setActiveComponent }) => {
             }`}
               >
                 <span className="text-xl">{component.icon}</span>
-                <span className="mr-4 text-lg font-semibold whitespace-nowrap">
+                <span className="text-base font-semibold whitespace-nowrap">
                   {component.name}
                 </span>
               </a>
@@ -125,7 +130,7 @@ const Sidebar = ({ setActiveComponent }) => {
                 }}
                 onMouseEnter={() => setActiveC(component.value)}
                 onMouseLeave={() => setActiveC(selectedC)}
-                className={`relative flex items-center w-full px-6 py-3 transition-all duration-300
+                className={`relative flex items-center gap-x-3 w-full px-4  rounded-md py-3 transition-all duration-300
             ${
               activeC === component.value
                 ? "bg-white text-primary"
@@ -133,14 +138,14 @@ const Sidebar = ({ setActiveComponent }) => {
             }`}
               >
                 <span className="text-xl">{component.icon}</span>
-                <span className="mr-4 text-lg font-semibold whitespace-nowrap">
+                <span className="text-base font-semibold whitespace-nowrap">
                   {component.name}
                 </span>
               </a>
             )}
 
             {/* Tooltip */}
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-4 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg z-50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-4 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg z-50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               {component.name}
               <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-r-4 border-r-gray-800"></div>
             </div>

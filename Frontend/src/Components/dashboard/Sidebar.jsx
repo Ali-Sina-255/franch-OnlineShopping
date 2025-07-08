@@ -86,8 +86,8 @@ const Sidebar = ({ setActiveComponent }) => {
   }
 
   return (
-    <div 
-      className={`h-full transition-all duration-300 ease-in-out w-64 bg-gradient-to-b from-[#2a2185] to-[#3a32a8] overflow-y-auto `}
+    <div
+      className={`h-full transition-all duration-300 ease-in-out w-64 bg-gradient-to-b from-[#2a2185] to-[#3a32a8] `}
     >
       <header className="flex items-center gap-5 p-5 text-white font-bold text-xl">
         <div className="flex items-center justify-center p-1 bg-white rounded-full">
@@ -98,44 +98,23 @@ const Sidebar = ({ setActiveComponent }) => {
           CHIQ FRIP
         </span>
       </header>
-
-      <ul className=" mr-1">
+      <ul className="mr-1">
         {AllComponents.map((component, index) => (
           <li key={index} className="relative group cursor-pointer">
             {component.value === "signout" ? (
               <a
                 onClick={handleSignOut}
-                className={`relative flex items-center w-full px-6 py-3 transition-all duration-300 rounded-r-3xl
-                ${
-                  activeC === component.value
-                    ? "bg-white text-primary"
-                    : "hover:bg-white hover:bg-opacity-20 text-white"
-                }`}
+                className={`relative flex items-center w-full px-6 py-3 transition-all duration-300
+            ${
+              activeC === component.value
+                ? "bg-white text-primary"
+                : "hover:bg-white hover:bg-opacity-20 text-white"
+            }`}
               >
                 <span className="text-xl">{component.icon}</span>
-
                 <span className="mr-4 text-lg font-semibold whitespace-nowrap">
                   {component.name}
                 </span>
-
-                <span
-                  className={`absolute left-0 -top-12 w-12 h-12 bg-transparent rounded-full shadow-[-35px_35px_0_10px_white]
-                      transition-opacity duration-100
-                      ${
-                        activeC === component.value
-                          ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100"
-                      }`}
-                ></span>
-                <span
-                  className={`absolute left-0 -bottom-12 w-12 h-12 bg-transparent rounded-full shadow-[-35px_-35px_0_10px_white]
-                      transition-opacity duration-100
-                      ${
-                        activeC === component.value
-                          ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100"
-                      }`}
-                ></span>
               </a>
             ) : (
               <a
@@ -146,45 +125,23 @@ const Sidebar = ({ setActiveComponent }) => {
                 }}
                 onMouseEnter={() => setActiveC(component.value)}
                 onMouseLeave={() => setActiveC(selectedC)}
-                className={`relative flex items-center w-full px-6 py-3 transition-all duration-300 rounded-r-3xl
-                ${
-                  activeC === component.value
-                    ? "bg-white text-primary"
-                    : "hover:bg-white hover:bg-opacity-20 text-white"
-                }`}
+                className={`relative flex items-center w-full px-6 py-3 transition-all duration-300
+            ${
+              activeC === component.value
+                ? "bg-white text-primary"
+                : "hover:bg-white hover:bg-opacity-20 text-white"
+            }`}
               >
                 <span className="text-xl">{component.icon}</span>
-
                 <span className="mr-4 text-lg font-semibold whitespace-nowrap">
                   {component.name}
                 </span>
-
-                <>
-                  <span
-                    className={`absolute left-0 -top-12 w-12 h-12 bg-transparent rounded-full shadow-[-35px_35px_0_10px_white]
-                      transition-opacity duration-100
-                      ${
-                        activeC === component.value
-                          ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100"
-                      }`}
-                  ></span>
-                  <span
-                    className={`absolute left-0 -bottom-12 w-12 h-12 bg-transparent rounded-full shadow-[-35px_-35px_0_10px_white]
-                      transition-opacity duration-100
-                      ${
-                        activeC === component.value
-                          ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100"
-                      }`}
-                  ></span>
-                </>
               </a>
             )}
 
+            {/* Tooltip */}
             <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-4 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg z-50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               {component.name}
-              {/* Arrow for tooltip */}
               <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-r-4 border-r-gray-800"></div>
             </div>
           </li>

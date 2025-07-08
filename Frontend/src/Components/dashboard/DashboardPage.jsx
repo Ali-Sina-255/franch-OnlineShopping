@@ -7,7 +7,7 @@ const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-gray-50">
+    <div className="flex h-screen w-full overflow-hidden bg-white">
       <Sidebar
         setActiveComponent={setActiveComponent}
         activeComponent={activeComponent}

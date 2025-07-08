@@ -5,14 +5,15 @@ import { signOutSuccess } from "../../state/userSlice/userSlice";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+// ✅ Correctly imported icons from their respective packages
+import { LuActivity } from "react-icons/lu"; // Lucide icons
 import {
-  LuActivity,
-  LucideUserRoundPlus,
+  FaUserPlus,
   FaBuilding,
-  MdLocalLaundryService,
   FaSignOutAlt,
   FaUserGear,
-} from "react-icons/all";
+} from "react-icons/fa"; // FontAwesome icons
+import { MdLocalLaundryService } from "react-icons/md"; // Material Design icons
 
 const MySwal = withReactContent(Swal);
 

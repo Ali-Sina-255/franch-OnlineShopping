@@ -1,6 +1,6 @@
 // src/App.jsx
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 
@@ -16,24 +16,20 @@ import FlyingImage from "./Components/FlyingImage";
 import PrivateRoute from "./Components/common/PrivateRoute";
 import Signin from "./features/authentication/components/Signin";
 import SignUp from "./features/authentication/components/Signup";
-
 import DashboardPage from "./Components/dashboard/DashboardPage";
-import SignUpPage from "./features/authentication/components/Signup";
-
 
 function App() {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const location = useLocation();
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-
-  // State and Ref for the animation
   const [animationData, setAnimationData] = useState(null);
   const cartRef = useRef(null);
+  const location = useLocation();
 
-  React.useEffect(() => {
+  // Reset state on route change
+  useEffect(() => {
     if (location.pathname !== "/") setSearchQuery("");
     setQuickViewProduct(null);
     setIsCartOpen(false);
@@ -45,14 +41,12 @@ function App() {
       return;
     }
 
-    // Trigger the animation by setting its data
     if (imageRef?.current && cartRef?.current) {
       const startRect = imageRef.current.getBoundingClientRect();
       const endRect = cartRef.current.getBoundingClientRect();
       setAnimationData({ startRect, endRect, imgSrc: productToAdd.imageUrl });
     }
 
-    // Use a small timeout to let the animation start before the cart state updates
     setTimeout(() => {
       setCart((prevCart) => [...prevCart, productToAdd]);
       toast.success(`${productToAdd.name} added to bag!`);
@@ -76,6 +70,9 @@ function App() {
     });
   };
 
+  // 👇 Conditionally hide Header and Footer on /dashboard
+  const hideLayout = location.pathname.startsWith("/dashboard");
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <Toaster
@@ -97,20 +94,22 @@ function App() {
         cartItems={cart}
         onRemoveItem={handleRemoveFromCart}
       />
-
       <FlyingImage
         animationData={animationData}
         onAnimationComplete={() => setAnimationData(null)}
       />
 
-      <Header
-        cartCount={cart.length}
-        wishlistCount={wishlist.length}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        onCartClick={() => setIsCartOpen(true)}
-        cartRef={cartRef} // Pass the ref down
-      />
+      {/* ✅ Only show Header if not on dashboard */}
+      {!hideLayout && (
+        <Header
+          cartCount={cart.length}
+          wishlistCount={wishlist.length}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onCartClick={() => setIsCartOpen(true)}
+          cartRef={cartRef}
+        />
+      )}
 
       <main className="flex-grow">
         <Routes>
@@ -155,14 +154,15 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
           </Route>
-          <Route path="/" element={<Signin />} />
-          <Route path="/sign-up" element={<SignUp />} />
 
+          <Route path="/sign-in" element={<Signin />} />
+          <Route path="/sign-up" element={<SignUp />} />
           <Route path="*" element={<Signin />} />
         </Routes>
       </main>
 
-      <Footer />
+      {/* ✅ Only show Footer if not on dashboard */}
+      {!hideLayout && <Footer />}
     </div>
   );
 }

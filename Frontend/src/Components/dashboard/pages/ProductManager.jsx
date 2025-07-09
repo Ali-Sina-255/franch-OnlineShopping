@@ -15,8 +15,8 @@ export default function ProductManager() {
     details: "",
     tags: "",
     attributes: "{}",
-    type: "ma", 
-    condition: "New", 
+    type: "ma",
+    condition: "New",
     price: "",
     stock: "",
     image_url: null,
@@ -28,7 +28,6 @@ export default function ProductManager() {
     multi_images: [],
   });
   const [editingId, setEditingId] = useState(null);
-
 
   useEffect(() => {
     if (token) {
@@ -117,220 +116,227 @@ export default function ProductManager() {
   };
 
   return (
-    <div className="p-4 mt-10 max-w-4xl mx-auto bg-white shadow-md rounded-md">
-      <h2 className="text-2xl font-bold text-center mb-6">
-        {editingId ? "Edit Product" : "Add New Product"}
-      </h2>
-      <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
-        <div>
-          <label className="block mb-1 font-medium">Product Name</label>
-          <input
-            type="text"
-            name="product_name"
-            value={formData.product_name}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Category</label>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            required
-          >
-            <option value="">Select Category</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Price</label>
-          <input
-            type="number"
-            name="price"
-            value={formData.price}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Stock Quantity</label>
-          <input
-            type="number"
-            name="stock"
-            value={formData.stock}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Type</label>
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            required
-          >
-            <option value="ma">Man</option>
-            <option value="wo">Woman</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Condition</label>
-          <select
-            name="condition"
-            value={formData.condition}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            required
-          >
-            <option value="New">New</option>
-            <option value="Use">Use</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <div className="col-span-2">
-          <label className="block mb-1 font-medium">Material</label>
-          <input
-            type="text"
-            name="material"
-            value={formData.material}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            required
-          />
-        </div>
-
-        <div className="col-span-2">
-          <label className="block mb-1 font-medium">
-            Tags (comma-separated)
-          </label>
-          <input
-            type="text"
-            name="tags"
-            value={formData.tags}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            placeholder="e.g. summer, casual, cotton"
-          />
-        </div>
-
-        <div className="col-span-2">
-          <label className="block mb-1 font-medium">Description</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            rows="4"
-            required
-          />
-        </div>
-
-        <div className="col-span-2">
-          <label className="block mb-1 font-medium">
-            Details (comma-separated list)
-          </label>
-          <input
-            type="text"
-            name="details"
-            value={formData.details}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            placeholder="e.g. 100% Cotton, Machine Washable"
-          />
-        </div>
-
-        <div className="col-span-2">
-          <label className="block mb-1 font-medium">Seller Notes</label>
-          <textarea
-            name="seller_notes"
-            value={formData.seller_notes}
-            onChange={handleFormChange}
-            className="input-field w-full"
-            rows="3"
-            required
-          />
-        </div>
-
-        <AttributeInput
-          categoryId={formData.category}
-          onAttributeChange={handleAttributeChange}
-        />
-
-        <div className="col-span-2 p-4 border rounded-md space-y-4">
-          <h3 className="font-medium text-lg">Product Images</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="p-6 ">
+      <div className=" bg-white p-6 shadow-md rounded-md">
+        <h2 className="text-2xl font-bold mb-6">
+          {editingId ? "Edit Product" : "Add New Product"}
+        </h2>
+        <form onSubmit={handleSubmit} className="">
+          <div className="grid grid-cols-3 gap-6">
             <div>
-              <label className="block mb-1 font-medium">
-                Main Image (image_url)
-              </label>
+              <label className="block mb-1 font-medium">Product Name</label>
               <input
-                type="file"
-                name="image_url"
-                onChange={handleFileChange}
+                type="text"
+                name="product_name"
+                value={formData.product_name}
+                onChange={handleFormChange}
                 className="input-field w-full"
+                required
               />
             </div>
+
             <div>
-              <label className="block mb-1 font-medium">
-                Hover Image (hover_image_url)
-              </label>
-              <input
-                type="file"
-                name="hover_image_url"
-                onChange={handleFileChange}
+              <label className="block mb-1 font-medium">Category</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleFormChange}
                 className="input-field w-full"
+                required
+              >
+                <option value="">Select Category</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium">Price</label>
+              <input
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleFormChange}
+                className="input-field w-full"
+                required
               />
             </div>
+
             <div>
+              <label className="block mb-1 font-medium">Stock Quantity</label>
+              <input
+                type="number"
+                name="stock"
+                value={formData.stock}
+                onChange={handleFormChange}
+                className="input-field w-full"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium">Type</label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleFormChange}
+                className="input-field w-full"
+                required
+              >
+                <option value="ma">Man</option>
+                <option value="wo">Woman</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium">Condition</label>
+              <select
+                name="condition"
+                value={formData.condition}
+                onChange={handleFormChange}
+                className="input-field w-full"
+                required
+              >
+                <option value="New">New</option>
+                <option value="Use">Use</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-6 mt-6">
+            <div className="col-span-1">
+              <label className="block mb-1 font-medium">Material</label>
+              <input
+                type="text"
+                name="material"
+                value={formData.material}
+                onChange={handleFormChange}
+                className="input-field w-full"
+                required
+              />
+            </div>
+
+            <div className="col-span-1">
               <label className="block mb-1 font-medium">
-                Additional Images (for Gallery)
+                Tags (comma-separated)
               </label>
               <input
-                type="file"
-                name="multi_images"
-                multiple
-                onChange={handleFileChange}
+                type="text"
+                name="tags"
+                value={formData.tags}
+                onChange={handleFormChange}
                 className="input-field w-full"
+                placeholder="e.g. summer, casual, cotton"
               />
             </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2 col-span-2">
-          <input
-            type="checkbox"
-            name="is_available"
-            checked={formData.is_available}
-            onChange={handleFormChange}
-            className="h-5 w-5"
+          <div className="col-span-2">
+            <label className="block mb-1 font-medium">Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleFormChange}
+              className="input-field w-full"
+              rows="4"
+              required
+            />
+          </div>
+
+          <div className="col-span-2">
+            <label className="block mb-1 font-medium">
+              Details (comma-separated list)
+            </label>
+            <input
+              type="text"
+              name="details"
+              value={formData.details}
+              onChange={handleFormChange}
+              className="input-field w-full"
+              placeholder="e.g. 100% Cotton, Machine Washable"
+            />
+          </div>
+
+          <div className="col-span-2">
+            <label className="block mb-1 font-medium">Seller Notes</label>
+            <textarea
+              name="seller_notes"
+              value={formData.seller_notes}
+              onChange={handleFormChange}
+              className="input-field w-full"
+              rows="3"
+              required
+            />
+          </div>
+
+          <AttributeInput
+            categoryId={formData.category}
+            onAttributeChange={handleAttributeChange}
           />
-          <label className="font-medium">
-            Is this product available for sale?
-          </label>
-        </div>
 
-        <button type="submit" className="col-span-2 primary-btn">
-          {editingId ? "Update Product" : "Add Product"}
-        </button>
-      </form>
+          <div className="col-span-2 p-4 border rounded-md space-y-4">
+            <h3 className="font-medium text-lg">Product Images</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block mb-1 font-medium">
+                  Main Image (image_url)
+                </label>
+                <input
+                  type="file"
+                  name="image_url"
+                  onChange={handleFileChange}
+                  className="input-field w-full"
+                />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">
+                  Hover Image (hover_image_url)
+                </label>
+                <input
+                  type="file"
+                  name="hover_image_url"
+                  onChange={handleFileChange}
+                  className="input-field w-full"
+                />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">
+                  Additional Images (for Gallery)
+                </label>
+                <input
+                  type="file"
+                  name="multi_images"
+                  multiple
+                  onChange={handleFileChange}
+                  className="input-field w-full"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 my-5 col-span-2">
+            <input
+              type="checkbox"
+              name="is_available"
+              checked={formData.is_available}
+              onChange={handleFormChange}
+              className="h-5 w-5"
+            />
+            <label className="font-medium">
+              Is this product available for sale?
+            </label>
+          </div>
+          <div className="flex justify-center mt-6">
+            <button type="submit" className=" primary-btn">
+              {editingId ? "Update Product" : "Add Product"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -1,10 +1,9 @@
+from apps.common.models import TimeStampedModel
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
-
-from apps.common.models import TimeStampedModel
 
 User = get_user_model()
 
@@ -35,6 +34,13 @@ class Profile(TimeStampedModel):
     city = models.CharField(
         verbose_name=_("city"), max_length=255, default="Kabul", blank=True, null=True
     )
+    state = models.CharField(
+        verbose_name=_("state"), max_length=100, blank=True, null=True
+    )
+    address = models.CharField(
+        verbose_name=_("address"), max_length=255, blank=True, null=True
+    )
+
     profile_photo = models.ImageField(
         verbose_name=_("profile photo"),
         blank=True,

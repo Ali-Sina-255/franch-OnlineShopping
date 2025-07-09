@@ -7,12 +7,10 @@ import { X, Trash2 } from "lucide-react";
 
 const CartDrawer = ({ isOpen, onClose, cartItems, onRemoveItem }) => {
   const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
   };
-
   const drawerVariants = {
     hidden: { x: "100%" },
     visible: { x: 0, transition: { duration: 0.3, ease: "easeInOut" } },

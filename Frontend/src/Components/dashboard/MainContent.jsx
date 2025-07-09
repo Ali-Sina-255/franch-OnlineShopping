@@ -31,7 +31,7 @@ const MainContent = ({ activeComponent }) => {
     }
   };
 
-  return <div className="min-h-[90vh]">{renderContent()}</div>;
+  return <div className="min-h-[93.5vh] bg-gray-200">{renderContent()}</div>;
 };
 
 export default MainContent;

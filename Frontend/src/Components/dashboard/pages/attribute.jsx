@@ -208,9 +208,9 @@ const Attribute = () => {
   );
 
   return (
-    <div className="p-4 mt-10 max-w-4xl mx-auto bg-white shadow-md rounded-md space-y-8">
+    <div className="p-6 w-full space-y-8">
       {/* --- FORM SECTION --- */}
-      <div>
+      <div className="bg-white p-6 rounded-md shadow-md">
         <h2 className="text-xl font-bold mb-4">
           {editingAttributeId ? "Edit Attribute" : "Create New Attribute"}
         </h2>
@@ -297,7 +297,7 @@ const Attribute = () => {
       </div>
 
       {/* --- TABLE & VALUE MANAGEMENT SECTION --- */}
-      <div>
+      <div className="bg-white p-6 rounded-md shadow-md ">
         <h2 className="text-xl font-bold mb-4">
           Manage Attributes for:{" "}
           <span className="text-green-600">

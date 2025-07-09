@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { FaRegEdit } from "react-icons/fa";
 import { IoTrashSharp } from "react-icons/io5";
 import { useSelector } from "react-redux";
+import Pagination from "../../Pagination";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -12,6 +13,21 @@ const CategoryManagement = () => {
   const [categoryName, setCategoryName] = useState("");
   const [categories, setCategories] = useState([]);
   const [editingCategory, setEditingCategory] = useState(null);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(6);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCategories = categories.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    document
+      .getElementById("category-table")
+      ?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const fetchCategories = async () => {
     if (!token) return;
@@ -65,7 +81,7 @@ const CategoryManagement = () => {
           timerProgressBar: true,
         });
         resetForm();
-        fetchCategories(); // Refresh the list
+        fetchCategories();
       }
     } catch (error) {
       console.error("Error submitting category:", error);
@@ -117,8 +133,9 @@ const CategoryManagement = () => {
   };
 
   return (
-    <div className="py-10 bg-gray-200 w-full min-h-[91vh] px-5">
-      <div className="max-w-3xl mx-auto py-4 px-5 shadow-lg bg-white rounded-md">
+    <div className="py-10 w-full px-5">
+      {/* Form Section */}
+      <div className="max-w-5xl mx-auto py-4 px-5 shadow-lg bg-white rounded-md">
         <h2 className="text-xl text-center font-bold mb-4">
           {editingCategory ? "Edit Category" : "Add New Category"}
         </h2>
@@ -153,22 +170,28 @@ const CategoryManagement = () => {
         </form>
       </div>
 
-      <div className="w-full max-w-4xl mx-auto mt-10 bg-white shadow-lg rounded-md overflow-hidden">
-        <table className="w-full border-collapse border border-gray-300">
+      {/* Table Section */}
+      <div
+        id="category-table"
+        className="w-full max-w-5xl mx-auto bg-white p-5 mt-10 rounded-lg shadow-md overflow-x-auto"
+      >
+        <table className="w-full">
           <thead className="bg-green text-gray-100 text-center">
             <tr className="bg-gray-100">
-              <th className="border px-6 py-2.5 font-semibold">
+              <th className="border text-black px-6 py-2.5 font-semibold">
                 Category Name
               </th>
-              <th className="border px-6 py-2.5 font-semibold">Actions</th>
+              <th className="border px-6 text-black py-2.5 font-semibold">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
-            {categories.length > 0 ? (
-              categories.map((category) => (
+            {currentCategories.length > 0 ? (
+              currentCategories.map((category) => (
                 <tr
                   key={category.id}
-                  className="text-center border-b hover:bg-gray-200"
+                  className="text-center border-b cursor-pointer hover:bg-gray-100"
                 >
                   <td className="px-6 py-2">{category.name}</td>
                   <td className="flex items-center justify-center gap-x-5 px-6 py-2">
@@ -196,6 +219,13 @@ const CategoryManagement = () => {
             )}
           </tbody>
         </table>
+
+        {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={Math.ceil(categories.length / itemsPerPage)}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

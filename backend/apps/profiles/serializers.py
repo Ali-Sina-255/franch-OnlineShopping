@@ -24,6 +24,7 @@ class ProfileSerializers(serializers.ModelSerializer):
             "email",
             "profile_photo",
             "country",
+            "address",
             "gender",
             "city",
             "about_me",

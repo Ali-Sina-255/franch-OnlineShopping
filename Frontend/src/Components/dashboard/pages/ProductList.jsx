@@ -95,106 +95,109 @@ export default function ProductList({ setCurrentView }) {
   );
 
   return (
-    <div className="p-4 md:p-8 mt-10 max-w-7xl mx-auto bg-white shadow-md rounded-md">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <h1 className="text-3xl font-bold">Product List ({totalProducts})</h1>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <input
-            type="text"
-            placeholder="Search by product name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="input-field w-full md:w-64"
-          />
-          <button
-            onClick={handleAddNew}
-                      className="primary-btn whitespace-nowrap"
-            
-          >
-            + Add New Product
-          </button>
+    <div className="p-6">
+      <div className="bg-white shadow-md rounded-md p-6">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+          <h1 className="text-2xl text-gray-600 font-bold">
+            Product List ({totalProducts})
+          </h1>
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <input
+              type="text"
+              placeholder="Search by product name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="input-field w-full md:w-64"
+            />
+            <button
+              onClick={handleAddNew}
+              className="primary-btn whitespace-nowrap"
+            >
+              + Add New Product
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left text-gray-500">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-100">
-            <tr>
-              <th scope="col" className="px-6 py-3">
-                Image
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Product Name
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Category
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Price
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Stock
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-100">
               <tr>
-                <td colSpan="7" className="text-center py-8">
-                  Loading...
-                </td>
+                <th scope="col" className="px-6 py-3">
+                  Image
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Product Name
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Category
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Price
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Stock
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Actions
+                </th>
               </tr>
-            ) : filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <tr
-                  key={product.id}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
-                  <td className="px-6 py-4">
-                    <img
-                      src={
-                        product.image_url || "https://via.placeholder.com/60"
-                      }
-                      alt={product.product_name}
-                      className="w-16 h-16 object-cover rounded-md"
-                    />
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900">
-                    {product.product_name}
-                  </td>
-                  <td className="px-6 py-4">
-                    {categories[product.category] || "N/A"}
-                  </td>
-                  <td className="px-6 py-4">${product.price}</td>
-                  <td className="px-6 py-4">{product.stock}</td>
-                  <td className="px-6 py-4 flex items-center gap-4">
-                    <button
-                      onClick={() => handleEdit(product.id)}
-                      className="text-blue-600"
-                    >
-                      <FaRegEdit size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="text-red-600"
-                    >
-                      <IoTrashSharp size={20} />
-                    </button>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-8">
+                    Loading...
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="text-center py-8">
-                  No products found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ) : filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <tr
+                    key={product.id}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4">
+                      <img
+                        src={
+                          product.image_url || "https://via.placeholder.com/60"
+                        }
+                        alt={product.product_name}
+                        className="w-12 h-12 object-cover rounded-md"
+                      />
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900">
+                      {product.product_name}
+                    </td>
+                    <td className="px-6 py-4">
+                      {categories[product.category] || "N/A"}
+                    </td>
+                    <td className="px-6 py-4">${product.price}</td>
+                    <td className="px-6 py-4">{product.stock}</td>
+                    <td className="px-6 py-4 flex items-center gap-4">
+                      <button
+                        onClick={() => handleEdit(product.id)}
+                        className="text-blue-600"
+                      >
+                        <FaRegEdit size={20} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="text-red-600"
+                      >
+                        <IoTrashSharp size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="text-center py-8">
+                    No products found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

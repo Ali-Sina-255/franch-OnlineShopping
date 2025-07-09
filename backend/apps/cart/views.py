@@ -2,7 +2,7 @@ import uuid
 
 from django.db.models import F, Sum, Value
 from django.db.models.functions import Coalesce
-from rest_framework import generics
+from rest_framework import generics, serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 
@@ -36,5 +36,13 @@ class CartItemListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        cart = Cart.objects.get(cart_id=self.request.data["cart_id"])
+        cart_id = self.request.data.get("cart_id")
+        if not cart_id:
+            raise serializers.ValidationError({"cart_id": "This field is required."})
+
+        try:
+            cart = Cart.objects.get(cart_id=cart_id)
+        except Cart.DoesNotExist:
+            raise serializers.ValidationError({"cart_id": "Invalid cart ID."})
+
         serializer.save(cart=cart)

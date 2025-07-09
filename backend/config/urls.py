@@ -23,6 +23,7 @@ urlpatterns = [
     path("api/v1/profiles/", include("apps.profiles.urls"), name="profiles"),
     path("api/v1/orders/", include("apps.orders.urls"), name="orders"),
     path("api/v1/cart/", include("apps.cart.urls"), name="cart"),
+    path("api/v1/checkout/", include("apps.checkout.urls"), name="checkout"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Optional: Customize admin UI

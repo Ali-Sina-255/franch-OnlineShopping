@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { FaHome, FaServicestack, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { signOutSuccess } from "../../state/userSlice/userSlice"; // Make sure path is correct
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { Fa3, FaBuilding } from "react-icons/fa6";
@@ -97,7 +97,7 @@ const Sidebar = ({ setActiveComponent }) => {
         </div>
 
         <span className="text-lg font-semibold  text-[#7209b7] whitespace-nowrap">
-          CHIQ FRIP
+          <Link to="/">CHIQ FRIP</Link>
         </span>
       </header>
       <ul className=" mx-2">
@@ -132,7 +132,7 @@ const Sidebar = ({ setActiveComponent }) => {
                 className={`relative flex items-center gap-x-3 w-full px-4  rounded-md py-3 transition-all duration-300
             ${
               activeC === component.value
-                ? "bg-gray-200 text-primary " 
+                ? "bg-gray-200 text-primary "
                 : "hover:bg-gray-200 hover:bg-opacity-20 text-black"
             }`}
               >

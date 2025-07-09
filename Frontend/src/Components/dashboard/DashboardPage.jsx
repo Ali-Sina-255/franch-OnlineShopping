@@ -22,7 +22,6 @@ const Dashboard = () => {
         setActiveComponent={setActiveComponent}
         activeComponent={activeComponent}
       />
-
       <div className="flex flex-col flex-1 h-screen overflow-hidden">
         <div className="bg-gray-100 py-2 w-full flex items-center justify-between px-4 shadow-sm">
           {/* Search Box */}

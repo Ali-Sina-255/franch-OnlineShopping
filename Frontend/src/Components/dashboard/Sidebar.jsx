@@ -9,15 +9,8 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { Fa3, FaBuilding } from "react-icons/fa6";
 import { MdDashboardCustomize } from "react-icons/md";
-import { FaShop } from "react-icons/fa6";
-import { GiTakeMyMoney } from "react-icons/gi";
-import { LuActivity } from "react-icons/lu";
 import { MdLocalLaundryService } from "react-icons/md";
-import { LuCable } from "react-icons/lu";
-import { FaUserGear } from "react-icons/fa6";
-import { IoMdSettings } from "react-icons/io";
 import { Home, LucideUserRoundPlus } from "lucide-react";
-import { IoIosHome } from "react-icons/io";
 
 const Sidebar = ({ setActiveComponent }) => {
   const [selectedC, setSelectedC] = useState("home");
@@ -62,10 +55,8 @@ const Sidebar = ({ setActiveComponent }) => {
   let accessibleComponents = [];
 
   if (currentUser?.role?.[0] === 0 || currentUser?.role?.[0] === 1) {
-    // نقش 0 و 1 => دسترسی کامل به همه منوها
     accessibleComponents = AllComponents;
   } else if (currentUser?.role?.[0] === 2) {
-    // نقش 2 => فقط منوهای خاص
     const allowedForRole2 = [
       "home",
       "ServiceManager",
@@ -92,7 +83,6 @@ const Sidebar = ({ setActiveComponent }) => {
     >
       <header className="flex items-center gap-5 p-5  font-bold text-xl">
         <div className="flex items-center justify-center p-1 bg-gray-300 h-10 w-10 rounded-full">
-          {/* <img src="/logo.png" alt="Logo" className="h-10 w-10" /> */}
           <FaUser className=" text-[#7209b7]" size={24} />
         </div>
 
@@ -142,7 +132,6 @@ const Sidebar = ({ setActiveComponent }) => {
                 </span>
               </a>
             )}
-
             {/* Tooltip */}
             <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-4 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg z-50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               {component.name}

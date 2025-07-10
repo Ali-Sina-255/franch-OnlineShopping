@@ -113,10 +113,28 @@ export default function ProductManager() {
         "error"
       );
     }
+    setFormData({
+      product_name: "",
+      description: "",
+      details: "",
+      tags: "",
+      attributes: "{}",
+      type: "ma",
+      condition: "New",
+      price: "",
+      stock: "",
+      image_url: null,
+      hover_image_url: null,
+      seller_notes: "",
+      material: "",
+      is_available: true,
+      category: "",
+      multi_images: [],
+    });
   };
 
   return (
-    <div  className="p-6 ">
+    <div className="p-6 ">
       <div className=" bg-white p-6 shadow-md rounded-md">
         <h2 className="text-2xl font-bold mb-6">
           {editingId ? "Edit Product" : "Add New Product"}
@@ -289,7 +307,7 @@ export default function ProductManager() {
                   type="file"
                   name="image_url"
                   onChange={handleFileChange}
-                  className="input-field w-full"
+                  className="w-full px-3 py-2 border rounded file:bg-blue-500 file:border-none file:py-1 file:text-white  cursor-pointer file:rounded-md bg-gray-200 text-black focus:outline-none"
                 />
               </div>
               <div>
@@ -300,7 +318,7 @@ export default function ProductManager() {
                   type="file"
                   name="hover_image_url"
                   onChange={handleFileChange}
-                  className="input-field w-full"
+                  className="w-full px-3 py-2 border rounded file:bg-blue-500 file:border-none file:py-1 file:text-white  cursor-pointer file:rounded-md bg-gray-200 text-black focus:outline-none"
                 />
               </div>
               <div>
@@ -312,7 +330,7 @@ export default function ProductManager() {
                   name="multi_images"
                   multiple
                   onChange={handleFileChange}
-                  className="input-field w-full"
+                  className="w-full px-3 py-2 border rounded file:bg-blue-500 file:border-none file:py-1 file:text-white  cursor-pointer file:rounded-md bg-gray-200 text-black focus:outline-none"
                 />
               </div>
             </div>

@@ -116,7 +116,7 @@ export default function ProductManager() {
   };
 
   return (
-    <div className="p-6 ">
+    <div  className="p-6 ">
       <div className=" bg-white p-6 shadow-md rounded-md">
         <h2 className="text-2xl font-bold mb-6">
           {editingId ? "Edit Product" : "Add New Product"}
@@ -130,7 +130,7 @@ export default function ProductManager() {
                 name="product_name"
                 value={formData.product_name}
                 onChange={handleFormChange}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
                 required
               />
             </div>
@@ -141,7 +141,7 @@ export default function ProductManager() {
                 name="category"
                 value={formData.category}
                 onChange={handleFormChange}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
                 required
               >
                 <option value="">Select Category</option>
@@ -160,7 +160,7 @@ export default function ProductManager() {
                 name="price"
                 value={formData.price}
                 onChange={handleFormChange}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
                 required
               />
             </div>
@@ -172,7 +172,7 @@ export default function ProductManager() {
                 name="stock"
                 value={formData.stock}
                 onChange={handleFormChange}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
                 required
               />
             </div>
@@ -183,7 +183,7 @@ export default function ProductManager() {
                 name="type"
                 value={formData.type}
                 onChange={handleFormChange}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
                 required
               >
                 <option value="ma">Man</option>
@@ -197,7 +197,7 @@ export default function ProductManager() {
                 name="condition"
                 value={formData.condition}
                 onChange={handleFormChange}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
                 required
               >
                 <option value="New">New</option>
@@ -215,7 +215,7 @@ export default function ProductManager() {
                 name="material"
                 value={formData.material}
                 onChange={handleFormChange}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
                 required
               />
             </div>
@@ -229,7 +229,7 @@ export default function ProductManager() {
                 name="tags"
                 value={formData.tags}
                 onChange={handleFormChange}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
                 placeholder="e.g. summer, casual, cotton"
               />
             </div>
@@ -256,7 +256,7 @@ export default function ProductManager() {
               name="details"
               value={formData.details}
               onChange={handleFormChange}
-              className="input-field w-full"
+              className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
               placeholder="e.g. 100% Cotton, Machine Washable"
             />
           </div>

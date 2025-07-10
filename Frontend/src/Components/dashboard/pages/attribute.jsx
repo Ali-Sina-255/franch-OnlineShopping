@@ -269,7 +269,7 @@ const Attribute = () => {
               value={attributeName}
               onChange={(e) => setAttributeName(e.target.value)}
               placeholder="e.g., Color, Size"
-              className="mt-1 block w-full p-2 bg-gray-200 border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
               required
             />
           </div>
@@ -279,7 +279,7 @@ const Attribute = () => {
             <select
               value={attributeType}
               onChange={(e) => setAttributeType(e.target.value)}
-              className="mt-1 block w-full p-2 bg-gray-200 border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
             >
               {ATTRIBUTE_TYPE_CHOICES.map((type) => (
                 <option key={type} value={type}>

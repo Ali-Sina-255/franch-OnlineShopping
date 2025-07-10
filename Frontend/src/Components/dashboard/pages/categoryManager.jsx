@@ -16,7 +16,7 @@ const CategoryManagement = () => {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(6);
+  const [itemsPerPage] = useState(9);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -77,7 +77,7 @@ const CategoryManagement = () => {
             editingCategory ? "updated" : "added"
           } successfully.`,
           icon: "success",
-          timer: 3000,
+          timer: 2000,
           timerProgressBar: true,
         });
         resetForm();
@@ -133,27 +133,27 @@ const CategoryManagement = () => {
   };
 
   return (
-    <div className="py-10 w-full px-5">
+    <div  className="p-6 w-full px-5">
       {/* Form Section */}
-      <div className="max-w-5xl mx-auto py-4 px-5 shadow-lg bg-white rounded-md">
+      <div className="w-full py-4 px-5 shadow-lg bg-white pb-14 rounded-md">
         <h2 className="text-xl text-center font-bold mb-4">
           {editingCategory ? "Edit Category" : "Add New Category"}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-lg font-medium text-gray-700 mb-1">
-              Category Name
-            </label>
+        <form
+          onSubmit={handleSubmit}
+          className=" flex max-w-4xl mx-auto  gap-x-5 justify-center items-center "
+        >
+          <div className="">
             <input
               type="text"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
-              className="w-full px-3 py-2 border rounded bg-gray-200 text-black focus:outline-none"
+              className="w-[450px] px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
               placeholder="Enter category name"
               required
             />
           </div>
-          <div className="flex justify-center gap-4 mt-4">
+          <div className="flex justify-center gap-4 py-2">
             <button type="submit" className="secondry-btn">
               {editingCategory ? "Update" : "Add"}
             </button>
@@ -168,64 +168,66 @@ const CategoryManagement = () => {
             )}
           </div>
         </form>
-      </div>
-
-      {/* Table Section */}
-      <div
-        id="category-table"
-        className="w-full max-w-5xl mx-auto bg-white p-5 mt-10 rounded-lg shadow-md overflow-x-auto"
-      >
-        <table className="w-full">
-          <thead className="bg-green text-gray-100 text-center">
-            <tr className="bg-gray-100">
-              <th className="border text-black px-6 py-2.5 font-semibold">
-                Category Name
-              </th>
-              <th className="border px-6 text-black py-2.5 font-semibold">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentCategories.length > 0 ? (
-              currentCategories.map((category) => (
-                <tr
-                  key={category.id}
-                  className="text-center border-b cursor-pointer hover:bg-gray-100"
-                >
-                  <td className="px-6 py-2">{category.name}</td>
-                  <td className="flex items-center justify-center gap-x-5 px-6 py-2">
-                    <button
-                      onClick={() => handleEdit(category)}
-                      className="text-green-600 hover:scale-105"
-                    >
-                      <FaRegEdit size={24} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(category.id)}
-                      className="text-red-600 hover:scale-105"
-                    >
-                      <IoTrashSharp size={24} />
-                    </button>
+        {/* Table Section */}
+        <div
+          id="category-table"
+          className="w-full max-w-5xl mx-auto bg-white p-5 mt-5 rounded-lg shadow-md overflow-x-auto"
+        >
+          <table className="w-full">
+            <thead className="bg-green text-gray-100 text-center">
+              <tr className="bg-gray-100">
+                <th className="border text-black px-6 py-2.5 font-semibold">
+                  Category Name
+                </th>
+                <th className="border px-6 text-black py-2.5 font-semibold">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentCategories.length > 0 ? (
+                currentCategories.map((category) => (
+                  <tr
+                    key={category.id}
+                    className="text-center border-b cursor-pointer hover:bg-gray-100"
+                  >
+                    <td className="px-6 py-2">{category.name}</td>
+                    <td className="flex items-center justify-center gap-x-5 px-6 py-2">
+                      <button
+                        onClick={() => handleEdit(category)}
+                        className="text-green-600 hover:scale-105"
+                      >
+                        <FaRegEdit size={24} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(category.id)}
+                        className="text-red-600 hover:scale-105"
+                      >
+                        <IoTrashSharp size={24} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="2" className="text-center py-4 text-gray-500">
+                    No categories found.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="2" className="text-center py-4 text-gray-500">
-                  No categories found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
 
-        {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={Math.ceil(categories.length / itemsPerPage)}
-          onPageChange={handlePageChange}
-        />
+          {/* Pagination */}
+          {/* Pagination */}
+          {Math.ceil(categories.length / itemsPerPage) > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(categories.length / itemsPerPage)}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

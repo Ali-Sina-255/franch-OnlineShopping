@@ -72,7 +72,10 @@ const Dashboard = () => {
           </div>
         </div>
         <main className="flex-1 overflow-y-auto custom-scrollbar">
-          <MainContent activeComponent={activeComponent} />
+          <MainContent
+            activeComponent={activeComponent}
+            setActiveComponent={setActiveComponent}
+          />
         </main>
       </div>
     </div>

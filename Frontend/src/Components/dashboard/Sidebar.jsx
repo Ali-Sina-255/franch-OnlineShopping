@@ -38,18 +38,42 @@ const Sidebar = ({ setActiveComponent }) => {
   };
 
   const AllComponents = [
-    { name: "Home", value: "home", icon: <MdDashboardCustomize /> },
+    {
+      name: "Home",
+      value: "home",
+      icon: <MdDashboardCustomize className="text-green-500" />,
+    },
     {
       name: "Category Management",
       value: "category",
-      icon: <LucideUserRoundPlus />,
+      icon: <LucideUserRoundPlus className="text-blue-500" />,
     },
-    { name: "Attribute Management", value: "attribute", icon: <FaBuilding /> },
-    { name: "Products", value: "products", icon: <MdLocalLaundryService /> },
-    { name: "Porductlist-table", value: "porductlist", icon: <FaBuilding /> },
-    { name: "Profile", value: "proflie", icon: <FaUser /> },
+    {
+      name: "Attribute Management",
+      value: "attribute",
+      icon: <FaBuilding className="text-blue-500" />,
+    },
+    {
+      name: "New Product",
+      value: "products",
+      icon: <MdLocalLaundryService className="text-blue-500" />,
+    },
+    {
+      name: "Porducts",
+      value: "porductlist",
+      icon: <FaBuilding className="text-blue-500" />,
+    },
+    {
+      name: "Profile",
+      value: "proflie",
+      icon: <FaUser className="text-blue-500" />,
+    },
 
-    { name: "Logout", value: "signout", icon: <FaSignOutAlt /> },
+    {
+      name: "Logout",
+      value: "signout",
+      icon: <FaSignOutAlt className="text-rose-500" />,
+    },
   ];
 
   let accessibleComponents = [];
@@ -82,13 +106,14 @@ const Sidebar = ({ setActiveComponent }) => {
       className={`h-full transition-all duration-300 ease-in-out w-64 bg-white `}
     >
       <header className="flex items-center gap-5 p-5  font-bold text-xl">
-        <div className="flex items-center justify-center p-1 bg-gray-300 h-10 w-10 rounded-full">
+        <Link to="/" className="flex items-center justify-center p-1 bg-gray-300 h-10 w-10 rounded-full">
+          {/* <img src="/logo.png" alt="Logo" className="h-10 w-10" /> */}
           <FaUser className=" text-[#7209b7]" size={24} />
-        </div>
+        </Link>
 
-        <span className="text-lg font-semibold  text-[#7209b7] whitespace-nowrap">
-          <Link to="/">CHIQ FRIP</Link>
-        </span>
+        <Link to='/' className="text-lg font-semibold  text-[#7209b7] whitespace-nowrap">
+          CHIQ FRIP
+        </Link>
       </header>
       <ul className=" mx-2">
         {AllComponents.map((component, index) => (

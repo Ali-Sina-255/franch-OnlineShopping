@@ -7,7 +7,7 @@ import { IoTrashSharp } from "react-icons/io5";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-export default function ProductList({ setCurrentView }) {
+export default function ProductList({ setActiveComponent }) {
   const token = useSelector((state) => state.user.accessToken);
 
   const [products, setProducts] = useState([]);
@@ -86,8 +86,8 @@ export default function ProductList({ setCurrentView }) {
     setCurrentView({ name: "editProduct", data: { productId } });
   };
 
-  const handleAddNew = () => {
-    setCurrentView({ name: "addProduct", data: null });
+  const handleGoToManager = () => {
+    setActiveComponent("products");
   };
 
   const filteredProducts = products.filter((product) =>
@@ -110,7 +110,7 @@ export default function ProductList({ setCurrentView }) {
               className="input-field w-full md:w-64"
             />
             <button
-              onClick={handleAddNew}
+              onClick={handleGoToManager}
               className="primary-btn whitespace-nowrap"
             >
               + Add New Product

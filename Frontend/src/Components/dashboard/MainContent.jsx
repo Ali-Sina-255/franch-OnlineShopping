@@ -8,7 +8,7 @@ import Attribute from "./pages/attribute.jsx";
 import ProductManager from "./pages/ProductManager.jsx";
 import ProductList from './pages/ProductList.jsx';
 
-const MainContent = ({ activeComponent }) => {
+const MainContent = ({ activeComponent, setActiveComponent }) => {
   const renderContent = () => {
     switch (activeComponent) {
       case "dashboard":
@@ -20,7 +20,7 @@ const MainContent = ({ activeComponent }) => {
       case "products":
         return <ProductManager />;
       case "porductlist":
-        return <ProductList />;
+        return <ProductList setActiveComponent={setActiveComponent} />;
       // case "report":
       //   return <Report />;
       case "proflie":

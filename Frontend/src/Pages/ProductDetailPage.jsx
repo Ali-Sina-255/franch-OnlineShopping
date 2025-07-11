@@ -50,6 +50,7 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 alt={product.name}
                 className="h-full w-full object-cover object-center rounded-lg shadow-lg"
               />
+
             </div>
             <div className="mx-auto w-full max-w-2xl sm:block lg:max-w-none">
               <div className="grid grid-cols-4 gap-6">
@@ -63,6 +64,7 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                         : "ring-1 ring-gray-300"
                     }`}
                   >
+
                     <span className="absolute inset-0 overflow-hidden rounded-md">
                       <img
                         src={image}
@@ -74,6 +76,7 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 ))}
               </div>
             </div>
+            
           </div>
           <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">

@@ -103,7 +103,8 @@ const Sidebar = ({ setActiveComponent }) => {
               activeC === component.value
                 ? "bg-gray-200 text-primary"
                 : "hover:bg-gray-200 hover:bg-opacity-20 text-black"
-            }`}
+                  }`}
+                
               >
                 <span className="text-xl">{component.icon}</span>
                 <span className="text-base font-semibold whitespace-nowrap">
@@ -132,7 +133,6 @@ const Sidebar = ({ setActiveComponent }) => {
                 </span>
               </a>
             )}
-            {/* Tooltip */}
             <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-4 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg z-50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               {component.name}
               <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-r-4 border-r-gray-800"></div>

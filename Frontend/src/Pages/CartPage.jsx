@@ -5,12 +5,13 @@ import { Link } from "react-router-dom";
 import { Trash2 } from "lucide-react";
 
 const CartPage = ({ cartItems, onRemoveItem }) => {
-  // Calculate subtotal
+  // NOTE: Your 'add to cart' logic likely needs updating to pass the full product object from the API.
+  // This code assumes `cartItems` contains objects matching the API structure.
+
   const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-  const shippingFee = subtotal > 0 ? 5.99 : 0; // Example shipping fee
+  const shippingFee = subtotal > 0 ? 5.99 : 0;
   const total = subtotal + shippingFee;
 
-  // Handle the empty cart case
   if (cartItems.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8 text-center">
@@ -48,9 +49,10 @@ const CartPage = ({ cartItems, onRemoveItem }) => {
               {cartItems.map((product) => (
                 <li key={product.id} className="flex py-6 sm:py-10">
                   <div className="flex-shrink-0">
+                    {/* FIX: Use snake_case 'image_url' from the API object */}
                     <img
-                      src={product.imageUrl}
-                      alt={product.name}
+                      src={product.image_url}
+                      alt={product.product_name}
                       className="h-24 w-24 rounded-md object-cover object-center sm:h-48 sm:w-48"
                     />
                   </div>
@@ -64,18 +66,19 @@ const CartPage = ({ cartItems, onRemoveItem }) => {
                               to={`/product/${product.id}`}
                               className="font-medium text-gray-700 hover:text-gray-800"
                             >
-                              {product.name}
+                              {/* FIX: Use 'product_name' from the API object */}
+                              {product.product_name}
                             </Link>
                           </h3>
                         </div>
                         <p className="mt-1 text-sm font-medium text-gray-900">
-                          {product.brand}
+                          {product.attributes?.brand}
                         </p>
                         <p className="mt-1 text-sm text-gray-500">
-                          {product.color}
+                          {product.attributes?.color}
                         </p>
                         <p className="mt-1 text-sm text-gray-500">
-                          Size: {product.size}
+                          Size: {product.attributes?.size}
                         </p>
                       </div>
 
@@ -105,8 +108,6 @@ const CartPage = ({ cartItems, onRemoveItem }) => {
             </ul>
           </section>
 
-
-          {/* Order summary */}
           <section
             aria-labelledby="summary-heading"
             className="mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8"
@@ -161,5 +162,3 @@ const CartPage = ({ cartItems, onRemoveItem }) => {
 };
 
 export default CartPage;
-
-

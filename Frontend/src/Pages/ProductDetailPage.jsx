@@ -2,27 +2,73 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { products } from "../data/products";
+import { fetchProductById } from "../services/api";
+import { mapProductFromApi } from "../utils/product-mapper";
 import { ShieldCheck, AlertTriangle, Tag, Heart } from "lucide-react";
+
+// A dedicated component for the loading skeleton to keep the main component cleaner
+const ProductDetailSkeleton = () => (
+  <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-8">
+      {/* Image Skeleton */}
+      <div className="animate-pulse">
+        <div className="aspect-h-1 aspect-w-1 w-full bg-gray-200 rounded-lg"></div>
+        <div className="mt-6 grid grid-cols-4 gap-6">
+          <div className="aspect-h-1 aspect-w-1 bg-gray-200 rounded-md"></div>
+          <div className="aspect-h-1 aspect-w-1 bg-gray-200 rounded-md"></div>
+          <div className="aspect-h-1 aspect-w-1 bg-gray-200 rounded-md"></div>
+          <div className="aspect-h-1 aspect-w-1 bg-gray-200 rounded-md"></div>
+        </div>
+      </div>
+      {/* Info Skeleton */}
+      <div className="animate-pulse mt-10 lg:mt-0">
+        <div className="h-8 w-3/4 bg-gray-200 rounded-md"></div>
+        <div className="mt-4 h-6 w-1/4 bg-gray-200 rounded-md"></div>
+        <div className="mt-8 h-10 w-1/3 bg-gray-200 rounded-md"></div>
+        <div className="mt-8 h-24 w-full bg-gray-200 rounded-md"></div>
+        <div className="mt-10 h-12 w-full bg-gray-200 rounded-md"></div>
+      </div>
+    </div>
+  </div>
+);
 
 const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
   const { id } = useParams();
-  const product = products.find((p) => p.id == id);
+  const [product, setProduct] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState("");
-  const isWishlisted = product ? wishlist.includes(product.id) : false;
-
-  const imageRef = useRef(null); // Create a ref for the image
+  const imageRef = useRef(null);
 
   useEffect(() => {
-    if (product) {
-      setCurrentImage(product.imageUrl);
-    }
-  }, [product]);
+    const getProduct = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetchProductById(id);
+        const mappedProduct = mapProductFromApi(res.data);
+        setProduct(mappedProduct);
+        if (mappedProduct && mappedProduct.imageUrl) {
+          setCurrentImage(mappedProduct.imageUrl);
+        }
+      } catch (error) {
+        console.error("Failed to fetch product", error);
+        setProduct(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    getProduct();
+  }, [id]);
 
   const handleAddToCartClick = () => {
-    // Pass the product AND the image element's ref to the handler
-    onAddToCart(product, imageRef);
+    if (product) {
+      // Pass the mapped product object, which is what the rest of the app expects
+      onAddToCart(product, imageRef);
+    }
   };
+
+  if (isLoading) {
+    return <ProductDetailSkeleton />;
+  }
 
   if (!product) {
     return (
@@ -38,57 +84,61 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
     );
   }
 
+  const isWishlisted = wishlist.includes(product.id);
+
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-        <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
-          <div className="flex flex-col-reverse">
-            <div className="aspect-h-1 aspect-w-1 w-full mt-4">
+        <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
+          {/* --- MODERN & ROBUST IMAGE GALLERY --- */}
+          <div className="flex flex-col gap-6">
+            {/* Main Image View */}
+            <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg">
               <img
-                ref={imageRef} // Attach the ref to the main image
+                ref={imageRef}
                 src={currentImage}
                 alt={product.name}
-                className="h-full w-full object-cover object-center rounded-lg shadow-lg"
+                className="h-full w-full object-cover object-center transition-opacity duration-300"
               />
-
             </div>
-            <div className="mx-auto w-full max-w-2xl sm:block lg:max-w-none">
-              <div className="grid grid-cols-4 gap-6">
-                {product.images.map((image) => (
-                  <button
-                    key={image}
-                    onClick={() => setCurrentImage(image)}
-                    className={`relative flex h-24 cursor-pointer items-center justify-center rounded-md bg-white text-sm font-medium uppercase text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring focus:ring-opacity-50 focus:ring-offset-4 ${
-                      currentImage === image
-                        ? "ring-2 ring-indigo-500"
-                        : "ring-1 ring-gray-300"
-                    }`}
-                  >
 
-                    <span className="absolute inset-0 overflow-hidden rounded-md">
-                      <img
-                        src={image}
-                        alt=""
-                        className="h-full w-full object-cover object-center"
-                      />
-                    </span>
-                  </button>
-                ))}
-              </div>
+            {/* Thumbnail Grid */}
+            <div className="hidden sm:grid grid-cols-4 gap-6">
+              {product.images.map((image, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentImage(image)}
+                  className={`aspect-h-1 aspect-w-1 rounded-md overflow-hidden ring-2 focus:outline-none transition-all duration-200 ${
+                    currentImage === image
+                      ? "ring-indigo-500 ring-offset-2"
+                      : "ring-transparent hover:ring-indigo-300"
+                  }`}
+                >
+                  <img
+                    src={image}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="h-full w-full object-cover object-center"
+                  />
+                </button>
+              ))}
             </div>
-            
           </div>
-          <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
+          {/* --- END OF IMAGE GALLERY --- */}
+
+          {/* Product Info */}
+          <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">
               {product.name}
             </h1>
             <p className="text-xl mt-2 text-gray-500">{product.brand}</p>
+
             <div className="mt-4">
               <p className="text-3xl tracking-tight text-gray-900">{`€${product.price.toFixed(
                 2
               )}`}</p>
             </div>
-            <div className="mt-4 flex items-center flex-wrap gap-2">
+
+            <div className="mt-6 flex items-center flex-wrap gap-2">
               <Tag className="h-5 w-5 text-gray-400" />
               {product.tags.map((tag) => (
                 <span
@@ -99,6 +149,7 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 </span>
               ))}
             </div>
+
             <div className="mt-8">
               <div className="flex items-center">
                 <ShieldCheck className="h-6 w-6 text-green-600 mr-2" />
@@ -107,8 +158,9 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 </p>
               </div>
             </div>
+
             {product.sellerNotes && (
-              <div className="mt-4 rounded-lg bg-yellow-50 p-4">
+              <div className="mt-6 rounded-lg bg-yellow-50 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
                     <AlertTriangle
@@ -127,23 +179,23 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 </div>
               </div>
             )}
+
             <div className="mt-8">
               <h3 className="text-lg font-medium text-gray-900">Description</h3>
               <div className="mt-4 space-y-6 text-base text-gray-700">
                 <p>{product.description}</p>
               </div>
             </div>
+
             <div className="mt-8">
               <h3 className="text-lg font-medium text-gray-900">Details</h3>
-              <ul
-                role="list"
-                className="list-disc space-y-2 pl-4 mt-4 text-gray-600"
-              >
+              <ul className="list-disc space-y-2 pl-4 mt-4 text-gray-600">
                 {product.details.map((detail) => (
                   <li key={detail}>{detail}</li>
                 ))}
               </ul>
             </div>
+
             <div className="mt-8 flex justify-between text-sm">
               <div>
                 <span className="font-medium text-gray-900">Color:</span>{" "}
@@ -158,10 +210,11 @@ const ProductDetailPage = ({ onAddToCart, wishlist, onToggleWishlist }) => {
                 {product.size}
               </div>
             </div>
+
             <div className="mt-10 flex items-center gap-x-4">
               <button
                 type="button"
-                onClick={handleAddToCartClick} // Use the new handler
+                onClick={handleAddToCartClick}
                 className="flex-1 flex items-center justify-center rounded-md border border-transparent bg-gray-900 px-8 py-3 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
               >
                 Add to bag

@@ -1,60 +1,85 @@
-// src/components/products/ProductCard.jsx
+// src/components/ProductCard.jsx
 
 import React from "react";
-import { Link } from "react-router-dom"; // Assuming you use react-router for navigation
-import { ShoppingCart } from "lucide-react";
+import { Heart, Eye } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const ProductCard = ({ product }) => {
-  // --- THIS IS THE FIX ---
-  // Add a "guard clause" at the top of the component.
-  // If the product prop is missing or invalid, render nothing (or a placeholder).
-  if (!product) {
-    return null; // or return <div className="product-card-placeholder"></div>;
-  }
-  // --- END OF FIX ---
+// This component now receives the CLEAN, MAPPED product object.
+const ProductCard = ({ product, onQuickView, wishlist, onToggleWishlist }) => {
+  const isWishlisted = wishlist.includes(product.id);
 
-  // This line (line 5 in your original file) was causing the error.
-  // It will now only run if the 'product' prop exists.
-  // We also add a fallback in case multi_images is empty.
-  const primaryImage =
-    product.multi_images && product.multi_images.length > 0
-      ? product.multi_images[0].image
-      : "/placeholder.jpg"; // A fallback image if there are no images
+  const handleQuickViewClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onQuickView(product);
+  };
 
-  // Add a check for price existence as well, defaulting to 'N/A'
-  const displayPrice = product.price
-    ? `${parseFloat(product.price).toLocaleString()} افغانی`
-    : "قیمت نامشخص";
+  const handleWishlistClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onToggleWishlist(product.id);
+  };
 
   return (
-    <div className="border rounded-lg shadow-sm overflow-hidden group transition-transform transform hover:-translate-y-1">
-      <Link to={`/products/${product.id}`} className="block">
-        <div className="w-full h-48 bg-gray-200 overflow-hidden">
+    <div className="group relative">
+      <Link to={`/product/${product.id}`}>
+        <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
+          {/* USE THE MAPPED 'imageUrl' (camelCase) */}
           <img
-            src={primaryImage}
-            alt={product.name || "Product Image"}
-            className="w-full h-full object-cover transition-transform group-hover:scale-110"
+            src={product.imageUrl}
+            alt={product.name}
+            className="h-full w-full object-cover object-center"
           />
-        </div>
-        <div className="p-4">
-          <h3
-            className="text-lg font-semibold truncate text-gray-800"
-            title={product.name}
-          >
-            {product.name || "محصول بی نام"}
-          </h3>
-          <p className="text-gray-500 text-sm mt-1">
-            {product.category_name || "دسته بندی نشده"}
-          </p>
-          <p className="text-lg font-bold text-blue-600 mt-2">{displayPrice}</p>
+
+          {/* USE THE MAPPED 'hoverImageUrl' */}
+          {product.hoverImageUrl && (
+            <img
+              src={product.hoverImageUrl}
+              alt={`${product.name} hover`}
+              className="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            />
+          )}
         </div>
       </Link>
-      <div className="p-4 pt-0">
-        <button className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
-          <ShoppingCart size={18} />
-          <span>افزودن به سبد</span>
+
+      <div className="absolute inset-x-0 bottom-24 opacity-0 group-hover:opacity-100 transition-opacity duration-300 px-4">
+        <button
+          onClick={handleQuickViewClick}
+          className="w-full bg-white/80 backdrop-blur-sm text-gray-900 font-semibold py-2 px-4 rounded-md shadow-md hover:bg-white flex items-center justify-center"
+        >
+          <Eye className="mr-2 h-5 w-5" />
+          Quick View
         </button>
       </div>
+
+      <div className="mt-4 flex justify-between">
+        <div>
+          <h3 className="text-sm font-medium text-gray-900">
+            <Link to={`/product/${product.id}`}>
+              <span aria-hidden="true" className="absolute inset-0" />
+              {product.brand}
+            </Link>
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">{product.name}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm font-semibold text-gray-900">{`€${product.price.toFixed(
+            2
+          )}`}</p>
+          <p className="mt-1 text-xs text-gray-500">Size: {product.size}</p>
+        </div>
+      </div>
+
+      <button
+        onClick={handleWishlistClick}
+        className="absolute top-2 right-2 p-1.5 bg-white/70 rounded-full text-gray-500 hover:text-red-500 transition-all duration-200 z-10"
+      >
+        <Heart
+          size={20}
+          className={isWishlisted ? "text-red-500" : "text-gray-500"}
+          fill={isWishlisted ? "currentColor" : "none"}
+        />
+      </button>
     </div>
   );
 };

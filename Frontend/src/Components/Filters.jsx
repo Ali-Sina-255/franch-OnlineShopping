@@ -1,6 +1,5 @@
 // src/components/Filters.jsx
 import React from "react";
-import { filters } from "../data/products";
 import AccordionFilterSection from "./AccordionFilterSection";
 import PriceSlider from "./PriceSlider";
 
@@ -12,6 +11,7 @@ const Filters = ({
   maxPrice,
   resetFilters,
   activeFilters,
+  filterOptions, // New prop with dynamic options
 }) => {
   const hasActiveFilters =
     Object.keys(activeFilters).length > 0 ||
@@ -34,33 +34,37 @@ const Filters = ({
         </div>
       )}
 
-      <AccordionFilterSection
-        title="Categories"
-        options={filters.categories}
-        onFilterChange={onFilterChange}
-      />
-      <AccordionFilterSection
-        title="Brands"
-        options={filters.brands}
-        onFilterChange={onFilterChange}
-        searchable={true}
-      />
-      <AccordionFilterSection
-        title="Sizes"
-        options={filters.sizes}
-        onFilterChange={onFilterChange}
-      />
-      <AccordionFilterSection
-        title="Conditions"
-        options={filters.conditions}
-        onFilterChange={onFilterChange}
-      />
-      <AccordionFilterSection
-        title="Colors"
-        options={filters.colors}
-        onFilterChange={onFilterChange}
-        searchable={true}
-      />
+      {/* Dynamic Filter Sections */}
+      {filterOptions.brands.length > 0 && (
+        <AccordionFilterSection
+          title="Brands"
+          options={filterOptions.brands}
+          onFilterChange={onFilterChange}
+          searchable={true}
+        />
+      )}
+      {filterOptions.sizes.length > 0 && (
+        <AccordionFilterSection
+          title="Sizes"
+          options={filterOptions.sizes}
+          onFilterChange={onFilterChange}
+        />
+      )}
+      {filterOptions.conditions.length > 0 && (
+        <AccordionFilterSection
+          title="Conditions"
+          options={filterOptions.conditions}
+          onFilterChange={onFilterChange}
+        />
+      )}
+      {filterOptions.colors.length > 0 && (
+        <AccordionFilterSection
+          title="Colors"
+          options={filterOptions.colors}
+          onFilterChange={onFilterChange}
+          searchable={true}
+        />
+      )}
 
       <PriceSlider
         min={minPrice}

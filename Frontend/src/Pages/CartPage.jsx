@@ -1,18 +1,18 @@
-// src/pages/CartPage.jsx
-
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Loader2, Trash2 } from "lucide-react";
 import { mapProductFromApi } from "../utils/product-mapper";
 
-// --- REDUX IMPORTS ---
 import { useSelector, useDispatch } from "react-redux";
-import { removeItemFromCart } from "../state/userSlice/userSlice";
+import {
+  removeItemFromCart,
+  updateCartItemQuantity,
+} from "../state/userSlice/userSlice";
 
 const CartPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // --- REDUX STATE ---
   const { cartItems, cartLoading } = useSelector((state) => state.user);
 
   const subtotal = cartItems.reduce(
@@ -25,6 +25,15 @@ const CartPage = () => {
 
   const handleRemoveItem = (cartItemId) => {
     dispatch(removeItemFromCart(cartItemId));
+  };
+
+  const handleQuantityChange = (cartItemId, currentQuantity, change) => {
+    const newQuantity = currentQuantity + change;
+    if (newQuantity > 0) {
+      dispatch(updateCartItemQuantity({ cartItemId, quantity: newQuantity }));
+    } else {
+      handleRemoveItem(cartItemId);
+    }
   };
 
   if (cartLoading && cartItems.length === 0) {
@@ -61,7 +70,7 @@ const CartPage = () => {
         <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
           Shopping Bag
         </h1>
-        <form className="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
+        <div className="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
           <section aria-labelledby="cart-heading" className="lg:col-span-7">
             <h2 id="cart-heading" className="sr-only">
               Items in your shopping cart
@@ -98,22 +107,16 @@ const CartPage = () => {
                             {product.brand}
                           </p>
                           <p className="mt-1 text-sm text-gray-500">
-                            {product.color}
-                          </p>
-                          <p className="mt-1 text-sm text-gray-500">
-                            Size: {product.size}
+                            Qty: {item.quantity}
                           </p>
                         </div>
                         <div className="mt-4 sm:mt-0 sm:pr-9">
                           <p className="text-right text-base font-semibold text-gray-900">
-                            €{product.price.toFixed(2)}
+                            €{(product.price * item.quantity).toFixed(2)}
                           </p>
                         </div>
                       </div>
-                      <div className="mt-4 flex items-center justify-between text-sm">
-                        <p className="text-gray-500">
-                          Condition: {product.condition}
-                        </p>
+                      <div className="mt-4 flex items-center justify-end text-sm">
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(item.id)}
@@ -167,18 +170,15 @@ const CartPage = () => {
             </dl>
             <div className="mt-6">
               <button
-                type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert("Checkout not implemented yet!");
-                }}
+                type="button"
+                onClick={() => navigate("/checkout")}
                 className="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 Proceed to Checkout
               </button>
             </div>
           </section>
-        </form>
+        </div>
       </div>
     </div>
   );

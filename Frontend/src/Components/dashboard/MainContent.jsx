@@ -7,6 +7,7 @@ import Profile from "../../Pages/dashboard/Profiles.jsx";
 import Attribute from "./pages/attribute.jsx";
 import ProductManager from "./pages/ProductManager.jsx";
 import ProductList from './pages/ProductList.jsx';
+import OrderManagement from "./pages/OrderManagement.jsx"; 
 
 const MainContent = ({ activeComponent, setActiveComponent }) => {
   const renderContent = () => {
@@ -23,6 +24,8 @@ const MainContent = ({ activeComponent, setActiveComponent }) => {
         return <ProductList setActiveComponent={setActiveComponent} />;
       // case "report":
       //   return <Report />;
+      case "orders": // --- ADD THIS CASE ---
+        return <OrderManagement />;
       case "proflie":
         return <Profile />;
 

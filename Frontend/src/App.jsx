@@ -17,7 +17,8 @@ import PrivateRoute from "./Components/common/PrivateRoute";
 import Signin from "./features/authentication/components/Signin";
 import SignUp from "./features/authentication/components/Signup";
 import DashboardPage from "./Components/dashboard/DashboardPage";
-
+import CheckoutPage from "./Pages/CheckoutPage";
+import OrderSuccessPage from "./Pages/OrderSuccessPage";
 function App() {
   // Remove the old local cart state and handlers
   // const [cart, setCart] = useState([]);
@@ -55,93 +56,98 @@ function App() {
 
   return (
     // Wrap the entire application with the CartProvider
-      <div className="flex flex-col min-h-screen bg-white">
-        <Toaster
-          position="bottom-center"
-          toastOptions={{
-            success: { style: { background: "#333", color: "#fff" } },
-            error: { style: { background: "#D22B2B", color: "#fff" } },
-          }}
+    <div className="flex flex-col min-h-screen bg-white">
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          success: { style: { background: "#333", color: "#fff" } },
+          error: { style: { background: "#D22B2B", color: "#fff" } },
+        }}
+      />
+
+      {/* QuickViewModal will now use the context internally if needed */}
+      <QuickViewModal
+        product={quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+      />
+
+      {/* CartDrawer now gets all its data from the context */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      <FlyingImage
+        animationData={animationData}
+        onAnimationComplete={() => setAnimationData(null)}
+      />
+
+      {!hideLayout && (
+        // Header will get its cart count from the context
+        <Header
+          wishlistCount={wishlist.length}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onCartClick={() => setIsCartOpen(true)}
+          cartRef={cartRef}
         />
+      )}
 
-        {/* QuickViewModal will now use the context internally if needed */}
-        <QuickViewModal
-          product={quickViewProduct}
-          onClose={() => setQuickViewProduct(null)}
-        />
-
-        {/* CartDrawer now gets all its data from the context */}
-        <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-
-        <FlyingImage
-          animationData={animationData}
-          onAnimationComplete={() => setAnimationData(null)}
-        />
-
-        {!hideLayout && (
-          // Header will get its cart count from the context
-          <Header
-            wishlistCount={wishlist.length}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onCartClick={() => setIsCartOpen(true)}
-            cartRef={cartRef}
+      <main className="flex-grow">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomePage
+                searchQuery={searchQuery}
+                onQuickView={setQuickViewProduct}
+                wishlist={wishlist}
+                onToggleWishlist={handleToggleWishlist}
+              />
+            }
           />
-        )}
+          <Route
+            path="/product/:id"
+            element={
+              // ProductDetailPage no longer needs onAddToCart prop
+              <ProductDetailPage
+                wishlist={wishlist}
+                onToggleWishlist={handleToggleWishlist}
+              />
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              // CartPage no longer needs any props
+              <CartPage />
+            }
+          />
+          <Route
+            path="/wishlist"
+            element={
+              <WishlistPage
+                wishlist={wishlist}
+                onToggleWishlist={handleToggleWishlist}
+                onQuickView={setQuickViewProduct}
+              />
+            }
+          />
 
-        <main className="flex-grow">
-          <Routes>
+          <Route element={<PrivateRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
             <Route
-              path="/"
-              element={
-                <HomePage
-                  searchQuery={searchQuery}
-                  onQuickView={setQuickViewProduct}
-                  wishlist={wishlist}
-                  onToggleWishlist={handleToggleWishlist}
-                />
-              }
+              path="/order-success/:orderNumber"
+              element={<OrderSuccessPage />}
             />
-            <Route
-              path="/product/:id"
-              element={
-                // ProductDetailPage no longer needs onAddToCart prop
-                <ProductDetailPage
-                  wishlist={wishlist}
-                  onToggleWishlist={handleToggleWishlist}
-                />
-              }
-            />
-            <Route
-              path="/cart"
-              element={
-                // CartPage no longer needs any props
-                <CartPage />
-              }
-            />
-            <Route
-              path="/wishlist"
-              element={
-                <WishlistPage
-                  wishlist={wishlist}
-                  onToggleWishlist={handleToggleWishlist}
-                  onQuickView={setQuickViewProduct}
-                />
-              }
-            />
+          </Route>
 
-            <Route element={<PrivateRoute />}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-            </Route>
+          <Route path="/sign-in" element={<Signin />} />
+          <Route path="/sign-up" element={<SignUp />} />
+          <Route path="*" element={<Signin />} />
+        </Routes>
+      </main>
 
-            <Route path="/sign-in" element={<Signin />} />
-            <Route path="/sign-up" element={<SignUp />} />
-            <Route path="*" element={<Signin />} />
-          </Routes>
-        </main>
-
-        {!hideLayout && <Footer />}
-      </div>
+      {!hideLayout && <Footer />}
+    </div>
   );
 }
 

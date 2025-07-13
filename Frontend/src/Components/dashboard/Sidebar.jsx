@@ -1,7 +1,6 @@
 // Sidebar.js (Corrected Role Handling)
-
 import React, { useState } from "react";
-import { FaHome, FaServicestack, FaSignOutAlt, FaUser } from "react-icons/fa";
+import { FaBoxOpen, FaHome, FaServicestack, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { signOutSuccess } from "../../state/userSlice/userSlice"; // Make sure path is correct
 import { Link, useNavigate } from "react-router-dom";
@@ -11,6 +10,9 @@ import { Fa3, FaBuilding } from "react-icons/fa6";
 import { MdDashboardCustomize } from "react-icons/md";
 import { MdLocalLaundryService } from "react-icons/md";
 import { Home, LucideUserRoundPlus } from "lucide-react";
+    
+
+
 
 const Sidebar = ({ setActiveComponent }) => {
   const [selectedC, setSelectedC] = useState("home");
@@ -62,6 +64,11 @@ const Sidebar = ({ setActiveComponent }) => {
       name: "Porducts",
       value: "porductlist",
       icon: <FaBuilding className="text-blue-500" />,
+    },
+    {
+      name: "Order Management", // --- NEW ITEM ---
+      value: "orders",
+      icon: <FaBoxOpen className="text-purple-500" />,
     },
     {
       name: "Profile",

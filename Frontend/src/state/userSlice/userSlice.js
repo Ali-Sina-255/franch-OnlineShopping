@@ -88,7 +88,6 @@ export const signIn = createAsyncThunk(
           : userDetailsResponse.data,
       };
     } catch (error) {
-      // This was the line with the syntax error.
       const message = getErrorMessage(error);
       toast.error(message);
       return rejectWithValue(message);
@@ -144,6 +143,30 @@ export const removeItemFromCart = createAsyncThunk(
       await api.delete(`/api/v1/cart/cart-items/${cartItemId}/`);
       toast.success("Item removed from bag.");
       return cartItemId;
+    } catch (error) {
+      const message = getErrorMessage(error);
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+// --- NEW THUNK FOR QUANTITY UPDATE ---
+export const updateCartItemQuantity = createAsyncThunk(
+  "user/updateCartItemQuantity",
+  async ({ cartItemId, quantity }, { rejectWithValue }) => {
+    if (quantity <= 0) {
+      return rejectWithValue("Quantity must be greater than 0.");
+    }
+    try {
+      const response = await api.patch(
+        `/api/v1/cart/cart-items/${cartItemId}/`,
+        {
+          quantity: quantity,
+        }
+      );
+      // We don't toast here to avoid it being too "noisy" on every click
+      return response.data;
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message);
@@ -242,6 +265,22 @@ const userSlice = createSlice({
       })
       .addCase(removeItemFromCart.rejected, (state, action) => {
         state.cartLoading = false;
+        state.error = action.payload;
+      })
+
+      // --- NEW REDUCER CASE FOR QUANTITY UPDATE ---
+      .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
+        const index = state.cartItems.findIndex(
+          (item) => item.id === action.payload.id
+        );
+        if (index !== -1) {
+          // Replace the old item in the array with the updated one from the server
+          state.cartItems[index] = action.payload;
+        }
+      })
+      .addCase(updateCartItemQuantity.rejected, (state, action) => {
+        // Log error but don't disrupt UX too much for a quantity update fail
+        console.error("Failed to update quantity:", action.payload);
         state.error = action.payload;
       });
   },

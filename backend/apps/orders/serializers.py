@@ -1,10 +1,10 @@
 import re
 from decimal import Decimal
 
-from apps.product.models import Product
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.fields import CurrentUserDefault
+
+from apps.product.models import Product
 
 from .models import Order, OrderProduct, Payment
 
@@ -65,10 +65,9 @@ class OrderSerializer(serializers.ModelSerializer):
             "updated_at",
             "name",
         ]
-        read_only_fields = ["created_at", "updated_at", "name"]
+        read_only_fields = ["user", "created_at", "updated_at", "name", "order_number"]
 
     def validate_phone(self, value):
-        # Example: Ensure phone is digits and length between 10-15
         if not re.match(r"^\+?\d{10,15}$", value):
             raise serializers.ValidationError(
                 "Phone number must be between 10 and 15 digits and may start with +"
@@ -76,47 +75,27 @@ class OrderSerializer(serializers.ModelSerializer):
         return value
 
     def validate_pin_code(self, value):
-        # Example: Pin code should be numeric and length 4-10
         if not value.isdigit() or not (4 <= len(value) <= 10):
             raise serializers.ValidationError(
                 "Pin code must be numeric and between 4 to 10 digits"
             )
         return value
 
-    def validate_payment_method(self, value):
-        valid_methods = [choice[0] for choice in Order.PAYMENT_METHOD]
-        if value not in valid_methods:
-            raise serializers.ValidationError(
-                f"Payment method must be one of: {', '.join(valid_methods)}"
-            )
-        return value
-
-    def validate_status(self, value):
-        valid_status = [choice[0] for choice in Order.STATUS]
-        if value not in valid_status:
-            raise serializers.ValidationError(
-                f"Status must be one of: {', '.join(valid_status)}"
-            )
-        return value
-
     def validate(self, data):
-        # Object-level validation
         if data.get("is_ordered") and not data.get("payment"):
             raise serializers.ValidationError(
                 "Payment information must be provided if the order is marked as ordered."
             )
-
-        # Example: email must belong to a certain domain (optional)
-        # email = data.get('email')
-        # if email and not email.endswith("@example.com"):
-        #     raise serializers.ValidationError("Email must be from @example.com domain.")
-
         return data
 
-    # def create(self, validated_data):
-    #     user = self.context["request"].user
-    #     validated_data["user"] = user
-    #     return super().create(validated_data)
+    def create(self, validated_data):
+        # The user is derived from the authenticated request, not sent in the payload.
+        user = self.context["request"].user
+        
+        # This logic should be expanded to include creating OrderProduct items from the cart.
+        # For now, it correctly creates the Order shell with the right user.
+        order = Order.objects.create(user=user, **validated_data)
+        return order
 
 
 class OrderProductSerializer(serializers.ModelSerializer):

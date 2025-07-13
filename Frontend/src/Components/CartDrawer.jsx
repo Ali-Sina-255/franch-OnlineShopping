@@ -3,10 +3,29 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Trash2 } from "lucide-react";
+import { X, Trash2, Loader2 } from "lucide-react";
+import { mapProductFromApi } from "../utils/product-mapper";
 
-const CartDrawer = ({ isOpen, onClose, cartItems, onRemoveItem }) => {
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+// --- REDUX IMPORTS ---
+import { useSelector, useDispatch } from "react-redux";
+import { removeItemFromCart } from "../state/userSlice/userSlice";
+
+const CartDrawer = ({ isOpen, onClose }) => {
+  const dispatch = useDispatch();
+
+  // --- GET DATA FROM THE REDUX STORE ---
+  const { cartItems, cartLoading } = useSelector((state) => state.user);
+
+  const subtotal = (cartItems || []).reduce(
+  // <-- Add (cartItems || [])
+   (sum, item) => sum + item.product.price * item.quantity,
+     0
+   );
+
+  const handleRemove = (cartItemId) => {
+    dispatch(removeItemFromCart(cartItemId));
+  };
+
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
@@ -21,7 +40,6 @@ const CartDrawer = ({ isOpen, onClose, cartItems, onRemoveItem }) => {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             className="fixed inset-0 bg-black/60 z-40"
             variants={backdropVariants}
@@ -30,8 +48,6 @@ const CartDrawer = ({ isOpen, onClose, cartItems, onRemoveItem }) => {
             exit="hidden"
             onClick={onClose}
           />
-
-          {/* Drawer Panel */}
           <motion.div
             className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 flex flex-col"
             variants={drawerVariants}
@@ -51,49 +67,60 @@ const CartDrawer = ({ isOpen, onClose, cartItems, onRemoveItem }) => {
               </button>
             </div>
 
-            {/* Cart Items */}
             <div className="flex-1 overflow-y-auto p-6">
-              {cartItems.length > 0 ? (
+              {cartLoading && cartItems.length === 0 ? (
+                <div className="flex justify-center items-center h-full">
+                  <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                </div>
+              ) : cartItems.length > 0 ? (
                 <ul className="-my-6 divide-y divide-gray-200">
-                  {cartItems.map((product) => (
-                    <li key={product.id} className="flex py-6">
-                      <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                        <img
-                          src={product.imageUrl}
-                          alt={product.name}
-                          className="h-full w-full object-cover object-center"
-                        />
-                      </div>
-                      <div className="ml-4 flex flex-1 flex-col">
-                        <div>
-                          <div className="flex justify-between text-base font-medium text-gray-900">
-                            <h3>
-                              <Link
-                                to={`/product/${product.id}`}
-                                onClick={onClose}
-                              >
-                                {product.name}
-                              </Link>
-                            </h3>
-                            <p className="ml-4">€{product.price.toFixed(2)}</p>
+                  {cartItems.map((item) => {
+                    const product = mapProductFromApi(item.product);
+                    return (
+                      <li key={item.id} className="flex py-6">
+                        <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                          <img
+                            src={product.imageUrl}
+                            alt={product.name}
+                            className="h-full w-full object-cover object-center"
+                          />
+                        </div>
+                        <div className="ml-4 flex flex-1 flex-col">
+                          <div>
+                            <div className="flex justify-between text-base font-medium text-gray-900">
+                              <h3>
+                                <Link
+                                  to={`/product/${product.id}`}
+                                  onClick={onClose}
+                                >
+                                  {product.name}
+                                </Link>
+                              </h3>
+                              <p className="ml-4">
+                                €{product.price.toFixed(2)}
+                              </p>
+                            </div>
+                            <p className="mt-1 text-sm text-gray-500">
+                              {product.brand}
+                            </p>
                           </div>
-                          <p className="mt-1 text-sm text-gray-500">
-                            {product.brand}
-                          </p>
+                          <div className="flex flex-1 items-end justify-between text-sm">
+                            <p className="text-gray-500">
+                              Qty: {item.quantity}
+                            </p>
+                            <button
+                              onClick={() => handleRemove(item.id)}
+                              type="button"
+                              disabled={cartLoading}
+                              className="font-medium text-red-600 hover:text-red-500 flex items-center disabled:opacity-50"
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" /> Remove
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex flex-1 items-end justify-between text-sm">
-                          <p className="text-gray-500">Size: {product.size}</p>
-                          <button
-                            onClick={() => onRemoveItem(product.id)}
-                            type="button"
-                            className="font-medium text-red-600 hover:text-red-500 flex items-center"
-                          >
-                            <Trash2 className="h-4 w-4 mr-1" /> Remove
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
                 </ul>
               ) : (
                 <div className="text-center h-full flex flex-col justify-center">
@@ -102,7 +129,6 @@ const CartDrawer = ({ isOpen, onClose, cartItems, onRemoveItem }) => {
               )}
             </div>
 
-            {/* Cart Footer */}
             {cartItems.length > 0 && (
               <div className="border-t border-gray-200 py-6 px-6">
                 <div className="flex justify-between text-base font-medium text-gray-900">

@@ -1,41 +1,44 @@
+// src/components/Header.jsx
+
 import React, { useState, useEffect } from "react";
 import { Search, User, ShoppingBag, Menu, X, Heart } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { filters } from "../data/products";
+import { filters } from "../data/products"; // This should be dynamic later
 
-
+// --- REDUX IMPORTS ---
+import { useSelector } from "react-redux";
 
 const Header = ({
-  cartCount,
   wishlistCount,
   searchQuery,
   setSearchQuery,
   onCartClick,
   cartRef,
 }) => {
+  // --- REDUX STATE ---
+  const { cartItems } = useSelector((state) => state.user);
+  // const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const cartCount = (cartItems || []).reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+
   const navigate = useNavigate();
   const location = useLocation();
   const [isShopMenuOpen, setShopMenuOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  
-  
+
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (location.pathname !== "/") {
-      navigate("/");
-    }
-    console.log("Searching for:", searchQuery);
+    if (location.pathname !== "/") navigate("/");
   };
 
   const mobileMenuVariants = {
@@ -150,14 +153,12 @@ const Header = ({
                 />
                 <Search className="h-5 w-5 text-indigo-400 absolute left-3 top-1/2 -translate-y-1/2" />
               </form>
-
               <Link
                 to="/account"
                 className="p-2 text-indigo-700 hover:text-indigo-900 hidden lg:block transition-colors duration-200"
               >
                 <User size={24} />
               </Link>
-
               <Link
                 to="/wishlist"
                 className="flex items-center p-2 text-indigo-700 hover:text-indigo-900 transition-colors duration-200"
@@ -169,7 +170,6 @@ const Header = ({
                   </span>
                 )}
               </Link>
-
               <button
                 ref={cartRef}
                 type="button"
@@ -187,10 +187,8 @@ const Header = ({
           </div>
         </nav>
       </header>
-    
+
       {/* Mobile Menu Slide-out */}
-
-
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>

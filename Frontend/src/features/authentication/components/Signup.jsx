@@ -1,26 +1,50 @@
+// src/features/authentication/components/SignUpPage.jsx
+
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Input from "../components/Input";
 import { Loader, Lock, Mail, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
-import useSignup from "../hooks/useSignup";
+import { useDispatch, useSelector } from "react-redux";
+import { createUser, clearUserError } from "../../../state/userSlice/userSlice";
 
 const SignUpPage = () => {
-  const {
-    firstName,
-    setFirstName,
-    lastName,
-    setLastName,
-    username,
-    setUsername,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    handleSignup,
-    isLoading,
-    error,
-  } = useSignup();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.user);
+
+  // Clear previous errors when the component mounts
+  useEffect(() => {
+    dispatch(clearUserError());
+  }, [dispatch]);
+
+  const handleSignup = (e) => {
+    e.preventDefault();
+    const userData = {
+      first_name: firstName,
+      last_name: lastName,
+      username,
+      email,
+      password,
+    };
+    dispatch(createUser(userData))
+      .unwrap()
+      .then(() => {
+        // On successful registration, navigate to the sign-in page
+        navigate("/sign-in");
+      })
+      .catch((err) => {
+        // Error is already handled by toast in the slice, no need to do anything here
+        console.error("Signup failed:", err);
+      });
+  };
 
   return (
     <div
@@ -128,16 +152,6 @@ const SignUpPage = () => {
               />
             </motion.div>
 
-            {error && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-red-400 font-semibold mt-2 text-sm text-right bg-red-900/50 p-2 rounded-md"
-              >
-                {error}
-              </motion.p>
-            )}
-
             {password && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -154,9 +168,9 @@ const SignUpPage = () => {
               whileTap={{ scale: 0.95 }}
               className="w-full mt-6 py-3 px-4 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-700 text-white font-bold rounded-lg shadow-lg hover:from-cyan-600 hover:via-blue-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               type="submit"
-              disabled={isLoading}
+              disabled={loading}
             >
-              {isLoading ? (
+              {loading ? (
                 <Loader className="animate-spin mx-auto" size={24} />
               ) : (
                 "ثبت نام"

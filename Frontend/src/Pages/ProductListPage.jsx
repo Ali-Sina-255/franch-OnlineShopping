@@ -1,16 +1,20 @@
 // src/pages/ProductListPage.jsx
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { fetchProducts, extractUniqueAttributes } from "../services/api";
+import { mapProductFromApi } from "../utils/product-mapper";
 import ProductCard from "../Components/ProductCard";
 import ProductCardSkeleton from "../Components/ProductCardSkeleton";
 import Filters from "../Components/Filters";
 import Pagination from "../Components/Pagination";
-import { ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { fetchProducts, extractUniqueAttributes } from "../services/api";
-import { mapProductFromApi } from "../utils/product-mapper"; // <-- IMPORT THE MAPPER
 
 const ITEMS_PER_PAGE = 9;
+const SORT_OPTIONS = {
+  newest: "Newest",
+  "price-asc": "Price: Low to High",
+  "price-desc": "Price: High to Low",
+};
 
 const ProductListPage = ({
   searchQuery,
@@ -18,6 +22,7 @@ const ProductListPage = ({
   wishlist,
   onToggleWishlist,
 }) => {
+  // State management
   const [productsToShow, setProductsToShow] = useState([]);
   const [activeFilters, setActiveFilters] = useState({});
   const [sortOption, setSortOption] = useState("newest");
@@ -31,56 +36,69 @@ const ProductListPage = ({
     brands: [],
     colors: [],
     sizes: [],
-    conditions: ["New", "Use", "Other"],
+    conditions: ["New", "Used", "Other"],
   });
-
-  useEffect(() => {
-    const getFilterData = async () => {
-      try {
-        const productsRes = await fetchProducts({ page_size: 100 });
-        const allProducts = productsRes.data.results;
-
-        const brands = extractUniqueAttributes(allProducts, "brand");
-        const colors = extractUniqueAttributes(allProducts, "color");
-        const sizes = extractUniqueAttributes(allProducts, "size");
-
-        setFilterOptions((prev) => ({ ...prev, brands, colors, sizes }));
-      } catch (error) {
-        console.error("Failed to fetch data for filters:", error);
-      }
-    };
-    getFilterData();
-  }, []);
 
   const { minPrice, maxPrice } = useMemo(
     () => ({ minPrice: 0, maxPrice: 2000 }),
     []
   );
   const [priceRange, setPriceRange] = useState([minPrice, maxPrice]);
-  useEffect(() => setPriceRange([minPrice, maxPrice]), [minPrice, maxPrice]);
 
+  // Data fetching for filters
+  useEffect(() => {
+    const getFilterData = async () => {
+      try {
+        const { data } = await fetchProducts({ page_size: 100 });
+        const allProducts = data.results;
+
+        setFilterOptions((prev) => ({
+          ...prev,
+          brands: extractUniqueAttributes(allProducts, "brand"),
+          colors: extractUniqueAttributes(allProducts, "color"),
+          sizes: extractUniqueAttributes(allProducts, "size"),
+        }));
+      } catch (error) {
+        console.error("Failed to fetch filter data:", error);
+      }
+    };
+
+    getFilterData();
+  }, []);
+
+  // Reset price range when min/max changes
+  useEffect(() => {
+    setPriceRange([minPrice, maxPrice]);
+  }, [minPrice, maxPrice]);
+
+  // Close sort dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sortRef.current && !sortRef.current.contains(event.target)) {
         setIsSortOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Filter handling
   const handleFilterChange = (filterType, value) => {
     setCurrentPage(1);
     setActiveFilters((prev) => {
-      const newFilters = { ...prev };
       const filterKey = filterType.toLowerCase();
+      const newFilters = { ...prev };
+
       if (!newFilters[filterKey]) newFilters[filterKey] = new Set();
+
       if (newFilters[filterKey].has(value)) {
         newFilters[filterKey].delete(value);
         if (newFilters[filterKey].size === 0) delete newFilters[filterKey];
       } else {
         newFilters[filterKey].add(value);
       }
+
       return newFilters;
     });
   };
@@ -94,76 +112,81 @@ const ProductListPage = ({
       .forEach((c) => (c.checked = false));
   };
 
+  // Product fetching with filters
   useEffect(() => {
-    setIsLoading(true);
-    const params = {
-      page: currentPage,
-      page_size: ITEMS_PER_PAGE,
-      price_min: priceRange[0] > minPrice ? priceRange[0] : undefined,
-      price_max: priceRange[1] < maxPrice ? priceRange[1] : undefined,
-      tags: searchQuery || undefined,
-      condition:
-        activeFilters.conditions?.size > 0
-          ? Array.from(activeFilters.conditions)[0]
-          : undefined,
-    };
+    const fetchFilteredProducts = async () => {
+      setIsLoading(true);
 
-    const attributeQueries = [];
-    Object.keys(activeFilters).forEach((key) => {
-      if (["brands", "colors", "sizes"].includes(key)) {
-        const filterKey = key.slice(0, -1);
-        Array.from(activeFilters[key]).forEach((value) =>
-          attributeQueries.push(`${filterKey}:${value}`)
-        );
+      const params = {
+        page: currentPage,
+        page_size: ITEMS_PER_PAGE,
+        price_min: priceRange[0] > minPrice ? priceRange[0] : undefined,
+        price_max: priceRange[1] < maxPrice ? priceRange[1] : undefined,
+        tags: searchQuery || undefined,
+        condition:
+          activeFilters.conditions?.size > 0
+            ? Array.from(activeFilters.conditions)[0]
+            : undefined,
+      };
+
+      // Build attribute queries
+      const attributeQueries = [];
+      Object.keys(activeFilters).forEach((key) => {
+        if (["brands", "colors", "sizes"].includes(key)) {
+          const filterKey = key.slice(0, -1);
+          Array.from(activeFilters[key]).forEach((value) =>
+            attributeQueries.push(`${filterKey}:${value}`)
+          );
+        }
+      });
+
+      if (attributeQueries.length > 0) {
+        params.attributes = attributeQueries.join(",");
       }
-    });
-    if (attributeQueries.length > 0)
-      params.attributes = attributeQueries.join(",");
 
-    fetchProducts(params)
-      .then((res) => {
-        // --- USE THE MAPPER HERE ---
-        const mappedProducts = res.data.results.map(mapProductFromApi);
+      try {
+        const { data } = await fetchProducts(params);
+        const mappedProducts = data.results.map(mapProductFromApi);
 
-        if (sortOption === "price-asc")
+        // Apply sorting
+        if (sortOption === "price-asc") {
           mappedProducts.sort((a, b) => a.price - b.price);
-        else if (sortOption === "price-desc")
+        } else if (sortOption === "price-desc") {
           mappedProducts.sort((a, b) => b.price - a.price);
-        // Newest is default from backend, no need to sort unless you have a date field
+        }
 
         setProductsToShow(mappedProducts);
-        setTotalProducts(res.data.count);
-        setIsLoading(false);
-      })
-      .catch((error) => {
+        setTotalProducts(data.count);
+      } catch (error) {
         console.error("Failed to fetch products:", error);
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+
+    fetchFilteredProducts();
   }, [
     activeFilters,
     sortOption,
     searchQuery,
     priceRange,
+    currentPage,
     minPrice,
     maxPrice,
-    currentPage,
   ]);
 
+  // Derived values
   const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
-  const getSortText = (option) =>
-    ({
-      newest: "Newest",
-      "price-asc": "Price: Low to High",
-      "price-desc": "Price: High to Low",
-    }[option]);
 
   return (
     <div className="bg-gradient-to-b from-indigo-50/20 to-white">
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Page header with sort controls */}
         <div className="flex items-baseline justify-between border-b border-indigo-100 pb-6 pt-12">
           <h1 className="text-4xl font-bold tracking-tight text-indigo-900">
             Premium Secondhand Fashion
           </h1>
+
           <div className="flex items-center" ref={sortRef}>
             <div className="relative inline-block text-left">
               <button
@@ -171,36 +194,37 @@ const ProductListPage = ({
                 className="group inline-flex justify-center text-sm font-medium text-indigo-700 hover:text-indigo-900"
                 onClick={() => setIsSortOpen(!isSortOpen)}
               >
-                {getSortText(sortOption)}
+                {SORT_OPTIONS[sortOption]}
                 <ChevronDown
-                  className={`-mr-1 ml-1 h-5 w-5 ... ${
+                  className={`-mr-1 ml-1 h-5 w-5 transition-transform ${
                     isSortOpen ? "rotate-180" : ""
                   }`}
                 />
               </button>
+
               <AnimatePresence>
                 {isSortOpen && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 z-10 mt-2 ..."
+                    className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                   >
                     <div className="py-1">
-                      {["newest", "price-asc", "price-desc"].map((option) => (
+                      {Object.keys(SORT_OPTIONS).map((option) => (
                         <button
                           key={option}
-                          className={`block px-4 py-2.5 text-sm w-full ... ${
+                          className={`block px-4 py-2.5 text-sm w-full text-left ${
                             sortOption === option
-                              ? "bg-indigo-50 ..."
-                              : "text-gray-700 ..."
+                              ? "bg-indigo-50 text-indigo-900"
+                              : "text-gray-700 hover:bg-gray-100"
                           }`}
                           onClick={() => {
                             setSortOption(option);
                             setIsSortOpen(false);
                           }}
                         >
-                          {getSortText(option)}
+                          {SORT_OPTIONS[option]}
                         </button>
                       ))}
                     </div>
@@ -210,8 +234,11 @@ const ProductListPage = ({
             </div>
           </div>
         </div>
+
+        {/* Main content area */}
         <section className="pb-24 pt-6">
           <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+            {/* Filters sidebar */}
             <Filters
               onFilterChange={handleFilterChange}
               priceRange={priceRange}
@@ -222,11 +249,13 @@ const ProductListPage = ({
               activeFilters={activeFilters}
               filterOptions={filterOptions}
             />
+
+            {/* Product grid */}
             <div className="lg:col-span-3">
               {isLoading ? (
                 <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
                   {[...Array(ITEMS_PER_PAGE)].map((_, i) => (
-                    <ProductCardSkeleton key={i} />
+                    <ProductCardSkeleton key={`skeleton-${i}`} />
                   ))}
                 </div>
               ) : (
@@ -257,14 +286,16 @@ const ProductListPage = ({
                           animate={{ opacity: 1 }}
                           className="lg:col-span-3 text-center py-20"
                         >
-                          <div className="bg-gradient-to-br from-indigo-50 ...">
-                            <h3 className="text-xl ...">No Products Found</h3>
-                            <p className="text-indigo-600 ...">
+                          <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-8 rounded-xl">
+                            <h3 className="text-xl font-medium text-gray-900">
+                              No Products Found
+                            </h3>
+                            <p className="text-indigo-600 mt-2">
                               Try adjusting your search or filter criteria.
                             </p>
                             <button
                               onClick={resetFilters}
-                              className="mt-4 px-4 py-2 ..."
+                              className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
                             >
                               Reset All Filters
                             </button>
@@ -273,6 +304,7 @@ const ProductListPage = ({
                       )}
                     </AnimatePresence>
                   </div>
+
                   {productsToShow.length > 0 && (
                     <Pagination
                       currentPage={currentPage}

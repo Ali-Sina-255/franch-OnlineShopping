@@ -2,15 +2,39 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
+import { mapProductFromApi } from "../utils/product-mapper";
 
-const CartPage = ({ cartItems, onRemoveItem }) => {
-  // NOTE: Your 'add to cart' logic likely needs updating to pass the full product object from the API.
-  // This code assumes `cartItems` contains objects matching the API structure.
+// --- REDUX IMPORTS ---
+import { useSelector, useDispatch } from "react-redux";
+import { removeItemFromCart } from "../state/userSlice/userSlice";
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+const CartPage = () => {
+  const dispatch = useDispatch();
+
+  // --- REDUX STATE ---
+  const { cartItems, cartLoading } = useSelector((state) => state.user);
+
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
+    0
+  );
+
   const shippingFee = subtotal > 0 ? 5.99 : 0;
   const total = subtotal + shippingFee;
+
+  const handleRemoveItem = (cartItemId) => {
+    dispatch(removeItemFromCart(cartItemId));
+  };
+
+  if (cartLoading && cartItems.length === 0) {
+    return (
+      <div className="text-center py-20 flex flex-col items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-gray-500" />
+        <h1 className="text-2xl font-bold mt-4">Loading Your Bag...</h1>
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -46,65 +70,64 @@ const CartPage = ({ cartItems, onRemoveItem }) => {
               role="list"
               className="divide-y divide-gray-200 border-t border-b border-gray-200"
             >
-              {cartItems.map((product) => (
-                <li key={product.id} className="flex py-6 sm:py-10">
-                  <div className="flex-shrink-0">
-                    {/* FIX: Use snake_case 'image_url' from the API object */}
-                    <img
-                      src={product.image_url}
-                      alt={product.product_name}
-                      className="h-24 w-24 rounded-md object-cover object-center sm:h-48 sm:w-48"
-                    />
-                  </div>
-
-                  <div className="ml-4 flex flex-1 flex-col justify-between sm:ml-6">
-                    <div className="relative pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
-                      <div>
-                        <div className="flex justify-between">
-                          <h3 className="text-sm">
-                            <Link
-                              to={`/product/${product.id}`}
-                              className="font-medium text-gray-700 hover:text-gray-800"
-                            >
-                              {/* FIX: Use 'product_name' from the API object */}
-                              {product.product_name}
-                            </Link>
-                          </h3>
+              {cartItems.map((item) => {
+                const product = mapProductFromApi(item.product);
+                return (
+                  <li key={item.id} className="flex py-6 sm:py-10">
+                    <div className="flex-shrink-0">
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="h-24 w-24 rounded-md object-cover object-center sm:h-48 sm:w-48"
+                      />
+                    </div>
+                    <div className="ml-4 flex flex-1 flex-col justify-between sm:ml-6">
+                      <div className="relative pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
+                        <div>
+                          <div className="flex justify-between">
+                            <h3 className="text-sm">
+                              <Link
+                                to={`/product/${product.id}`}
+                                className="font-medium text-gray-700 hover:text-gray-800"
+                              >
+                                {product.name}
+                              </Link>
+                            </h3>
+                          </div>
+                          <p className="mt-1 text-sm font-medium text-gray-900">
+                            {product.brand}
+                          </p>
+                          <p className="mt-1 text-sm text-gray-500">
+                            {product.color}
+                          </p>
+                          <p className="mt-1 text-sm text-gray-500">
+                            Size: {product.size}
+                          </p>
                         </div>
-                        <p className="mt-1 text-sm font-medium text-gray-900">
-                          {product.attributes?.brand}
-                        </p>
-                        <p className="mt-1 text-sm text-gray-500">
-                          {product.attributes?.color}
-                        </p>
-                        <p className="mt-1 text-sm text-gray-500">
-                          Size: {product.attributes?.size}
-                        </p>
+                        <div className="mt-4 sm:mt-0 sm:pr-9">
+                          <p className="text-right text-base font-semibold text-gray-900">
+                            €{product.price.toFixed(2)}
+                          </p>
+                        </div>
                       </div>
-
-                      <div className="mt-4 sm:mt-0 sm:pr-9">
-                        <p className="text-right text-base font-semibold text-gray-900">
-                          €{product.price.toFixed(2)}
+                      <div className="mt-4 flex items-center justify-between text-sm">
+                        <p className="text-gray-500">
+                          Condition: {product.condition}
                         </p>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(item.id)}
+                          disabled={cartLoading}
+                          className="flex items-center font-medium text-red-600 hover:text-red-500 disabled:opacity-50"
+                        >
+                          <Trash2 className="h-4 w-4 mr-1.5" />
+                          <span>Remove</span>
+                        </button>
                       </div>
                     </div>
-
-                    <div className="mt-4 flex items-center justify-between text-sm">
-                      <p className="text-gray-500">
-                        Condition: {product.condition}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => onRemoveItem(product.id)}
-                        className="flex items-center font-medium text-red-600 hover:text-red-500"
-                      >
-                        <Trash2 className="h-4 w-4 mr-1.5" />
-                        <span>Remove</span>
-                      </button>
-                    </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           </section>
 

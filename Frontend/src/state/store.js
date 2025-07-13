@@ -1,13 +1,15 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import userReducer from "./userSlice/userSlice";
 import storage from "redux-persist/lib/storage";
-import { persistReducer, persistStore } from 'redux-persist';
+import { persistReducer, persistStore } from "redux-persist";
+
+// --- 1. ADD THIS IMPORT ---
+// Import the injector function from your userSlice in addition to the reducer.
+import userReducer, { injectStore } from "./userSlice/userSlice";
 import themeReducer from "./Theme/themeSlice";
 
 const rootReducer = combineReducers({
   user: userReducer,
   theme: themeReducer,
- 
 });
 
 const persistConfig = {
@@ -16,12 +18,20 @@ const persistConfig = {
   version: 1,
 };
 
-const persisteReducer = persistReducer(persistConfig, rootReducer);
+// Fixed typo: 'persisteReducer' -> 'persistedReducer'
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: persisteReducer,
+  reducer: persistedReducer, // Use the persisted reducer
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({serializableCheck:false})
+    getDefaultMiddleware({
+      serializableCheck: false, // This is okay for redux-persist
+    }),
 });
 
-export const persistor=persistStore(store)
+// --- 2. ADD THIS LINE ---
+// This is the CRITICAL step. It gives the axios interceptor in `userSlice.js`
+// access to the store, allowing it to get the auth token for all API calls.
+injectStore(store);
+
+export const persistor = persistStore(store);

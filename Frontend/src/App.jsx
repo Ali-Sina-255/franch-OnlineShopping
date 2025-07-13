@@ -1,8 +1,8 @@
-// src/App.jsx
-
 import React, { useState, useRef, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
+
+import { CartProvider } from "./context/CartContext"; // Import the provider
 
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
@@ -19,45 +19,26 @@ import SignUp from "./features/authentication/components/Signup";
 import DashboardPage from "./Components/dashboard/DashboardPage";
 
 function App() {
-  const [cart, setCart] = useState([]);
+  // Remove the old local cart state and handlers
+  // const [cart, setCart] = useState([]);
+  // const handleAddToCart = ...
+  // const handleRemoveFromCart = ...
+
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [animationData, setAnimationData] = useState(null);
+  const [animationData, setAnimationData] = useState(null); // This can stay for the visual effect
   const cartRef = useRef(null);
   const location = useLocation();
 
-  // Reset state on route change
   useEffect(() => {
     if (location.pathname !== "/") setSearchQuery("");
     setQuickViewProduct(null);
     setIsCartOpen(false);
   }, [location.pathname]);
 
-  const handleAddToCart = (productToAdd, imageRef) => {
-    if (cart.find((item) => item.id === productToAdd.id)) {
-      toast.error(`${productToAdd.name} is already in your bag.`);
-      return;
-    }
-
-    if (imageRef?.current && cartRef?.current) {
-      const startRect = imageRef.current.getBoundingClientRect();
-      const endRect = cartRef.current.getBoundingClientRect();
-      setAnimationData({ startRect, endRect, imgSrc: productToAdd.imageUrl });
-    }
-
-    setTimeout(() => {
-      setCart((prevCart) => [...prevCart, productToAdd]);
-      toast.success(`${productToAdd.name} added to bag!`);
-    }, 150);
-  };
-
-  const handleRemoveFromCart = (productId) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
-    toast.error("Item removed from bag.");
-  };
-
+  // Wishlist logic can remain as is, since it's local state
   const handleToggleWishlist = (productId) => {
     setWishlist((prevWishlist) => {
       if (prevWishlist.includes(productId)) {
@@ -70,100 +51,97 @@ function App() {
     });
   };
 
-  // 👇 Conditionally hide Header and Footer on /dashboard
   const hideLayout = location.pathname.startsWith("/dashboard");
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <Toaster
-        position="bottom-center"
-        toastOptions={{
-          success: { style: { background: "#333", color: "#fff" } },
-          error: { style: { background: "#D22B2B", color: "#fff" } },
-        }}
-      />
-
-      <QuickViewModal
-        product={quickViewProduct}
-        onClose={() => setQuickViewProduct(null)}
-        onAddToCart={handleAddToCart}
-      />
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cart}
-        onRemoveItem={handleRemoveFromCart}
-      />
-      <FlyingImage
-        animationData={animationData}
-        onAnimationComplete={() => setAnimationData(null)}
-      />
-
-      {/* ✅ Only show Header if not on dashboard */}
-      {!hideLayout && (
-        <Header
-          cartCount={cart.length}
-          wishlistCount={wishlist.length}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          onCartClick={() => setIsCartOpen(true)}
-          cartRef={cartRef}
+    // Wrap the entire application with the CartProvider
+      <div className="flex flex-col min-h-screen bg-white">
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            success: { style: { background: "#333", color: "#fff" } },
+            error: { style: { background: "#D22B2B", color: "#fff" } },
+          }}
         />
-      )}
 
-      <main className="flex-grow">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <HomePage
-                searchQuery={searchQuery}
-                onQuickView={setQuickViewProduct}
-                wishlist={wishlist}
-                onToggleWishlist={handleToggleWishlist}
-              />
-            }
-          />
-          <Route
-            path="/product/:id"
-            element={
-              <ProductDetailPage
-                onAddToCart={handleAddToCart}
-                wishlist={wishlist}
-                onToggleWishlist={handleToggleWishlist}
-              />
-            }
-          />
-          <Route
-            path="/cart"
-            element={
-              <CartPage cartItems={cart} onRemoveItem={handleRemoveFromCart} />
-            }
-          />
-          <Route
-            path="/wishlist"
-            element={
-              <WishlistPage
-                wishlist={wishlist}
-                onToggleWishlist={handleToggleWishlist}
-                onQuickView={setQuickViewProduct}
-              />
-            }
-          />
+        {/* QuickViewModal will now use the context internally if needed */}
+        <QuickViewModal
+          product={quickViewProduct}
+          onClose={() => setQuickViewProduct(null)}
+        />
 
-          <Route element={<PrivateRoute />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-          </Route>
+        {/* CartDrawer now gets all its data from the context */}
+        <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
-          <Route path="/sign-in" element={<Signin />} />
-          <Route path="/sign-up" element={<SignUp />} />
-          <Route path="*" element={<Signin />} />
-        </Routes>
-      </main>
+        <FlyingImage
+          animationData={animationData}
+          onAnimationComplete={() => setAnimationData(null)}
+        />
 
-      {/* ✅ Only show Footer if not on dashboard */}
-      {!hideLayout && <Footer />}
-    </div>
+        {!hideLayout && (
+          // Header will get its cart count from the context
+          <Header
+            wishlistCount={wishlist.length}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onCartClick={() => setIsCartOpen(true)}
+            cartRef={cartRef}
+          />
+        )}
+
+        <main className="flex-grow">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomePage
+                  searchQuery={searchQuery}
+                  onQuickView={setQuickViewProduct}
+                  wishlist={wishlist}
+                  onToggleWishlist={handleToggleWishlist}
+                />
+              }
+            />
+            <Route
+              path="/product/:id"
+              element={
+                // ProductDetailPage no longer needs onAddToCart prop
+                <ProductDetailPage
+                  wishlist={wishlist}
+                  onToggleWishlist={handleToggleWishlist}
+                />
+              }
+            />
+            <Route
+              path="/cart"
+              element={
+                // CartPage no longer needs any props
+                <CartPage />
+              }
+            />
+            <Route
+              path="/wishlist"
+              element={
+                <WishlistPage
+                  wishlist={wishlist}
+                  onToggleWishlist={handleToggleWishlist}
+                  onQuickView={setQuickViewProduct}
+                />
+              }
+            />
+
+            <Route element={<PrivateRoute />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+            </Route>
+
+            <Route path="/sign-in" element={<Signin />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="*" element={<Signin />} />
+          </Routes>
+        </main>
+
+        {!hideLayout && <Footer />}
+      </div>
   );
 }
 

@@ -6,9 +6,6 @@ const FilterSidebar = ({ filtersData, onFilterChange }) => {
     <aside className="lg:col-span-1">
       <h2 className="text-xl font-bold mb-4">Filters</h2>
 
-      {/* TODO: Add a dedicated Category filter here */}
-
-      {/* Dynamic Attribute Filters */}
       {filtersData.map((attribute) => (
         <FilterGroup
           key={attribute.id}

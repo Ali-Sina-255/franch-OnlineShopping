@@ -30,6 +30,10 @@ class Order(models.Model):
         ("Completed", "Completed"),
         ("Canceled", "Canceled"),
     )
+    PAYMENT_METHOD = (
+        ("PayPal", "PayPal"),
+        ("Card", "Card"),
+    )
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey(
         Payment, on_delete=models.SET_NULL, blank=True, null=True
@@ -39,27 +43,30 @@ class Order(models.Model):
     last_name = models.CharField(max_length=200)
     phone = models.CharField(max_length=15)
     email = models.EmailField(max_length=200)
-    address_line_1 = models.CharField(max_length=200)
-    address_line_2 = models.CharField(max_length=200, blank=True)
+    address_line = models.CharField(max_length=200)
     country = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
+    pin_code = models.CharField(max_length=10)
     order_note = models.TextField(null=True, blank=True)
     order_total = models.DecimalField(
         max_digits=10, decimal_places=2, default=Decimal("0.00")
     )
-    tax = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD)
     status = models.CharField(max_length=200, choices=STATUS, default="New")
-    ip = models.CharField(max_length=130, blank=True, null=True)
     is_ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def name(self):
+        return f"{self.first_name} {self.last_name}"
 
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
     def full_address(self):
-        return f"{self.address_line_1} {self.address_line_2}"
+        return f"{self.address_line} "
 
     def __str__(self):
         return f"Order {self.order_number} by {self.full_name()}"
@@ -77,7 +84,6 @@ class OrderProduct(models.Model):
     product_price = models.DecimalField(
         max_digits=10, decimal_places=2, default=Decimal("0.00")
     )
-    ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

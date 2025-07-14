@@ -37,6 +37,7 @@ LOCAL_APPS = [
     "apps.profiles",
     "apps.orders",
     "apps.cart",
+    "apps.checkout",
 ]
 
 THIRD_PARTY_APPS = [
@@ -159,7 +160,6 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_FILTER_BACKEND": [
         "django_filters.rest_framework.DjangoFilterBackend",
-           
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }

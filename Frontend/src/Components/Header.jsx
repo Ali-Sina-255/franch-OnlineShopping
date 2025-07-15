@@ -8,6 +8,12 @@ import { filters } from "../data/products"; // This should be dynamic later
 
 // --- REDUX IMPORTS ---
 import { useSelector } from "react-redux";
+const navbarItems = [
+  { name: "Home", path: "/" },
+  { name: "Category", path: "/category" },
+  { name: "Contact Us", path: "/contact" },
+  { name: "About Us", path: "/about" },
+];
 
 const Header = ({
   wishlistCount,
@@ -80,62 +86,57 @@ const Header = ({
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex lg:items-center lg:space-x-8">
-              <div
-                className="relative"
-                onMouseEnter={() => setShopMenuOpen(true)}
-                onMouseLeave={() => setShopMenuOpen(false)}
-              >
+              {navbarItems.map((item, index) => (
                 <Link
-                  to="/"
+                  key={index}
+                  to={item.path}
                   className={`text-sm font-medium ${
                     isScrolled ? "text-indigo-800" : "text-indigo-900"
-                  } ml-4 hover:text-indigo-600 transition-colors duration-200 flex items-center`}
+                  } hover:text-indigo-600 transition-colors duration-200 ${
+                    item.name === "Home" ? "ml-4 flex items-center" : ""
+                  }`}
+                  onMouseEnter={
+                    item.name === "Home"
+                      ? () => setShopMenuOpen(true)
+                      : undefined
+                  }
+                  onMouseLeave={
+                    item.name === "Home"
+                      ? () => setShopMenuOpen(false)
+                      : undefined
+                  }
                 >
-                  Shop
+                  {item.name}
                 </Link>
-                <AnimatePresence>
-                  {isShopMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 rounded-lg shadow-xl bg-white border border-indigo-100"
+              ))}
+
+              {/* Dropdown under 'Home' */}
+              <AnimatePresence>
+                {isShopMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-[100px] mt-2 w-56 rounded-lg shadow-xl bg-white border border-indigo-100"
+                  >
+                    <div
+                      className="py-1"
+                      role="menu"
+                      aria-orientation="vertical"
                     >
-                      <div
-                        className="py-1"
-                        role="menu"
-                        aria-orientation="vertical"
-                      >
-                        {filters.categories.map((category) => (
-                          <Link
-                            key={category}
-                            to={`/category/${category.toLowerCase()}`}
-                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-150"
-                          >
-                            {category}
-                          </Link>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-              <a
-                href="#"
-                className={`text-sm font-medium ${
-                  isScrolled ? "text-indigo-800" : "text-indigo-900"
-                } hover:text-indigo-600 transition-colors duration-200`}
-              >
-                New Arrivals
-              </a>
-              <a
-                href="#"
-                className={`text-sm font-medium ${
-                  isScrolled ? "text-indigo-800" : "text-indigo-900"
-                } hover:text-indigo-600 transition-colors duration-200`}
-              >
-                Brands
-              </a>
+                      {filters.categories.map((category) => (
+                        <Link
+                          key={category}
+                          to={`/category/${category.toLowerCase()}`}
+                          className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-150"
+                        >
+                          {category}
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Icons and Search */}

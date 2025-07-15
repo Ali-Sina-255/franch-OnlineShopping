@@ -66,7 +66,7 @@ const Sidebar = ({ setActiveComponent }) => {
       icon: <FaBuilding className="text-blue-500" />,
     },
     {
-      name: "Order Management", // --- NEW ITEM ---
+      name: "Order Management",
       value: "orders",
       icon: <FaBoxOpen className="text-purple-500" />,
     },

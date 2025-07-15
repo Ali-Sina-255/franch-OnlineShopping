@@ -38,6 +38,7 @@ LOCAL_APPS = [
     "apps.orders",
     "apps.cart",
     "apps.checkout",
+    "apps.payment",
 ]
 
 THIRD_PARTY_APPS = [
@@ -178,3 +179,5 @@ SIMPLE_JWT = {
 }
 
 SITE_ID = 1
+CLIENT_ID = os.getenv("CLIENT_ID")
+SECRET_KEY = os.getenv("SECRET_KEY")

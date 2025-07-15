@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { placeOrder } from "../state/checkoutSlice/checkoutSlice";
 import { mapProductFromApi } from "../utils/product-mapper";
 import { Loader2 } from "lucide-react";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -16,6 +17,7 @@ const CheckoutPage = () => {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm();
 
@@ -23,8 +25,14 @@ const CheckoutPage = () => {
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
-  const shippingFee = subtotal > 0 ? 5.99 : 0;
+  const shippingFee = subtotal > 0 ? 0 : 0;
   const total = subtotal + shippingFee;
+
+  const initialOptions = {
+    clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
+    currency: "EUR",
+    intent: "capture",
+  };
 
   const onSubmit = (data) => {
     const orderData = {
@@ -346,6 +354,49 @@ const CheckoutPage = () => {
                       "Confirm Order"
                     )}
                   </button>
+                  <div className="mt-4">
+                    <PayPalScriptProvider options={initialOptions}>
+                      <PayPalButtons
+                        style={{ layout: "vertical" }}
+                        createOrder={(data, actions) => {
+                          return actions.order.create({
+                            purchase_units: [
+                              {
+                                amount: {
+                                  currency_code: "EUR",
+                                  value: total.toFixed(2),
+                                },
+                              },
+                            ],
+                          });
+                        }}
+                        onApprove={(data, actions) => {
+                          return actions.order.capture().then((details) => {
+                            const status = details.status;
+                            const paypal_order_id = data.orderID;
+
+                            if (status === "COMPLETED") {
+                              const formData = getValues();
+
+                              const orderData = {
+                                ...formData,
+                                order_total: total.toFixed(2),
+                                payment_method: "PayPal",
+                                paypal_order_id,
+                              };
+
+                              dispatch(placeOrder(orderData)).then((result) => {
+                                if (result.meta.requestStatus === "fulfilled") {
+                                  const orderOid = result.payload.order_number;
+                                  navigate(`/payment-success/${orderOid}/`);
+                                }
+                              });
+                            }
+                          });
+                        }}
+                      />
+                    </PayPalScriptProvider>
+                  </div>
                 </div>
               </div>
             </div>

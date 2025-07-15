@@ -8,8 +8,7 @@ import "./index.css";
 import { store, persistor } from "./state/store.js";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import ThemeProvider from "./components/common/ThemeProvider.jsx";
-
+import ThemeProvider from "./Components/common/ThemeProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <PersistGate persistor={persistor}>

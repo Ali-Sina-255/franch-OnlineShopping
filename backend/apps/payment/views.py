@@ -28,7 +28,7 @@ def get_access_token(client_id, secret_id):
 
 class PaymentSuccessView(generics.CreateAPIView):
     serializer_class = OrderProductSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         payload = request.data
@@ -57,16 +57,19 @@ class PaymentSuccessView(generics.CreateAPIView):
             )
 
         access_token = get_access_token(settings.CLIENT_ID, settings.SECRET_KEY)
+        if paypal_order_id != "null":
 
-        paypal_order_url = (
-            f"https://api-m.sandbox.paypal.com/v2/checkout/orders/{paypal_order_id}"
-        )
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {access_token}",
-        }
+            paypal_order_url = (
+                f"https://api-m.sandbox.paypal.com/v2/checkout/orders/{paypal_order_id}"
+            )
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {access_token}",
+            }
 
-        response = requests.get(paypal_order_url, headers=headers)
+            response = requests.get(paypal_order_url, headers=headers)
+            print("response ===>", response)
+            
         if response.status_code != 200:
             return Response(
                 {"error": "Failed to verify PayPal order."},

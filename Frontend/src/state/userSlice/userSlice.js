@@ -1,9 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
-
 const getErrorMessage = (error) => {
   const errorData = error.response?.data;
   if (!errorData) return error.message || "An unknown error occurred.";
@@ -253,7 +251,6 @@ const userSlice = createSlice({
         state.cartLoading = false;
       })
 
-      // Remove Item Reducers
       .addCase(removeItemFromCart.pending, (state) => {
         state.cartLoading = true;
       })
@@ -268,18 +265,15 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
-      // --- NEW REDUCER CASE FOR QUANTITY UPDATE ---
       .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
         const index = state.cartItems.findIndex(
           (item) => item.id === action.payload.id
         );
         if (index !== -1) {
-          // Replace the old item in the array with the updated one from the server
           state.cartItems[index] = action.payload;
         }
       })
       .addCase(updateCartItemQuantity.rejected, (state, action) => {
-        // Log error but don't disrupt UX too much for a quantity update fail
         console.error("Failed to update quantity:", action.payload);
         state.error = action.payload;
       });

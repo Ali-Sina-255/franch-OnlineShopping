@@ -1,6 +1,4 @@
-// src/components/AccordionFilterSection.jsx
 import React, { useState } from "react";
-
 const AccordionFilterSection = ({
   title,
   options,

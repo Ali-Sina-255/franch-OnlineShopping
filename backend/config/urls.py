@@ -12,11 +12,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
-    path(
-        "api/schema/redoc/",
-        SpectacularRedocView.as_view(url_name="schema"),
-        name="redoc",
-    ),
+    path("api/schema/redoc/",SpectacularRedocView.as_view(url_name="schema"),name="redoc", ),
     path("api/v1/auth/", include("apps.users.urls"), name="category"),
     path("api/v1/category/", include("apps.category.urls"), name="category"),
     path("api/v1/product/", include("apps.product.urls"), name="product"),
@@ -26,7 +22,6 @@ urlpatterns = [
     path("api/v1/checkout/", include("apps.checkout.urls"), name="checkout"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-# Optional: Customize admin UI
 admin.site.site_header = "Online Shopping Center Admin"
 admin.site.site_title = "Online Shopping Center Admin Portal"
 admin.site.index_title = "Welcome to Online Shopping Center API Portal"

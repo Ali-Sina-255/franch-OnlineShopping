@@ -30,8 +30,7 @@ const CheckoutPage = () => {
     const orderData = {
       ...data,
       order_total: total.toFixed(2),
-      payment_method: "Card", // Hardcoded for now.
-      // The backend should populate products from the cart associated with the user
+      payment_method: "Card", 
     };
     dispatch(placeOrder(orderData)).then((result) => {
       if (result.meta.requestStatus === "fulfilled") {
@@ -54,7 +53,6 @@ const CheckoutPage = () => {
       </div>
     );
   }
-
   return (
     <div className="bg-gray-50">
       <main className="mx-auto max-w-7xl px-4 pt-16 pb-24 sm:px-6 lg:px-8">
@@ -311,6 +309,7 @@ const CheckoutPage = () => {
                       </div>
                     </li>
                   ))}
+
                 </ul>
                 <dl className="space-y-6 border-t border-gray-200 py-6 px-4 sm:px-6">
                   <div className="flex items-center justify-between">
@@ -319,6 +318,7 @@ const CheckoutPage = () => {
                       €{subtotal.toFixed(2)}
                     </dd>
                   </div>
+              
                   <div className="flex items-center justify-between">
                     <dt className="text-sm text-gray-600">Shipping</dt>
                     <dd className="text-sm font-medium text-gray-900">

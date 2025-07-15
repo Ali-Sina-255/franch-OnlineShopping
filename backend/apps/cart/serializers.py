@@ -2,10 +2,8 @@ from django.contrib.auth import get_user_model
 from django.db.models import F, Sum, Value
 from django.db.models.functions import Coalesce
 from rest_framework import serializers
-
 from apps.product.models import Product
 from apps.product.serializers import ProductSerializer
-
 from .models import Cart, CartItem
 
 User = get_user_model()

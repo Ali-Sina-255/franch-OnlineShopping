@@ -116,7 +116,6 @@ class OrderProductSerializer(serializers.ModelSerializer):
             "quantity",
             "total_price",
             "product_price",
-            "ordered",
             "created_at",
             "updated_at",
         ]

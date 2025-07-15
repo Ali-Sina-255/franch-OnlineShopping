@@ -19,6 +19,7 @@ import SignUp from "./features/authentication/components/Signup";
 import DashboardPage from "./Components/dashboard/DashboardPage";
 import CheckoutPage from "./Pages/CheckoutPage";
 import OrderSuccessPage from "./Pages/OrderSuccessPage";
+import PaymentsSuccess from "./Pages/PaymentsSuccess";
 function App() {
   // Remove the old local cart state and handlers
   // const [cart, setCart] = useState([]);
@@ -113,6 +114,8 @@ function App() {
               />
             }
           />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/about" element={<About />} />
           <Route
             path="/cart"
             element={
@@ -143,6 +146,10 @@ function App() {
           <Route path="/sign-in" element={<Signin />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="*" element={<Signin />} />
+          <Route
+            path="/payment-success/:order_oid/"
+            element={<PaymentsSuccess />}
+          />
         </Routes>
       </main>
 

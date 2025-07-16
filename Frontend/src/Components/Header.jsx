@@ -8,6 +8,7 @@ import { filters } from "../data/products"; // This should be dynamic later
 
 // --- REDUX IMPORTS ---
 import { useSelector } from "react-redux";
+import MegaMenu from "./MegaMenu";
 const navbarItems = [
   { name: "Home", path: "/" },
   { name: "Category", path: "/category" },
@@ -56,10 +57,10 @@ const Header = ({
   return (
     <>
       <header
-        className={`sticky top-0 z-30 transition-all duration-300 ${
+        className={`sticky  top-0 z-30 transition-all duration-300 ${
           isScrolled
-            ? "bg-white/80 backdrop-blur-lg border-b border-indigo-100 shadow-sm"
-            : "bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm border-b border-indigo-100"
+            ? "bg-white/80 backdrop-blur-lg  border-indigo-100 shadow-sm"
+            : "bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm  border-indigo-100"
         }`}
       >
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -85,58 +86,42 @@ const Header = ({
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex lg:items-center lg:space-x-8">
-              {navbarItems.map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.path}
-                  className={`text-sm font-medium ${
-                    isScrolled ? "text-indigo-800" : "text-indigo-900"
-                  } hover:text-indigo-600 transition-colors duration-200 ${
-                    item.name === "Home" ? "ml-4 flex items-center" : ""
-                  }`}
-                  onMouseEnter={
-                    item.name === "Home"
-                      ? () => setShopMenuOpen(true)
-                      : undefined
-                  }
-                  onMouseLeave={
-                    item.name === "Home"
-                      ? () => setShopMenuOpen(false)
-                      : undefined
-                  }
-                >
-                  {item.name}
-                </Link>
-              ))}
+            <div className="hidden lg:flex lg:items-center lg:space-x-8 relative">
+              {navbarItems.map((item, index) => {
+                const isCategory = item.name === "Category";
 
-              {/* Dropdown under 'Home' */}
-              <AnimatePresence>
-                {isShopMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-[100px] mt-2 w-56 rounded-lg shadow-xl bg-white border border-indigo-100"
+                return (
+                  <div
+                    key={index}
+                    onMouseEnter={() => isCategory && setShopMenuOpen(true)}
+                    onMouseLeave={() => isCategory && setShopMenuOpen(false)}
+                    className="relative"
                   >
-                    <div
-                      className="py-1"
-                      role="menu"
-                      aria-orientation="vertical"
+                    <Link
+                      to={item.path}
+                      className={`text-sm font-medium ${
+                        isScrolled ? "text-indigo-800" : "text-indigo-900"
+                      } hover:text-indigo-600 transition-colors duration-200`}
                     >
-                      {filters.categories.map((category) => (
-                        <Link
-                          key={category}
-                          to={`/category/${category.toLowerCase()}`}
-                          className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-150"
-                        >
-                          {category}
-                        </Link>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                      {item.name}
+                    </Link>
+
+                    {/* Show MegaMenu only for "Category" */}
+                    {isCategory && (
+                      <AnimatePresence>
+                        {isShopMenuOpen && (
+                          <div
+                            onMouseEnter={() => setShopMenuOpen(true)}
+                            onMouseLeave={() => setShopMenuOpen(false)}
+                          >
+                            <MegaMenu onClose={() => setShopMenuOpen(false)} />
+                          </div>
+                        )}
+                      </AnimatePresence>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Icons and Search */}

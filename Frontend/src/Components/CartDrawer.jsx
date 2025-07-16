@@ -1,35 +1,43 @@
-// src/components/CartDrawer.jsx
-
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2, Loader2 } from "lucide-react";
 import { mapProductFromApi } from "../utils/product-mapper";
-
-// --- REDUX IMPORTS ---
 import { useSelector, useDispatch } from "react-redux";
 import { removeItemFromCart } from "../state/userSlice/userSlice";
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
 
-  // --- GET DATA FROM THE REDUX STORE ---
   const { cartItems, cartLoading } = useSelector((state) => state.user);
 
   const subtotal = (cartItems || []).reduce(
-  // <-- Add (cartItems || [])
-   (sum, item) => sum + item.product.price * item.quantity,
-     0
-   );
+    (sum, item) => sum + item.product.price * item.quantity,
+    0
+  );
 
   const handleRemove = (cartItemId) => {
     dispatch(removeItemFromCart(cartItemId));
   };
 
+  // 🔒 Prevent body scroll when drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
   };
+
   const drawerVariants = {
     hidden: { x: "100%" },
     visible: { x: 0, transition: { duration: 0.3, ease: "easeInOut" } },
@@ -55,6 +63,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
             animate="visible"
             exit="exit"
           >
+            {/* HEADER */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-lg font-medium text-gray-900">
                 Shopping Bag
@@ -67,6 +76,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
               </button>
             </div>
 
+            {/* BODY */}
             <div className="flex-1 overflow-y-auto p-6">
               {cartLoading && cartItems.length === 0 ? (
                 <div className="flex justify-center items-center h-full">
@@ -129,6 +139,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
               )}
             </div>
 
+            {/* FOOTER */}
             {cartItems.length > 0 && (
               <div className="border-t border-gray-200 py-6 px-6">
                 <div className="flex justify-between text-base font-medium text-gray-900">

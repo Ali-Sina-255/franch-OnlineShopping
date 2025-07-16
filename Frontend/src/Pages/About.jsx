@@ -94,22 +94,22 @@ const About = () => {
               </p>
 
               {/* Contact Information */}
-              <div className=" border-t  flex items-center justify-between border-gray-200 pt-4 ">
+              <div className=" border-t  md:flex items-center space-y-4 md:space-y-0 justify-between border-gray-200 pt-4 ">
                 <div className="flex items-center gap-3">
-                  <MdOutlineEmail className="text-xl text-indigo-600" />
+                  <MdOutlineEmail className="text-2xl text-indigo-600" />
                   <a
                     href="mailto:info@chigfrip.com"
-                    className="text-gray-700 hover:text-indigo-600 transition-colors"
+                    className="text-gray-700 text-base md:text-xl hover:text-indigo-600 transition-colors"
                   >
                     info@chigfrip.com
                   </a>
                 </div>
-
+                <div className="hidden md:block h-[1px] w-[250px] bg-gray-300"></div>
                 <div className="flex items-center gap-3">
-                  <FiPhone className="text-xl text-indigo-600" />
+                  <FiPhone className="text-2xl text-indigo-600" />
                   <a
                     href="tel:+1234567890"
-                    className="text-gray-700 hover:text-indigo-600 transition-colors"
+                    className="text-gray-700 text-base md:text-xl hover:text-indigo-600 transition-colors"
                   >
                     +1 (234) 567-890
                   </a>

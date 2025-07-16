@@ -5,19 +5,14 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2, Loader2 } from "lucide-react";
 import { mapProductFromApi } from "../utils/product-mapper";
-
-// --- REDUX IMPORTS ---
 import { useSelector, useDispatch } from "react-redux";
 import { removeItemFromCart } from "../state/userSlice/userSlice";
-
 const CartDrawer = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
 
-  // --- GET DATA FROM THE REDUX STORE ---
   const { cartItems, cartLoading } = useSelector((state) => state.user);
 
   const subtotal = (cartItems || []).reduce(
-  // <-- Add (cartItems || [])
    (sum, item) => sum + item.product.price * item.quantity,
      0
    );

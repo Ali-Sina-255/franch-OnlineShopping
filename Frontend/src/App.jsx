@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 
-import { CartProvider } from "./context/CartContext"; // Import the provider
+// import { CartProvider } from "./context/CartContext"; // Import the provider
 
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
@@ -66,13 +66,11 @@ function App() {
         }}
       />
 
-      {/* QuickViewModal will now use the context internally if needed */}
       <QuickViewModal
         product={quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
       />
 
-      {/* CartDrawer now gets all its data from the context */}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
       <FlyingImage
@@ -81,7 +79,6 @@ function App() {
       />
 
       {!hideLayout && (
-        // Header will get its cart count from the context
         <Header
           wishlistCount={wishlist.length}
           searchQuery={searchQuery}
@@ -114,8 +111,8 @@ function App() {
               />
             }
           />
-          <Route path="/contact" element={<ContactUs />} />
-          <Route path="/about" element={<About />} />
+          {/* <Route path="/contact" element={<ContactUs />} /> */}
+          {/* <Route path="/about" element={<About />} /> */}
           <Route
             path="/cart"
             element={

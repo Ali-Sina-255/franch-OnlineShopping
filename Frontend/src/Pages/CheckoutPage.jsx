@@ -1,11 +1,13 @@
+// src/Pages/CheckoutPage.jsx
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
-import { placeOrder } from "../state/checkoutSlice/checkoutSlice";
+import { placeOrder } from "../state/checkoutSlice/checkoutSlice"; // Ensure this path is correct
 import { mapProductFromApi } from "../utils/product-mapper";
 import { Loader2 } from "lucide-react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { toast } from "react-hot-toast";
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -34,17 +36,11 @@ const CheckoutPage = () => {
     intent: "capture",
   };
 
+  // This is for the "Confirm Order" button (Card payment)
   const onSubmit = (data) => {
-    const orderData = {
-      ...data,
-      order_total: total.toFixed(2),
-      payment_method: "Card", 
-    };
-    dispatch(placeOrder(orderData)).then((result) => {
-      if (result.meta.requestStatus === "fulfilled") {
-        navigate(`/order-success/${result.payload.order_number}`);
-      }
-    });
+    // This flow would need its own implementation, similar to the PayPal one.
+    // For now, we focus on the PayPal flow.
+    toast.error("Card payment is not yet implemented.");
   };
 
   if (cartItems.length === 0 && !isPlacingOrder) {
@@ -61,6 +57,7 @@ const CheckoutPage = () => {
       </div>
     );
   }
+
   return (
     <div className="bg-gray-50">
       <main className="mx-auto max-w-7xl px-4 pt-16 pb-24 sm:px-6 lg:px-8">
@@ -71,6 +68,7 @@ const CheckoutPage = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16"
           >
+            {/* --- Shipping Information Form (No changes needed here) --- */}
             <div>
               <div>
                 <h2 className="text-lg font-medium text-gray-900">
@@ -281,6 +279,7 @@ const CheckoutPage = () => {
               </div>
             </div>
 
+            {/* --- Order Summary and Payment Section --- */}
             <div className="mt-10 lg:mt-0">
               <h2 className="text-lg font-medium text-gray-900">
                 Order summary
@@ -317,7 +316,6 @@ const CheckoutPage = () => {
                       </div>
                     </li>
                   ))}
-
                 </ul>
                 <dl className="space-y-6 border-t border-gray-200 py-6 px-4 sm:px-6">
                   <div className="flex items-center justify-between">
@@ -326,7 +324,6 @@ const CheckoutPage = () => {
                       €{subtotal.toFixed(2)}
                     </dd>
                   </div>
-              
                   <div className="flex items-center justify-between">
                     <dt className="text-sm text-gray-600">Shipping</dt>
                     <dd className="text-sm font-medium text-gray-900">
@@ -358,6 +355,9 @@ const CheckoutPage = () => {
                     <PayPalScriptProvider options={initialOptions}>
                       <PayPalButtons
                         style={{ layout: "vertical" }}
+                        disabled={
+                          Object.keys(errors).length > 0 || isPlacingOrder
+                        }
                         createOrder={(data, actions) => {
                           return actions.order.create({
                             purchase_units: [
@@ -371,28 +371,50 @@ const CheckoutPage = () => {
                           });
                         }}
                         onApprove={(data, actions) => {
-                          return actions.order.capture().then((details) => {
-                            const status = details.status;
-                            const paypal_order_id = data.orderID;
+                          // Check if the form is valid before proceeding
+                          const formValues = getValues();
+                          const formIsValid = Object.values(formValues).every(
+                            (val) => val !== ""
+                          );
+                          if (!formIsValid) {
+                            toast.error(
+                              "Please fill out all shipping information fields before paying."
+                            );
+                            return Promise.reject(new Error("Form is invalid"));
+                          }
 
-                            if (status === "COMPLETED") {
-                              const formData = getValues();
+                          return actions.order
+                            .capture()
+                            .then((paypalDetails) => {
+                              if (paypalDetails.status === "COMPLETED") {
+                                const orderDetails = {
+                                  ...getValues(),
+                                  order_total: total.toFixed(2),
+                                  payment_method: "PayPal", // Set payment method
+                                };
 
-                              const orderData = {
-                                ...formData,
-                                order_total: total.toFixed(2),
-                                payment_method: "PayPal",
-                                paypal_order_id,
-                              };
-
-                              dispatch(placeOrder(orderData)).then((result) => {
-                                if (result.meta.requestStatus === "fulfilled") {
-                                  const orderOid = result.payload.order_number;
-                                  navigate(`/payment-success/${orderOid}/`);
-                                }
-                              });
-                            }
-                          });
+                                dispatch(
+                                  placeOrder({ orderDetails, paypalDetails })
+                                )
+                                  .unwrap() // .unwrap() gives us the fulfilled value or throws the rejected value
+                                  .then((result) => {
+                                    toast.success("Order placed successfully!");
+                                    navigate(
+                                      `/order-success/${result.order_number}`
+                                    );
+                                  })
+                                  .catch((error) => {
+                                    toast.error(
+                                      error.detail ||
+                                        "Failed to place order. Please try again."
+                                    );
+                                  });
+                              } else {
+                                toast.error(
+                                  "Payment not completed. Please try again."
+                                );
+                              }
+                            });
                         }}
                       />
                     </PayPalScriptProvider>

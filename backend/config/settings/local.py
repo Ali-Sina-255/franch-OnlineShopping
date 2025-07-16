@@ -26,3 +26,25 @@ DEFAULT_FROM_EMAIL = getenv("DEFAULT_FROM_EMAIL", default="alisinasultani@gmail.
 MAX_UPLOAD_SIZE = 1 * 1024 * 1024
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "apps.orders": {
+            "handlers": ["console"],
+            "level": "WARNING",  # This will hide INFO logs
+            "propagate": False,
+        },
+    },
+}

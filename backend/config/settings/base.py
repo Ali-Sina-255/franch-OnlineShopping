@@ -181,3 +181,25 @@ SIMPLE_JWT = {
 SITE_ID = 1
 CLIENT_ID = os.getenv("CLIENT_ID")
 SECRET_KEY = os.getenv("SECRET_KEY")
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "apps.orders": {
+            "handlers": ["console"],
+            "level": "WARNING",  # This will hide INFO logs
+            "propagate": False,
+        },
+    },
+}

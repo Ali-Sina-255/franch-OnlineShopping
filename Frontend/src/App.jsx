@@ -111,8 +111,13 @@ function App() {
               />
             }
           />
+<<<<<<< HEAD
           {/* <Route path="/contact" element={<ContactUs />} /> */}
           {/* <Route path="/about" element={<About />} /> */}
+=======
+          {/* <Route path="/contact" element={<ContactUs />} />
+          <Route path="/about" element={<About />} /> */}
+>>>>>>> aukto
           <Route
             path="/cart"
             element={

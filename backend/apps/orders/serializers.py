@@ -13,6 +13,7 @@ User = get_user_model()
 
 class PaymentSerializer(serializers.ModelSerializer):
     amount_paid = serializers.DecimalField(max_digits=10, decimal_places=2)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Payment

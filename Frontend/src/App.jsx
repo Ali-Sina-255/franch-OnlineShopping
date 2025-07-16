@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 
-import { CartProvider } from "./context/CartContext"; // Import the provider
+// import { CartProvider } from "./context/CartContext"; // Import the provider
 
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
@@ -114,8 +114,8 @@ function App() {
               />
             }
           />
-          <Route path="/contact" element={<ContactUs />} />
-          <Route path="/about" element={<About />} />
+          {/* <Route path="/contact" element={<ContactUs />} />
+          <Route path="/about" element={<About />} /> */}
           <Route
             path="/cart"
             element={

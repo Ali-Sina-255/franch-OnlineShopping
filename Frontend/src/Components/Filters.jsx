@@ -1,4 +1,3 @@
-// src/components/Filters.jsx
 import React from "react";
 import AccordionFilterSection from "./AccordionFilterSection";
 import PriceSlider from "./PriceSlider";
@@ -50,7 +49,8 @@ const Filters = ({
   ];
 
   return (
-    <aside className="lg:col-span-1 bg-white p-6 rounded-xl border border-gray-200 self-start shadow-sm sticky top-4">
+    <aside className="lg:col-span-1 bg-white p-6 rounded-xl border border-gray-200 self-start shadow-sm lg:sticky  top-4">
+      {/* Changed from sticky to lg:sticky */}
       <div className="space-y-6">
         <h2 className="text-lg font-medium text-gray-900">Filters</h2>
 

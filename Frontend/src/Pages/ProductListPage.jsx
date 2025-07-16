@@ -180,10 +180,10 @@ const ProductListPage = ({
 
   return (
     <div className="bg-gradient-to-b from-indigo-50/20 to-white">
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-[95%] px-8 sm:px-6 lg:px-8">
         {/* Page header with sort controls */}
         <div className="flex items-baseline justify-between border-b border-indigo-100 pb-6 pt-12">
-          <h1 className="text-4xl font-bold tracking-tight text-indigo-900">
+          <h1 className=" text-xl md:text-2xl lg:text-4xl font-bold tracking-tight text-indigo-900">
             Premium Secondhand Fashion
           </h1>
 
@@ -250,17 +250,17 @@ const ProductListPage = ({
               filterOptions={filterOptions}
             />
 
-            {/* Product grid */}
+            {/* Product section */}
             <div className="lg:col-span-3">
               {isLoading ? (
-                <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+                <div className="grid grid-cols-1 gap-x-3 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-4">
                   {[...Array(ITEMS_PER_PAGE)].map((_, i) => (
                     <ProductCardSkeleton key={`skeleton-${i}`} />
                   ))}
                 </div>
               ) : (
                 <motion.div layout>
-                  <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+                  <div className="grid grid-cols-1 gap-x-4 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-x-8">
                     <AnimatePresence>
                       {productsToShow.length > 0 ? (
                         productsToShow.map((product) => (

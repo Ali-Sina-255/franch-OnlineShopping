@@ -9,7 +9,6 @@ import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { addItemToCart } from "../state/userSlice/userSlice";
 
-
 // Skeleton component for a clean loading state
 const ProductDetailSkeleton = () => (
   <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 animate-pulse">
@@ -157,7 +156,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
 
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-2xl px-4 py-16 border sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+      <div className="mx-auto max-w-2xl px-8 py-10 md:py-20  sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
           {/* Image gallery */}
           <div className="flex flex-col gap-6">
@@ -169,7 +168,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
                 className="h-full w-full object-cover object-center transition-opacity duration-300"
               />
             </div>
-            <div className="hidden sm:grid grid-cols-4 gap-6">
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-6">
               {(product.images || []).map((image, idx) => (
                 <button
                   key={idx}
@@ -291,12 +290,6 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
             </div>
           </div>
         </div>
-      </div>
-      <div className="border h-[300px] lg:max-w-7xl mx-auto">
-        {/* <RelatedProducts
-          category={product.category}
-          currentProductId={product.id}
-        /> */}
       </div>
     </div>
   );

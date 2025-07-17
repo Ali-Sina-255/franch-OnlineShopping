@@ -56,7 +56,6 @@ const LoginPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="max-w-md w-full bg-gray-900/80 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden relative z-10 border border-white/20"
-        dir="rtl"
       >
         <div className="p-8">
           <motion.h2
@@ -65,7 +64,7 @@ const LoginPage = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-4xl font-extrabold mb-8 text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text"
           >
-            خوش آمدید
+            Welcome!
           </motion.h2>
 
           <form onSubmit={handleSignin}>
@@ -77,7 +76,7 @@ const LoginPage = () => {
               <Input
                 icon={Mail}
                 type="email"
-                placeholder="ایمیل"
+                placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -91,7 +90,7 @@ const LoginPage = () => {
               <Input
                 icon={Lock}
                 type="password"
-                placeholder="رمز عبور"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -107,7 +106,7 @@ const LoginPage = () => {
                 to="/forgot-password"
                 className="text-sm text-cyan-400 hover:underline"
               >
-                رمز عبور را فراموش کرده‌اید؟
+                Forgot Password{" "}
               </Link>
             </motion.div>
 
@@ -123,7 +122,7 @@ const LoginPage = () => {
               {loading ? (
                 <Loader className="w-6 h-6 animate-spin mx-auto" />
               ) : (
-                "ورود"
+                "Login"
               )}
             </motion.button>
           </form>
@@ -135,10 +134,10 @@ const LoginPage = () => {
           transition={{ duration: 0.5, delay: 1 }}
           className="px-8 py-4 bg-gray-800/70 flex justify-center"
         >
-          <p className="text-sm text-gray-300">
-            حساب کاربری ندارید؟{" "}
+          <p className="text-sm space-x-2 text-gray-300">
+            Don't have an account{" "}
             <Link to="/sign-up" className="text-cyan-400 hover:underline">
-              ثبت نام کنید
+              Register
             </Link>
           </p>
         </motion.div>

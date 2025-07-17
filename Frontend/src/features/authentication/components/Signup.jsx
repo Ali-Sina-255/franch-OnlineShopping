@@ -49,7 +49,6 @@ const SignUpPage = () => {
   return (
     <div
       className="w-full min-h-screen flex justify-center items-center py-8"
-      dir="rtl"
       style={{
         backgroundImage: 'url("/eur.png")',
         backgroundSize: "cover",
@@ -70,9 +69,9 @@ const SignUpPage = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-4xl font-extrabold mb-8 text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text"
+            className="text-2xl font-extrabold mb-8 text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text"
           >
-            ایجاد حساب کاربری
+            Create User Account
           </motion.h2>
 
           <form onSubmit={handleSignup}>
@@ -85,7 +84,7 @@ const SignUpPage = () => {
                 <Input
                   icon={User}
                   type="text"
-                  placeholder="نام"
+                  placeholder="Name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   required
@@ -99,7 +98,7 @@ const SignUpPage = () => {
                 <Input
                   icon={User}
                   type="text"
-                  placeholder="نام خانوادگی"
+                  placeholder="Last Name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   required
@@ -115,7 +114,7 @@ const SignUpPage = () => {
               <Input
                 icon={User}
                 type="text"
-                placeholder="نام کاربری"
+                placeholder="User Name"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -130,7 +129,7 @@ const SignUpPage = () => {
               <Input
                 icon={Mail}
                 type="email"
-                placeholder="آدرس ایمیل"
+                placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -145,7 +144,7 @@ const SignUpPage = () => {
               <Input
                 icon={Lock}
                 type="password"
-                placeholder="رمز عبور"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -173,7 +172,7 @@ const SignUpPage = () => {
               {loading ? (
                 <Loader className="animate-spin mx-auto" size={24} />
               ) : (
-                "ثبت نام"
+                " Register"
               )}
             </motion.button>
           </form>
@@ -186,12 +185,12 @@ const SignUpPage = () => {
           className="px-8 py-4 bg-gray-800/70 flex justify-center"
         >
           <p className="text-sm text-gray-300">
-            حساب دارید؟{" "}
+            Do you have an account{" "}
             <Link
               to={"/sign-in"}
               className="text-cyan-400 hover:underline font-semibold"
             >
-              ورود
+              Login
             </Link>
           </p>
         </motion.div>

@@ -21,6 +21,8 @@ import CheckoutPage from "./Pages/CheckoutPage";
 import OrderSuccessPage from "./Pages/OrderSuccessPage";
 import ContactUs from "./Pages/ContactUs";
 import About from "./Pages/About";
+import LoginPage from "./features/authentication/components/Signin";
+import LoginPagee from "./features/authentication/components/LoginPagee";
 function App() {
   // Remove the old local cart state and handlers
   // const [cart, setCart] = useState([]);
@@ -147,6 +149,7 @@ function App() {
           <Route path="/sign-in" element={<Signin />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="*" element={<Signin />} />
+          <Route path="/log" element={<LoginPagee />} />
         </Routes>
       </main>
 

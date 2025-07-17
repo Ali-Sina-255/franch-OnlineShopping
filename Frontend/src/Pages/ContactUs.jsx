@@ -1,36 +1,84 @@
-import React from "react";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 import { MapPin, Mail, Phone, Clock, MessageSquare } from "lucide-react";
+import FAQSection from "../Components/FAQSection";
 
 const ContactUs = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const textVariants = {
+    hidden: { y: -50, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  // For scroll-triggered animations
+  const [headingRef, headingInView] = useInView({
+    triggerOnce: false, // Set to true if you only want animation once
+    threshold: 0.5,
+  });
+
+  const [paragraphRef, paragraphInView] = useInView({
+    triggerOnce: false,
+    threshold: 0.3,
+  });
   return (
     <div className="bg-gradient-to-b from-indigo-50/20 to-white min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-20">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Contact Us</h1>
-          <p className="text-xl md:text-2xl max-w-3xl mx-auto">
+
+      <section className="relative bg-[url('about.png')] bg-cover bg-center bg-no-repeat text-white py-20 h-[400px]">
+        <div className="absolute inset-0 bg-black opacity-50 z-0" />
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <motion.h1
+            ref={headingRef}
+            initial="hidden"
+            animate={headingInView ? "visible" : "hidden"}
+            variants={textVariants}
+            className="text-4xl md:text-5xl font-bold mb-6"
+          >
+            Contact Us
+          </motion.h1>
+
+          <motion.p
+            ref={paragraphRef}
+            initial="hidden"
+            animate={paragraphInView ? "visible" : "hidden"}
+            variants={textVariants}
+            transition={{ delay: 0.2 }} // Slight delay for staggered effect
+            className="text-xl md:text-2xl max-w-3xl mx-auto"
+          >
             We're here to help! Reach out to our team for any questions or
             concerns.
-          </p>
+          </motion.p>
         </div>
       </section>
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="container max-w-[] md:max-w-[90%] mx-auto px-6 py-16">
+        <div className=" gap-12">
           {/* Contact Information */}
-          <div className="bg-white rounded-xl shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-indigo-900 mb-8">
+          <div className="bg-white">
+            <h2 className="text-2xl font-bold text-center text-indigo-900 mb-8">
               Get in Touch
             </h2>
 
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="bg-indigo-100 p-3 rounded-full">
-                  <MapPin className="text-indigo-600" size={20} />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-x-10 gap-y-10 mb-8 pt-5">
+              <div className=" text-center gap-4">
+                <div className="flex items-center gap-x-2  justify-center bg-indigo-100 p-3 rounded-full">
+                  <MapPin className="text-indigo-600" size={30} />
+                  <h3 className="font-semibold text-lg text-gray-900">
+                    Our Location
+                  </h3>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Our Location</h3>
+                <div className="mt-3">
                   <p className="text-gray-600">
                     123 Fashion Avenue, Suite 456
                     <br />
@@ -39,12 +87,14 @@ const ContactUs = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="bg-indigo-100 p-3 rounded-full">
-                  <Mail className="text-indigo-600" size={20} />
+              <div className="gap-4">
+                <div className="flex items-center gap-x-2 justify-center bg-indigo-100 p-3 rounded-full">
+                  <Mail className="text-indigo-600" size={30} />
+                  <h3 className="font-semibold text-lg text-gray-900">
+                    Email Us
+                  </h3>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Email Us</h3>
+                <div className="text-center mt-3">
                   <p className="text-gray-600">
                     <a
                       href="mailto:info@chigfrip.com"
@@ -63,12 +113,14 @@ const ContactUs = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="bg-indigo-100 p-3 rounded-full">
-                  <Phone className="text-indigo-600" size={20} />
+              <div className="gap-4">
+                <div className="flex items-center gap-x-2 justify-center bg-indigo-100 p-3 rounded-full">
+                  <Phone className="text-indigo-600" size={30} />
+                  <h3 className="font-semibold text-lg text-gray-900">
+                    Call Us
+                  </h3>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Call Us</h3>
+                <div className="text-center mt-3">
                   <p className="text-gray-600">
                     <a
                       href="tel:+18005551234"
@@ -82,14 +134,14 @@ const ContactUs = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="bg-indigo-100 p-3 rounded-full">
-                  <Clock className="text-indigo-600" size={20} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">
+              <div className="gap-4">
+                <div className="flex items-center gap-x-2 justify-center bg-indigo-100 p-3 rounded-full">
+                  <Clock className="text-indigo-600" size={30} />
+                  <h3 className="font-semibold text-lg text-gray-900">
                     Business Hours
                   </h3>
+                </div>
+                <div className="text-center mt-3">
                   <p className="text-gray-600">
                     Monday-Friday: 9:00 AM - 6:00 PM
                     <br />
@@ -103,146 +155,107 @@ const ContactUs = () => {
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white rounded-xl shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-indigo-900 mb-8">
-              Send Us a Message
-            </h2>
 
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+            <div className="col-span-1 md:px-20">
+              <h2 className="text-2xl font-bold text-indigo-900 mb-8">
+                Send Us a Message
+              </h2>
+              <form className="space-y-6">
+                <div className="grid grid-cols-1  gap-6">
+                  <div className="space-y-6">
+                    {/* Full Name Input */}
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="peer w-full px-4 py-3 border border-black rounded-lg bg-white focus:outline-none focus:bg-white placeholder-transparent"
+                        placeholder="Full Name"
+                        required
+                      />
+                      <label
+                        htmlFor="name"
+                        className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+            ${
+              name
+                ? "-top-2 text-xs text-black"
+                : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+            }`}
+                      >
+                        Your Name
+                      </label>
+                    </div>
+
+                    {/* Email Input */}
+                    <div className="relative">
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="peer w-full px-4 py-3 border border-black rounded-lg bg-white focus:outline-none focus:bg-white placeholder-transparent"
+                        placeholder="Email"
+                        required
+                      />
+                      <label
+                        htmlFor="email"
+                        className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+            ${
+              email
+                ? "-top-2 text-xs text-black"
+                : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+            }`}
+                      >
+                        Your Email
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative mt-6">
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows="5"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Your message"
+                    className="peer w-full px-4 pt-6 pb-2 border border-black rounded-lg focus:outline-none  placeholder-transparent resize-none"
                     required
                   />
-                </div>
-                <div>
                   <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    htmlFor="message"
+                    className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+          ${
+            message
+              ? "-top-2 text-xs text-black"
+              : "top-4 text-gray-400 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-black"
+          }`}
                   >
-                    Email Address
+                    Your Message
                   </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
-                    required
-                  />
                 </div>
-              </div>
 
-              <div>
-                <label
-                  htmlFor="subject"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="message"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows="5"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
-                  required
-                ></textarea>
-              </div>
-
-              <div>
-                <button
-                  type="submit"
-                  className="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-                >
-                  Send Message
-                </button>
-              </div>
-            </form>
+                <div className="flex justify-center items-center">
+                  <button class="text-xl w-40 h-12 rounded bg-emerald-500 text-white relative overflow-hidden group z-10 hover:text-white duration-1000">
+                    <span class="absolute bg-emerald-600 w-44 h-36 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
+                    <span class="absolute bg-emerald-800 w-44 h-36 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
+                    Send
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div className="col-span-1 flex items-center bg-white rounded-xl shadow-sm p-8">
+              <FAQSection />
+            </div>
           </div>
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-20 bg-white rounded-xl shadow-sm p-8">
-          <h2 className="text-2xl font-bold text-indigo-900 mb-8">
-            Frequently Asked Questions
-          </h2>
-
-          <div className="space-y-6">
-            {[
-              {
-                question: "How long does shipping take?",
-                answer:
-                  "Standard shipping takes 3-5 business days. Express options are available at checkout.",
-              },
-              {
-                question: "What is your return policy?",
-                answer:
-                  "We offer 30-day returns for unused items with original tags. Final sale items are non-returnable.",
-              },
-              {
-                question: "How do I track my order?",
-                answer:
-                  "You'll receive a tracking number via email once your order ships. You can also check in your account dashboard.",
-              },
-              {
-                question: "Do you offer international shipping?",
-                answer:
-                  "Yes! We ship to over 50 countries worldwide. Shipping costs vary by destination.",
-              },
-            ].map((item, index) => (
-              <div key={index} className="border-b border-gray-200 pb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {item.question}
-                </h3>
-                <p className="text-gray-600">{item.answer}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Live Chat CTA */}
-        <div className="mt-12 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl p-8 text-center text-white">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-            <div className="bg-white/20 p-4 rounded-full">
-              <MessageSquare size={40} />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Need Immediate Help?</h2>
-              <p className="text-lg mb-4 max-w-2xl">
-                Our customer support team is available via live chat from
-                9am-6pm EST.
-              </p>
-              <button className="bg-white text-indigo-600 font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                Start Live Chat
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

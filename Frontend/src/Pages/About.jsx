@@ -63,7 +63,7 @@ const About = () => {
       </section>
 
       {/* Main Content */}
-      <div className="container max-w-[95%] mx-auto px-6 py-16">
+      <div className="container max-w-[90%] mx-auto px-6 py-16">
         {/* Our Story */}
         <section className="mb-20">
           <div className="flex flex-col lg:flex-row gap-12 ">

@@ -1,9 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
-
-// import { CartProvider } from "./context/CartContext"; // Import the provider
-
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import HomePage from "./Pages/HomePage";
@@ -20,27 +17,25 @@ import DashboardPage from "./Components/dashboard/DashboardPage";
 import CheckoutPage from "./Pages/CheckoutPage";
 import OrderSuccessPage from "./Pages/OrderSuccessPage";
 import PaymentsSuccess from "./Pages/PaymentsSuccess";
+import ContactUs from "./Pages/ContactUs";
+import About from "./Pages/About";
 function App() {
-  // Remove the old local cart state and handlers
-  // const [cart, setCart] = useState([]);
-  // const handleAddToCart = ...
-  // const handleRemoveFromCart = ...
+
 
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [animationData, setAnimationData] = useState(null); // This can stay for the visual effect
+  const [animationData, setAnimationData] = useState(null); 
   const cartRef = useRef(null);
   const location = useLocation();
-
+  
   useEffect(() => {
     if (location.pathname !== "/") setSearchQuery("");
     setQuickViewProduct(null);
     setIsCartOpen(false);
   }, [location.pathname]);
 
-  // Wishlist logic can remain as is, since it's local state
   const handleToggleWishlist = (productId) => {
     setWishlist((prevWishlist) => {
       if (prevWishlist.includes(productId)) {
@@ -56,7 +51,6 @@ function App() {
   const hideLayout = location.pathname.startsWith("/dashboard");
 
   return (
-    // Wrap the entire application with the CartProvider
     <div className="flex flex-col min-h-screen bg-white">
       <Toaster
         position="bottom-center"
@@ -104,24 +98,17 @@ function App() {
           <Route
             path="/product/:id"
             element={
-              // ProductDetailPage no longer needs onAddToCart prop
               <ProductDetailPage
                 wishlist={wishlist}
                 onToggleWishlist={handleToggleWishlist}
               />
             }
           />
-<<<<<<< HEAD
-          {/* <Route path="/contact" element={<ContactUs />} /> */}
-          {/* <Route path="/about" element={<About />} /> */}
-=======
-          {/* <Route path="/contact" element={<ContactUs />} />
-          <Route path="/about" element={<About />} /> */}
->>>>>>> aukto
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/about" element={<About />} />
           <Route
             path="/cart"
             element={
-              // CartPage no longer needs any props
               <CartPage />
             }
           />

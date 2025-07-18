@@ -1,6 +1,7 @@
+from rest_framework import serializers
+
 from apps.product.models import Product
 from apps.product.serializers import ProductSerializer
-from rest_framework import serializers
 
 from .models import Cart, CartOrder, CartOrderItem
 
@@ -41,7 +42,17 @@ class CartOrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartOrderItem
-        fields = "__all__"
+        fields = [
+            "id",
+            "oid",
+            "order",
+            "product",
+            "qty",
+            "price",
+            "sub_total",
+            "total",
+            "date",
+        ]
 
     def __init__(self, *args, **kwargs):
         super(CartOrderItemSerializer, self).__init__(*args, **kwargs)
@@ -73,4 +84,5 @@ class CartOrderSerializer(serializers.ModelSerializer):
             self.Meta.depth = 0
         else:
             # For other methods, set serialization depth to 3.
+            self.Meta.depth = 3
             self.Meta.depth = 3

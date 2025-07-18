@@ -6,6 +6,7 @@ from .views import (
     CartItemDeleteView,
     CartListView,
     CartTotalView,
+    CheckoutAPIView,
     CreateOrderView,
 )
 
@@ -30,4 +31,5 @@ urlpatterns = [
         name="cart-item-delete-user",
     ),
     path("orders/create/", CreateOrderView.as_view(), name="create-order"),
+    path("checkout/<str:order_id>/", CheckoutAPIView.as_view(), name="checkout-view"),
 ]

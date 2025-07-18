@@ -1,7 +1,5 @@
 from decimal import Decimal
 
-from apps.carts.models import Cart
-from apps.product.models import Product
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -9,17 +7,21 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
+from apps.carts.models import Cart
+from apps.product.models import Product
+
 from .models import Cart, CartOrder, CartOrderItem
 from .serializers import CartOrderItem, CartOrderSerializer, CartSerializer
 
 User = get_user_model()
 
 
-from apps.product.models import Product
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from apps.product.models import Product
 
 # from .serializers import CartSerializer
 
@@ -163,3 +165,14 @@ class CreateOrderView(generics.CreateAPIView):
             {"message": "Order Created Successfully", "order_oid": order.oid},
             status=status.HTTP_201_CREATED,
         )
+
+
+class CheckoutAPIView(generics.RetrieveAPIView):
+    serializer_class = CartOrderSerializer
+    lookup_field = "order_id"
+
+    def get_object(self):
+        order_id = self.kwargs["order_id"]
+        order = CartOrder.objects.get(oid=order_id)
+
+        return order

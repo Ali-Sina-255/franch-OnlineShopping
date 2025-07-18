@@ -8,6 +8,7 @@ from .views import (
     CartTotalView,
     CheckoutAPIView,
     CreateOrderView,
+    PaymentSuccessView,
 )
 
 urlpatterns = [
@@ -32,4 +33,5 @@ urlpatterns = [
     ),
     path("orders/create/", CreateOrderView.as_view(), name="create-order"),
     path("checkout/<str:order_id>/", CheckoutAPIView.as_view(), name="checkout-view"),
+    path("payment-success/", PaymentSuccessView.as_view(), name="payment-success"),
 ]

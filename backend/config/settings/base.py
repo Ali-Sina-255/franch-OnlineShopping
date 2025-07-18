@@ -176,8 +176,8 @@ SIMPLE_JWT = {
 }
 
 SITE_ID = 1
-CLIENT_ID = os.getenv("CLIENT_ID")
-SECRET_KEY = os.getenv("SECRET_KEY")
+PAYPAL_CLIENT_ID = os.getenv("CLIENT_ID")
+PAYPAL_SECRET_ID = os.getenv("SECRET_KEY")
 
 
 LOGGING = {

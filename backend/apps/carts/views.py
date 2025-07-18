@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+import requests
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -176,3 +178,85 @@ class CheckoutAPIView(generics.RetrieveAPIView):
         order = CartOrder.objects.get(oid=order_id)
 
         return order
+
+
+def get_access_token(client_id, secret_key):
+    # Function to get access token from PayPal API
+    token_url = "https://api.sandbox.paypal.com/v1/oauth2/token"
+    data = {"grant_type": "client_credentials"}
+    auth = (client_id, secret_key)
+    response = requests.post(token_url, data=data, auth=auth)
+
+    if response.status_code == 200:
+        print("access_token ====", response.json()["access_token"])
+        return response.json()["access_token"]
+    else:
+        raise Exception(
+            f"Failed to get access token from PayPal. Status code: {response.status_code}"
+        )
+
+
+class PaymentSuccessView(generics.CreateAPIView):
+    serializer_class = CartOrderSerializer
+    queryset = CartOrder.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        payload = request.data
+
+        order_oid = payload["order_oid"]
+        payapl_order_id = payload["payapl_order_id"]
+
+        try:
+            order = CartOrder.objects.get(oid=order_oid)
+        except CartOrder.DoesNotExist:
+            return Response(
+                {"message": "Order not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        # order_items = CartOrderItem.objects.filter(order=order)
+
+        if payapl_order_id != "null":
+            paypal_api_url = (
+                f"https://api-m.sandbox.paypal.com/v2/checkout/orders/{payapl_order_id}"
+            )
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {get_access_token(settings.PAYPAL_CLIENT_ID, settings.PAYPAL_SECRET_ID)}",
+            }
+            response = requests.get(paypal_api_url, headers=headers)
+
+            if response.status_code == 200:
+                paypal_order_data = response.json()
+                paypal_payment_status = paypal_order_data["status"]
+
+                if paypal_payment_status == "COMPLETED":
+                    if order.payment_status == "processing":
+                        order.payment_status = "paid"
+                        order.save()
+
+                        # if order.user is not None:
+                        #     send_notification(user=order.user, order=order)
+                        return Response(
+                            {"message": "Payment Successful"},
+                            status=status.HTTP_201_CREATED,
+                        )
+
+                    else:
+                        return Response(
+                            {"message": "Already Paid"}, status=status.HTTP_200_OK
+                        )
+
+                return Response(
+                    {"message": f"Payment status is '{paypal_payment_status}'"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            return Response(
+                {"message": "Failed to verify PayPal payment"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {"message": "No valid PayPal order ID provided"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )

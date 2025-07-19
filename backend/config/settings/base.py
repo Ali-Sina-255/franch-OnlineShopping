@@ -35,10 +35,7 @@ LOCAL_APPS = [
     "apps.category",
     "apps.product",
     "apps.profiles",
-    "apps.orders",
-    "apps.cart",
-    "apps.checkout",
-    "apps.payment",
+    "apps.carts",
 ]
 
 THIRD_PARTY_APPS = [
@@ -179,8 +176,8 @@ SIMPLE_JWT = {
 }
 
 SITE_ID = 1
-CLIENT_ID = os.getenv("CLIENT_ID")
-SECRET_KEY = os.getenv("SECRET_KEY")
+PAYPAL_CLIENT_ID = os.getenv("CLIENT_ID")
+PAYPAL_SECRET_ID = os.getenv("SECRET_KEY")
 
 
 LOGGING = {

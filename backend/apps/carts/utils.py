@@ -1,60 +1,44 @@
-import datetime
+import logging
+from datetime import datetime
 
 from django.conf import settings
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives, get_connection, send_mail
+from django.core.mail.backends.smtp import EmailBackend
 from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.utils.html import strip_tags
+
+logger = logging.getLogger(__name__)
+
+from apps.carts.models import CartOrderItem
 
 
-def send_email_notification(request, user, email_subject, email_template, link=None):
-    # Get the current site and protocol (HTTP or HTTPS)
-    current_site = get_current_site(request)
-    protocol = "https" if request.is_secure() else "http"
+def send_payment_success_email(order):
+    subject = "✅ Payment Confirmation - Your Shop"
+    from_email = settings.DEFAULT_FROM_EMAIL
+    to = [order.email]
 
-    # Generate the uid and token for user activation or password reset
-    uid = urlsafe_base64_encode(force_bytes(user.pk))
-    token = default_token_generator.make_token(user)
+    # Get all items in the order
+    order_items = CartOrderItem.objects.filter(order=order)
 
-    # If link is provided, it's for password reset, otherwise for account activation
-    if link is None:
-        # Generate activation link for new user account activation
-        activation_link = (
-            f"{protocol}://{current_site.domain}/users/activate/{uid}/{token}/"
-        )
-        email_message = render_to_string(
-            email_template,
+    context = {
+        "full_name": order.full_name,
+        "order_id": order.oid,
+        "order_items": [
             {
-                "user": user,
-                "domain": current_site.domain,
-                "uid": uid,
-                "token": token,
-                "activation_link": activation_link,  # Pass the full URL here
-                "current_year": datetime.datetime.now().year,
-            },
-        )
-    else:
-        # Generate reset link for password reset email
-        email_message = render_to_string(
-            email_template,
-            {
-                "user": user,
-                "domain": current_site.domain,
-                "uid": uid,
-                "token": token,
-                "link": link,  # For password reset link
-            },
-        )
+                "product_name": item.product.product_name,
+                "price": f"{item.price:.2f}",
+                "total_price": f"{item.total:.2f}",
+            }
+            for item in order_items
+        ],
+        "order_total": f"{order.total:.2f}",
+        "support_email": settings.DEFAULT_FROM_EMAIL,
+        "year": datetime.now().year,
+    }
 
-    # Prepare the email message
-    email = EmailMessage(
-        subject=email_subject,
-        body=email_message,
-        to=[user.email],
-    )
-    email.content_subtype = "html"  # Send as HTML email
+    html_content = render_to_string("emails/payment_success_email.html", context)
+    text_content = strip_tags(html_content)
+
+    email = EmailMultiAlternatives(subject, text_content, from_email, to)
+    email.attach_alternative(html_content, "text/html")
     email.send()
-
-    print(f"Sent email to {user.email} with subject: {email_subject}")

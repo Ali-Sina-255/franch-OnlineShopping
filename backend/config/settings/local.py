@@ -19,7 +19,9 @@ SECRET_KEY = getenv("DJANGO_SECRET_KEY")
 ADMIN_URL = getenv("ADMIN_URL")
 
 # Email settings
-EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+
 EMAIL_HOST = getenv("EMAIL_HOST")
 EMAIL_PORT = getenv("EMAIL_PORT")
 DEFAULT_FROM_EMAIL = getenv("DEFAULT_FROM_EMAIL", default="alisinasultani@gmail.com")

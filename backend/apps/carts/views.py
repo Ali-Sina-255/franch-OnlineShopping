@@ -7,13 +7,14 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from loguru import logger
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Cart, CartOrder, CartOrderItem
 from .serializers import CartOrderItem, CartOrderSerializer, CartSerializer
-from .utils import send_email_notification
+from .utils import send_payment_success_email
 
 User = get_user_model()
 
@@ -205,7 +206,6 @@ class PaymentSuccessView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         payload = request.data
-
         order_oid = payload["order_oid"]
         payapl_order_id = payload["payapl_order_id"]
 
@@ -215,8 +215,6 @@ class PaymentSuccessView(generics.CreateAPIView):
             return Response(
                 {"message": "Order not found"}, status=status.HTTP_404_NOT_FOUND
             )
-
-        # order_items = CartOrderItem.objects.filter(order=order)
 
         if payapl_order_id != "null":
             paypal_api_url = (
@@ -237,17 +235,20 @@ class PaymentSuccessView(generics.CreateAPIView):
                         order.payment_status = "paid"
                         order.save()
 
-                        # if order.user is not None:
-                        #     send_email_notification(user=order.user, order=order)
+                        # ✅ Send payment success email
+                        try:
+                            send_payment_success_email(order)
+                        except Exception as e:
+                            logger.warning(f"Failed to send email: {str(e)}")
+
                         return Response(
                             {"message": "Payment Successful"},
                             status=status.HTTP_201_CREATED,
                         )
 
-                    else:
-                        return Response(
-                            {"message": "Already Paid"}, status=status.HTTP_200_OK
-                        )
+                    return Response(
+                        {"message": "Already Paid"}, status=status.HTTP_200_OK
+                    )
 
                 return Response(
                     {"message": f"Payment status is '{paypal_payment_status}'"},

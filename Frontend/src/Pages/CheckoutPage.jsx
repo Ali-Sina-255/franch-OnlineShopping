@@ -111,16 +111,13 @@ const CheckoutPage = () => {
           </h1>
           <p className="text-lg text-gray-600 mb-8 lg:mb-12">
             Please fill in your shipping details to complete your purchase.
-          </p>
-
+          </p>     
           <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
-            {/* --- NEW STYLED Shipping Information Form --- */}
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">
                 Shipping Information
               </h2>
               <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
-                {/* First Name */}
                 <FormInput
                   id="first_name"
                   label="First Name"
@@ -182,7 +179,6 @@ const CheckoutPage = () => {
                   register={register}
                   errors={errors}
                 />
-                {/* Postal Code */}
                 <FormInput
                   id="pin_code"
                   label="Postal Code"
@@ -200,7 +196,6 @@ const CheckoutPage = () => {
               </div>
             </div>
 
-            {/* --- Order Summary and Payment Section --- */}
             <div className="mt-10 lg:mt-0">
               <h2 className="text-xl font-semibold text-gray-900">
                 Order Summary

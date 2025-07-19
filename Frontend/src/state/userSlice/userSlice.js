@@ -46,6 +46,8 @@ export const fetchUserProfile = createAsyncThunk(
     try {
       const response = await api.get("/api/v1/profiles/me/");
       return response.data;
+      console.log(response);
+      
     } catch (error) {
       toast.error("Could not load profile.");
       return rejectWithValue(getErrorMessage(error));

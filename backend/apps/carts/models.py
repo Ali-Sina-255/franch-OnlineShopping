@@ -14,7 +14,7 @@ import uuid
 class Cart(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="carts")
     qty = models.PositiveIntegerField(default=1, null=True, blank=True)
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     cart_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -76,7 +76,7 @@ class CartOrder(models.Model):
     state = models.CharField(max_length=1000, null=True, blank=True)
     country = models.CharField(max_length=1000, null=True, blank=True)
 
-    oid = ShortUUIDField(length=10, max_length=25, alphabet="abcdefghijklmnopqrstuvxyz")
+    oid = ShortUUIDField(length=30, max_length=40, alphabet="abcdefghijklmnopqrstuvxyz")
     date = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -113,7 +113,7 @@ class CartOrderItem(models.Model):
     sub_total = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
 
-    oid = ShortUUIDField(length=10, max_length=25, alphabet="abcdefghijklmnopqrstuvxyz")
+    oid = ShortUUIDField(length=30, max_length=40, alphabet="abcdefghijklmnopqrstuvxyz")
     date = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -127,8 +127,10 @@ class CartOrderItem(models.Model):
         return f"Order ID #{self.order.oid}"
 
     def save(self, *args, **kwargs):
-        if self.product:
-            self.price = self.product.price
-        self.sub_total = self.price * self.qty
+        self.sub_total = self.qty * self.price
         self.total = self.sub_total
         super().save(*args, **kwargs)
+
+        # Update order total after saving item
+        self.order.total = self.order.calculate_total()
+        self.order.save(update_fields=["total"])

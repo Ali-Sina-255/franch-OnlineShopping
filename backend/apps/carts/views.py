@@ -1,46 +1,49 @@
 from decimal import Decimal
 
 import requests
+from apps.carts.models import Cart
+from apps.product.models import Product
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-
-from apps.carts.models import Cart
-from apps.product.models import Product
 
 from .models import Cart, CartOrder, CartOrderItem
 from .serializers import CartOrderItem, CartOrderSerializer, CartSerializer
+from .utils import send_email_notification
 
 User = get_user_model()
 
-
-from django.shortcuts import get_object_or_404
-from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-
-from apps.product.models import Product
 
 # from .serializers import CartSerializer
 
 
 class CartApiView(generics.ListCreateAPIView):
     serializer_class = CartSerializer
-    queryset = Cart.objects.all()
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Return only carts of the logged-in user
+        return Cart.objects.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
         user = request.user if request.user.is_authenticated else None
         product = get_object_or_404(Product, id=request.data.get("product_id"))
         qty = int(request.data.get("qty", 1))
 
-        cart, created = Cart.objects.update_or_create(
-            user=user, defaults={"product": product, "qty": qty}
-        )
+        cart_qs = Cart.objects.filter(user=user, product=product)
+
+        if cart_qs.exists():
+            cart = cart_qs.first()
+            cart.qty += qty  # increment quantity
+            cart.save()
+            created = False
+        else:
+            cart = Cart.objects.create(user=user, product=product, qty=qty)
+            created = True
 
         status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         serializer = self.get_serializer(cart)
@@ -234,8 +237,8 @@ class PaymentSuccessView(generics.CreateAPIView):
                         order.payment_status = "paid"
                         order.save()
 
-                        # if order.user is not None:
-                        #     send_notification(user=order.user, order=order)
+                        if order.user is not None:
+                            send_email_notification(user=order.user, order=order)
                         return Response(
                             {"message": "Payment Successful"},
                             status=status.HTTP_201_CREATED,

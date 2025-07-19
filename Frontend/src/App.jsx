@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
@@ -19,17 +20,19 @@ import OrderSuccessPage from "./Pages/OrderSuccessPage";
 import PaymentsSuccess from "./Pages/PaymentsSuccess";
 import ContactUs from "./Pages/ContactUs";
 import About from "./Pages/About";
+
+// Import the new page component
+import ShippingDetailsPage from "./Pages/ShippingDetailsPage";
+
 function App() {
-
-
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [animationData, setAnimationData] = useState(null); 
+  const [animationData, setAnimationData] = useState(null);
   const cartRef = useRef(null);
   const location = useLocation();
-  
+
   useEffect(() => {
     if (location.pathname !== "/") setSearchQuery("");
     setQuickViewProduct(null);
@@ -59,14 +62,11 @@ function App() {
           error: { style: { background: "#D22B2B", color: "#fff" } },
         }}
       />
-
       <QuickViewModal
         product={quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
       />
-
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-
       <FlyingImage
         animationData={animationData}
         onAnimationComplete={() => setAnimationData(null)}
@@ -106,12 +106,7 @@ function App() {
           />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/about" element={<About />} />
-          <Route
-            path="/cart"
-            element={
-              <CartPage />
-            }
-          />
+          <Route path="/cart" element={<CartPage />} />
           <Route
             path="/wishlist"
             element={
@@ -123,9 +118,16 @@ function App() {
             }
           />
 
+          {/* --- UPDATED PRIVATE ROUTES --- */}
           <Route element={<PrivateRoute />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/dashboard/*" element={<DashboardPage />} />
+
+            {/* The new route for entering shipping details */}
+            <Route path="/shipping-details" element={<ShippingDetailsPage />} />
+
+            {/* The old checkout route is now the PAYMENT page, requiring an orderId */}
+            <Route path="/checkout/:orderId" element={<CheckoutPage />} />
+
             <Route
               path="/order-success/:orderNumber"
               element={<OrderSuccessPage />}

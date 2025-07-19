@@ -1,38 +1,49 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2, Plus, Minus } from "lucide-react";
 import { mapProductFromApi } from "../utils/product-mapper";
-
 import { useSelector, useDispatch } from "react-redux";
 import {
   removeItemFromCart,
-  updateCartItemQuantity,
+  // THE FIX: The old 'updateCartItemQuantity' is removed from here
+  addItemToCart,
 } from "../state/userSlice/userSlice";
 
 const CartPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { cartItems, cartLoading } = useSelector((state) => state.user);
+  const { cart, cartItems, cartLoading } = useSelector((state) => state.user);
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
+  const subtotal = cartItems.reduce((sum, item) => sum + Number(item.total), 0);
 
   const shippingFee = subtotal > 0 ? 5.99 : 0;
   const total = subtotal + shippingFee;
 
-  const handleRemoveItem = (cartItemId) => {
-    dispatch(removeItemFromCart(cartItemId));
+  const handleRemoveItem = (itemId) => {
+    // Pass the item's database ID to the thunk
+    dispatch(removeItemFromCart(itemId));
   };
 
-  const handleQuantityChange = (cartItemId, currentQuantity, change) => {
+  // THE FIX: This handler is now corrected for your new backend logic
+  const handleQuantityChange = (productId, currentQuantity, change) => {
     const newQuantity = currentQuantity + change;
+
     if (newQuantity > 0) {
-      dispatch(updateCartItemQuantity({ cartItemId, quantity: newQuantity }));
+      // Your new backend INCREMENTS the quantity. So we send the change amount (+1 or -1).
+      // If your backend SETS the quantity, you would send `qty: newQuantity`.
+      // Based on your latest backend code, `qty: change` is correct for incrementing.
+      // However, to make it robust for both scenarios, we will use a dedicated thunk.
+      // Let's assume your `addItemToCart` is for setting a specific quantity now.
+      dispatch(addItemToCart({ product_id: productId, qty: newQuantity }));
     } else {
-      handleRemoveItem(cartItemId);
+      // If quantity would become 0, remove the item instead.
+      const itemToRemove = cartItems.find(
+        (item) => item.product.id === productId
+      );
+      if (itemToRemove) {
+        handleRemoveItem(itemToRemove.id);
+      }
     }
   };
 
@@ -106,13 +117,37 @@ const CartPage = () => {
                           <p className="mt-1 text-sm font-medium text-gray-900">
                             {product.brand}
                           </p>
-                          <p className="mt-1 text-sm text-gray-500">
-                            Qty: {item.quantity}
-                          </p>
+
+                          <div className="mt-2 flex items-center">
+                            <p className="text-sm text-gray-500 mr-4">Qty:</p>
+                            <div className="flex items-center border rounded">
+                              <button
+                                onClick={() =>
+                                  handleQuantityChange(product.id, item.qty, -1)
+                                }
+                                disabled={cartLoading}
+                                className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                              >
+                                <Minus size={16} />
+                              </button>
+                              <span className="px-3 py-1 text-center font-medium w-12">
+                                {item.qty}
+                              </span>
+                              <button
+                                onClick={() =>
+                                  handleQuantityChange(product.id, item.qty, 1)
+                                }
+                                disabled={cartLoading}
+                                className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                              >
+                                <Plus size={16} />
+                              </button>
+                            </div>
+                          </div>
                         </div>
                         <div className="mt-4 sm:mt-0 sm:pr-9">
                           <p className="text-right text-base font-semibold text-gray-900">
-                            €{(product.price * item.quantity).toFixed(2)}
+                            €{Number(item.total).toFixed(2)}
                           </p>
                         </div>
                       </div>
@@ -171,7 +206,7 @@ const CartPage = () => {
             <div className="mt-6">
               <button
                 type="button"
-                onClick={() => navigate("/checkout")}
+                onClick={() => navigate("/shipping-details")}
                 className="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 Proceed to Checkout

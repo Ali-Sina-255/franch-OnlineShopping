@@ -37,7 +37,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// --- ASYNC THUNKS FOR PROFILE MANAGEMENT (TAILORED TO YOUR BACKEND) ---
+// --- ASYNC THUNKS FOR PROFILE MANAGEMENT (NO CHANGES) ---
 
 // Fetches the combined user and profile data from your /profiles/me/ endpoint
 export const fetchUserProfile = createAsyncThunk(
@@ -63,8 +63,6 @@ export const updateUserProfile = createAsyncThunk(
         first_name: profileData.first_name,
         last_name: profileData.last_name,
       };
-      // Your CustomUserDetailsView is at `/api/v1/users/me/` from your original code.
-      // This view updates the User model.
       await api.put("/api/v1/users/me/", userPayload);
 
       // --- STEP 2: Update the Profile model (rest of the data) ---
@@ -75,7 +73,6 @@ export const updateUserProfile = createAsyncThunk(
       profilePayload.append("country", profileData.country);
       profilePayload.append("city", profileData.city || "");
 
-      // Only append the photo if a new one was selected (it will be a File object)
       if (
         profileData.profile_photo &&
         typeof profileData.profile_photo !== "string"
@@ -83,15 +80,12 @@ export const updateUserProfile = createAsyncThunk(
         profilePayload.append("profile_photo", profileData.profile_photo);
       }
 
-      // Your UpdateProfileAPIView is at `/api/v1/profiles/me/update/`
-      // This view updates the Profile model.
       await api.put("/api/v1/profiles/me/update/", profilePayload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       toast.success("Profile updated successfully!");
 
-      // After both updates succeed, re-fetch the profile to get the latest data
       const updatedProfile = await dispatch(fetchUserProfile()).unwrap();
       return updatedProfile;
     } catch (error) {
@@ -105,17 +99,17 @@ export const updateUserProfile = createAsyncThunk(
 // --- INITIAL STATE ---
 const initialState = {
   currentUser: null,
-  profile: null, // This will hold the detailed profile data
+  profile: null,
   accessToken: null,
   refreshToken: null,
-  cart: null,
+  cart: null, // This will now store the cart_id
   cartItems: [],
   cartLoading: false,
   error: null,
-  loading: false, // Unified loading state for auth/profile actions
+  loading: false,
 };
 
-// --- AUTH & CART THUNKS (Provided for completeness) ---
+// --- AUTH THUNKS (NO CHANGES) ---
 
 export const createUser = createAsyncThunk(
   "user/createUser",
@@ -147,7 +141,6 @@ export const signIn = createAsyncThunk(
       );
       const { access, refresh } = tokenResponse.data;
 
-      // On sign-in, dispatch actions to get all necessary user data
       dispatch(fetchUserProfile());
       dispatch(fetchUserCart());
 
@@ -161,18 +154,24 @@ export const signIn = createAsyncThunk(
   }
 );
 
+// --- UPDATED CART LOGIC ---
+
 export const fetchUserCart = createAsyncThunk(
   "user/fetchUserCart",
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/api/v1/cart/cart/");
-      let cartData = response.data.results?.[0];
-      if (!cartData) {
-        const createResponse = await api.post("/api/v1/cart/cart/", {});
-        cartData = createResponse.data;
-      }
-      return cartData;
+      const items = response.data;
+      const cartId = items.length > 0 ? items[0].cart_id : null;
+      return { items, cartId };
     } catch (error) {
+      if (
+        error.response &&
+        (error.response.status === 404 ||
+          (error.response.status === 200 && !error.response.data.length))
+      ) {
+        return { items: [], cartId: null };
+      }
       return rejectWithValue(getErrorMessage(error));
     }
   }
@@ -180,19 +179,11 @@ export const fetchUserCart = createAsyncThunk(
 
 export const addItemToCart = createAsyncThunk(
   "user/addItemToCart",
-  async (itemData, { getState, rejectWithValue }) => {
-    const { cartItems } = getState().user;
-    const existingItem = cartItems.find(
-      (item) => item.product.id === itemData.product_id
-    );
-    if (existingItem) {
-      toast.error("Item is already in your bag.");
-      return rejectWithValue("Item already in cart.");
-    }
+  async (itemData, { dispatch, rejectWithValue }) => {
     try {
-      const response = await api.post("/api/v1/cart/cart-items/", itemData);
-      toast.success("Item added to bag!");
-      return response.data;
+      await api.post("/api/v1/cart/cart/", itemData);
+      toast.success("Bag updated!");
+      dispatch(fetchUserCart());
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message);
@@ -203,31 +194,16 @@ export const addItemToCart = createAsyncThunk(
 
 export const removeItemFromCart = createAsyncThunk(
   "user/removeItemFromCart",
-  async (cartItemId, { rejectWithValue }) => {
+  async (itemId, { getState, rejectWithValue }) => {
+    const { cart } = getState().user;
+    if (!cart?.cart_id) {
+      toast.error("Cart not found.");
+      return rejectWithValue("Cart ID not found.");
+    }
     try {
-      await api.delete(`/api/v1/cart/cart-items/${cartItemId}/`);
+      await api.delete(`/api/v1/cart/cart/${cart.cart_id}/delete/${itemId}/`);
       toast.success("Item removed from bag.");
-      return cartItemId;
-    } catch (error) {
-      const message = getErrorMessage(error);
-      toast.error(message);
-      return rejectWithValue(message);
-    }
-  }
-);
-
-export const updateCartItemQuantity = createAsyncThunk(
-  "user/updateCartItemQuantity",
-  async ({ cartItemId, quantity }, { rejectWithValue }) => {
-    if (quantity <= 0) {
-      return rejectWithValue("Quantity must be greater than 0.");
-    }
-    try {
-      const response = await api.patch(
-        `/api/v1/cart/cart-items/${cartItemId}/`,
-        { quantity: quantity }
-      );
-      return response.data;
+      return itemId;
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message);
@@ -242,7 +218,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     signOutSuccess: (state) => {
-      Object.assign(state, initialState); // Reset all state properties to their initial values
+      Object.assign(state, initialState);
       toast("You have been signed out.");
     },
     clearUserError: (state) => {
@@ -282,8 +258,8 @@ const userSlice = createSlice({
         state.cartLoading = true;
       })
       .addCase(fetchUserCart.fulfilled, (state, action) => {
-        state.cart = action.payload;
-        state.cartItems = action.payload.items || [];
+        state.cartItems = action.payload.items;
+        state.cart = { cart_id: action.payload.cartId };
         state.cartLoading = false;
       })
       .addCase(fetchUserCart.rejected, (state, action) => {
@@ -292,10 +268,6 @@ const userSlice = createSlice({
       })
       .addCase(addItemToCart.pending, (state) => {
         state.cartLoading = true;
-      })
-      .addCase(addItemToCart.fulfilled, (state, action) => {
-        state.cartItems.push(action.payload);
-        state.cartLoading = false;
       })
       .addCase(addItemToCart.rejected, (state, action) => {
         state.cartLoading = false;
@@ -313,20 +285,8 @@ const userSlice = createSlice({
         state.cartLoading = false;
         state.error = action.payload;
       })
-      .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
-        const index = state.cartItems.findIndex(
-          (item) => item.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.cartItems[index] = action.payload;
-        }
-      })
-      .addCase(updateCartItemQuantity.rejected, (state, action) => {
-        console.error("Failed to update quantity:", action.payload);
-        state.error = action.payload;
-      })
 
-      // --- PROFILE REDUCERS ---
+      // PROFILE REDUCERS
       .addCase(fetchUserProfile.pending, (state) => {
         state.loading = true;
       })
@@ -344,7 +304,6 @@ const userSlice = createSlice({
         state.error = action.payload;
         state.loading = false;
       })
-
       .addCase(updateUserProfile.pending, (state) => {
         state.loading = true;
       })

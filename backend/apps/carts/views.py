@@ -237,8 +237,8 @@ class PaymentSuccessView(generics.CreateAPIView):
                         order.payment_status = "paid"
                         order.save()
 
-                        if order.user is not None:
-                            send_email_notification(user=order.user, order=order)
+                        # if order.user is not None:
+                        #     send_email_notification(user=order.user, order=order)
                         return Response(
                             {"message": "Payment Successful"},
                             status=status.HTTP_201_CREATED,

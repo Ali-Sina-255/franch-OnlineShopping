@@ -2,8 +2,9 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import render
 from rest_framework import generics, permissions
 
-from .models import Notification
-from .serializers import NotificationSerializer
+from .models import Contact, Notification
+from .permission import IsAdminOrOwner
+from .serializers import ContactSerializer, NotificationSerializer
 
 User = get_user_model()
 
@@ -25,3 +26,15 @@ class CustomerNotificationView(generics.ListAPIView):
         user_id = self.kwargs["user_id"]
         user = User.objects.get(id=user_id)
         return Notification.objects.filter(user=user)
+
+
+class ContactCreateAPIView(generics.ListCreateAPIView):
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class ContactDeleteAPIView(generics.DestroyAPIView):
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+    permission_classes = [permissions.IsAuthenticated]

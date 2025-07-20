@@ -1,5 +1,3 @@
-from allauth.account.adapter import get_adapter
-from dj_rest_auth.registration.serializers import RegisterSerializer
 from django.contrib.auth import get_user_model
 from django_countries.serializer_fields import CountryField
 from phonenumber_field.serializerfields import PhoneNumberField
@@ -36,7 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
         return representation
 
 
-class CustomRegisterSerializer(RegisterSerializer):
+class CustomRegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
@@ -44,28 +42,30 @@ class CustomRegisterSerializer(RegisterSerializer):
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
-    def get_cleaned_data(self):
-        return {
-            "username": self.validated_data.get("username", ""),
-            "email": self.validated_data.get("email", ""),
-            "first_name": self.validated_data.get("first_name", ""),
-            "last_name": self.validated_data.get("last_name", ""),
-            "password1": self.validated_data.get("password1", ""),
-        }
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "password1",
+            "password2",
+        ]
 
-    def save(self, request):
-        adapter = get_adapter()
-        user = adapter.new_user(request)
-        self.cleaned_data = self.get_cleaned_data()
-        adapter.save_user(request, user, self)
+    def validate(self, attrs):
+        if attrs.get("password1") != attrs.get("password2"):
+            raise serializers.ValidationError({"password": "Passwords must match."})
+        return attrs
 
-        user.username = self.cleaned_data.get("username")
-        user.first_name = self.cleaned_data.get("first_name")
-        user.last_name = self.cleaned_data.get("last_name")
-        user.set_password(self.cleaned_data.get("password1"))
-
-        user.is_active = True
-
+    def save(self, request=None, **kwargs):
+        user = User.objects.create(
+            username=self.validated_data["username"],
+            email=self.validated_data["email"],
+            first_name=self.validated_data["first_name"],
+            last_name=self.validated_data["last_name"],
+            is_active=True,
+        )
+        user.set_password(self.validated_data["password1"])
         user.save()
-
         return user

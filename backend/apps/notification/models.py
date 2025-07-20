@@ -1,8 +1,7 @@
+from apps.carts.models import CartOrder, CartOrderItem
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from apps.carts.models import CartOrder, CartOrderItem
 
 User = get_user_model()
 
@@ -36,4 +35,8 @@ class Notification(models.Model):
 
 class Contact(models.Model):
     name = models.CharField(max_length=255)
-    email = models
+    email = models.EmailField(max_length=400, unique=True)
+    message = models.TextField()
+
+    def __repr__(self):
+        return f"{self.email } contacted {self.message}"

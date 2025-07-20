@@ -1,18 +1,17 @@
-// src/components/Header.jsx
-
 import React, { useState, useEffect } from "react";
 import { Search, User, ShoppingBag, Menu, X, Heart } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { filters } from "../data/products"; // This should be dynamic later
-
-// --- REDUX IMPORTS ---
+import axios from "axios";
+import { toast } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import MegaMenu from "./MegaMenu";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
+
 const navbarItems = [
   { name: "Home", path: "/" },
-  { name: "Category", path: "/category" },
+  { name: "Category", path: "/" },
   { name: "Contact Us", path: "/contact" },
   { name: "About Us", path: "/about" },
 ];
@@ -24,22 +23,45 @@ const Header = ({
   onCartClick,
   cartRef,
 }) => {
-  // --- REDUX STATE ---
   const { cartItems } = useSelector((state) => state.user);
-
-  // ========================================================================
-  // THE FIX: Change `item.quantity` to `item.qty` to match your new backend model.
-  // ========================================================================
   const cartCount = (cartItems || []).reduce((sum, item) => sum + item.qty, 0);
-  // ========================================================================
-  // END OF FIX
-  // ========================================================================
 
   const navigate = useNavigate();
   const location = useLocation();
   const [isShopMenuOpen, setShopMenuOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true); // Ensure loading is true at the start
+        const response = await axios.get(`${BASE_URL}/api/v1/category/`);
+
+        // ========================================================================
+        // FIX #1: Handle paginated API response
+        // ========================================================================
+        if (response.data && Array.isArray(response.data.results)) {
+          setCategories(response.data.results);
+        } else if (Array.isArray(response.data)) {
+          // Handle non-paginated responses just in case
+          setCategories(response.data);
+        } else {
+          toast.error("Received invalid category data.");
+        }
+        // ========================================================================
+        // END OF FIX
+        // ========================================================================
+      } catch (err) {
+        toast.error("Could not load categories.");
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -93,7 +115,6 @@ const Header = ({
             <div className="hidden lg:flex lg:items-center lg:space-x-8 relative">
               {navbarItems.map((item, index) => {
                 const isCategory = item.name === "Category";
-
                 return (
                   <div
                     key={index}
@@ -109,7 +130,6 @@ const Header = ({
                     >
                       {item.name}
                     </Link>
-
                     {isCategory && (
                       <AnimatePresence>
                         {isShopMenuOpen && (
@@ -208,16 +228,29 @@ const Header = ({
                 <h3 className="font-semibold text-indigo-800">
                   Shop by Category
                 </h3>
-                {filters.categories.map((category) => (
-                  <Link
-                    key={category}
-                    to={`/category/${category.toLowerCase()}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="text-gray-700 hover:text-indigo-700 pl-4 py-2 hover:bg-indigo-50 rounded-lg transition-colors duration-150"
-                  >
-                    {category}
-                  </Link>
-                ))}
+                {categoriesLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-5 bg-gray-200 rounded-md animate-pulse ml-4"
+                      ></div>
+                    ))
+                  : categories.map((category) => (
+                      // ========================================================================
+                      // FIX #2: Generate slug from `category.name`
+                      // ========================================================================
+                      <Link
+                        key={category.id || category.name} // Use a guaranteed unique key
+                        to={`/?category=${category.name.toLowerCase()}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-gray-700 hover:text-indigo-700 pl-4 py-2 hover:bg-indigo-50 rounded-lg transition-colors duration-150"
+                      >
+                        {category.name}
+                      </Link>
+                      // ========================================================================
+                      // END OF FIX
+                      // ========================================================================
+                    ))}
                 <hr className="border-indigo-100" />
                 <Link
                   to="/new"

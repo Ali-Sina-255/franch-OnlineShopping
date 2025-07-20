@@ -5,6 +5,7 @@ import { X, Trash2, Loader2 } from "lucide-react";
 import { mapProductFromApi } from "../utils/product-mapper";
 import { useSelector, useDispatch } from "react-redux";
 import { removeItemFromCart } from "../state/userSlice/userSlice";
+import { HiOutlineShoppingBag } from "react-icons/hi2";
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -72,9 +73,12 @@ const CartDrawer = ({ isOpen, onClose }) => {
           >
             {/* HEADER */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">
-                Shopping Bag
-              </h2>
+              <div className="flex items-center gap-x-2">
+                <HiOutlineShoppingBag className="h-6 w-6 text-gray-700" />
+                <h2 className="text-lg font-medium text-gray-900">
+                  Shopping Bag
+                </h2>
+              </div>
               <button
                 onClick={onClose}
                 className="p-1 text-gray-400 hover:text-gray-600"

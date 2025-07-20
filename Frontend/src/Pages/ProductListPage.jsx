@@ -277,7 +277,7 @@ const ProductListPage = ({
 
             <div className="lg:col-span-3">
               {isLoading ? (
-                <div className="grid grid-cols-1 gap-x-3 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-4">
+                <div className="grid grid-cols-1 gap-x-3 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-x-4">
                   {[...Array(ITEMS_PER_PAGE)].map((_, i) => (
                     <ProductCardSkeleton key={`skeleton-${i}`} />
                   ))}

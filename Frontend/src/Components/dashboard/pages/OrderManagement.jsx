@@ -38,7 +38,7 @@ const OrderManagement = () => {
         const api = createApiClient();
         // We use the existing `OrderListView` which returns all orders.
         // If this were for a specific user, we'd hit a different endpoint.
-        const response = await api.get("/api/v1/orders/orders/");
+        const response = await api.get("/api/v1/cart/orders/");
         setOrders(response.data); // Assuming the response is the array of orders
       } catch (err) {
         const errorMessage =

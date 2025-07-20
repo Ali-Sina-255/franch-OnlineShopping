@@ -67,7 +67,7 @@ export const updateUserProfile = createAsyncThunk(
       };
       await api.put("/api/v1/users/me/", userPayload);
 
-      // --- STEP 2: Update the Profile model (rest of the data) ---
+      // --- STEP 2: Update the Profile model ( of the data) ---
       const profilePayload = new FormData();
       profilePayload.append("phone_number", profileData.phone_number || "");
       profilePayload.append("about_me", profileData.about_me || "");

@@ -9,6 +9,7 @@ import { filters } from "../data/products"; // This should be dynamic later
 // --- REDUX IMPORTS ---
 import { useSelector } from "react-redux";
 import MegaMenu from "./MegaMenu";
+import SearchBar from "./SearchBar";
 const navbarItems = [
   { name: "Home", path: "/" },
   { name: "Category", path: "/category" },
@@ -126,19 +127,7 @@ const Header = ({
 
             {/* Icons and Search */}
             <div className="flex items-center justify-end gap-x-4">
-              <form
-                onSubmit={handleSearchSubmit}
-                className="hidden sm:block relative"
-              >
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
-                  className="w-full rounded-xl border border-indigo-200 bg-white py-2 pl-10 pr-4 text-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all duration-200"
-                />
-                <Search className="h-5 w-5 text-indigo-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              </form>
+              <SearchBar />
               <Link
                 to="/account"
                 className="p-2 text-indigo-700 hover:text-indigo-900 hidden lg:block transition-colors duration-200"

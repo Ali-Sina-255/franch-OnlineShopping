@@ -18,6 +18,10 @@ import DashboardPage from "./Components/dashboard/DashboardPage";
 import CheckoutPage from "./Pages/CheckoutPage";
 import OrderSuccessPage from "./Pages/OrderSuccessPage";
 import PaymentsSuccess from "./Pages/PaymentsSuccess";
+import ShippingDetailsPage from "./Pages/ShippingDetailsPage";
+import AuthContainer from "./features/authentication/components/AuthContainer";
+import About from "./Pages/About";
+import ContactUs from "./Pages/ContactUs";
 function App() {
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -98,8 +102,8 @@ function App() {
               />
             }
           />
-          {/* <Route path="/contact" element={<ContactUs />} />
-          <Route path="/about" element={<About />} /> */}
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/about" element={<About />} />
           <Route
             path="/cart"
             element={

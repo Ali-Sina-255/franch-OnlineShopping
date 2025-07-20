@@ -1,9 +1,11 @@
 from apps.product.models import Product
 from apps.product.serializers import ProductSerializer
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import Cart, CartOrder, CartOrderItem
+from .models import Cart, CartOrder, CartOrderItem, Wishlist
 
+User = get_user_model()
 # Define a serializer for the CartOrderItem model
 
 
@@ -14,11 +16,24 @@ class CartSerializer(serializers.ModelSerializer):
         source="product",
         write_only=True,
     )
+    qty = serializers.IntegerField()
 
     class Meta:
         model = Cart
         fields = ["id", "product", "product_id", "qty", "total", "cart_id", "date"]
         read_only_fields = ["total", "cart_id", "date", "product"]
+
+    def validate_qty(self, value):
+        prod = None
+        if self.initial_data.get("product_id"):
+            prod = Product.objects.filter(id=self.initial_data["product_id"]).first()
+        elif self.instance:
+            prod = self.instance.product
+        if prod and value > prod.stock:
+            raise serializers.ValidationError(
+                f"Only {prod.stock} in stock, you requested {value}."
+            )
+        return value
 
     def create(self, validated_data):
         # Automatically assign the authenticated user
@@ -80,3 +95,14 @@ class CartOrderSerializer(serializers.ModelSerializer):
             "date",
             "orderitem",
         ]
+
+
+class WishlistCreateSerializer(serializers.ModelSerializer):
+    product_id = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.filter(is_available=True), write_only=True
+    )
+    product = ProductSerializer(read_only=True)
+
+    class Meta:
+        model = Wishlist
+        fields = ["id", "product_id", "product"]

@@ -138,3 +138,24 @@ class CartOrderItem(models.Model):
         # Update order total after saving item
         self.order.total = self.order.calculate_total()
         self.order.save(update_fields=["total"])
+
+
+class Wishlist(models.Model):
+    # A foreign key relationship to the User model with CASCADE deletion
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    # A foreign key relationship to the Product model with CASCADE deletion, specifying a related name
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="wishlist"
+    )
+    # Date and time field
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Wishlist"
+
+    # Method to return a string representation of the object
+    def __str__(self):
+        if self.product.title:
+            return self.product.title
+        else:
+            return "Wishlist"

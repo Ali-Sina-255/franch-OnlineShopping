@@ -2,6 +2,8 @@ from decimal import Decimal
 
 import requests
 from apps.carts.models import Cart
+from apps.notification.models import Notification
+from apps.notification.serializers import NotificationSerializer
 from apps.product.models import Product
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -12,8 +14,13 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Cart, CartOrder, CartOrderItem
-from .serializers import CartOrderItem, CartOrderSerializer, CartSerializer
+from .models import Cart, CartOrder, CartOrderItem, Wishlist
+from .serializers import (
+    CartOrderItem,
+    CartOrderSerializer,
+    CartSerializer,
+    WishlistCreateSerializer,
+)
 from .utils import send_payment_success_email
 
 User = get_user_model()
@@ -289,3 +296,35 @@ class PaymentSuccessView(generics.CreateAPIView):
             {"message": "No valid PayPal order ID provided"},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class WishlistCreateAPIView(generics.CreateAPIView):
+    serializer_class = WishlistCreateSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        product = serializer.validated_data["product_id"]
+        user = request.user
+
+        existing = Wishlist.objects.filter(product=product, user=user)
+        if existing.exists():
+            existing.delete()
+            return Response({"message": "Removed from wishlist"}, status=status.HTTP_200_OK)
+
+        Wishlist.objects.create(product=product, user=user)
+        return Response({"message": "Added to wishlist"}, status=status.HTTP_201_CREATED)
+
+
+class WishlistAPIView(generics.ListAPIView):
+    serializer_class = WishlistCreateSerializer
+    permission_classes = (AllowAny,)
+
+    def get_queryset(self):
+        user_id = self.kwargs["user_id"]
+        user = User.objects.get(id=user_id)
+        wishlist = Wishlist.objects.filter(
+            user=user,
+        )
+        return wishlist

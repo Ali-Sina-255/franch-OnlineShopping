@@ -124,6 +124,10 @@ class CartOrderItem(models.Model):
     def order_id(self):
         return f"Order ID #{self.order.oid}"
 
+    @property
+    def total_price(self):
+        return self.total
+
     def save(self, *args, **kwargs):
         self.sub_total = self.qty * self.price
         self.total = self.sub_total

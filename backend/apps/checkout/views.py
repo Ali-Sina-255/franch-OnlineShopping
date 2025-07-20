@@ -7,7 +7,7 @@ from apps.cart.models import Cart, CartItem
 from apps.cart.serializers import CartItemSerializer
 from apps.orders.models import Order, OrderProduct
 from apps.profiles.models import Profile
-from rest_framework import status
+from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -121,3 +121,5 @@ def checkout_post_api_view(request):
         },
         status=status.HTTP_201_CREATED,
     )
+
+

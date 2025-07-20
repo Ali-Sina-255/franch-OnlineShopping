@@ -5,7 +5,6 @@ import { X, Trash2, Loader2 } from "lucide-react";
 import { mapProductFromApi } from "../utils/product-mapper";
 import { useSelector, useDispatch } from "react-redux";
 import { removeItemFromCart } from "../state/userSlice/userSlice";
-
 const CartDrawer = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
 
@@ -49,7 +48,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
       {isOpen && (
         <>
           <motion.div
-            className="fixed inset-0 bg-black/60 z-40"
+            className="fixed inset-0 bg-black/60 z-50"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 
-import { CartProvider } from "./context/CartContext"; // Import the provider
+// import { CartProvider } from "./context/CartContext"; // Import the provider
 
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
@@ -22,7 +22,8 @@ import OrderSuccessPage from "./Pages/OrderSuccessPage";
 import ContactUs from "./Pages/ContactUs";
 import About from "./Pages/About";
 import LoginPage from "./features/authentication/components/Signin";
-import LoginPagee from "./features/authentication/components/LoginPagee";
+import LoginPagee from "./features/authentication/components/AuthContainer";
+import AuthContainer from "./features/authentication/components/AuthContainer";
 function App() {
   // Remove the old local cart state and handlers
   // const [cart, setCart] = useState([]);
@@ -69,13 +70,11 @@ function App() {
         }}
       />
 
-      {/* QuickViewModal will now use the context internally if needed */}
       <QuickViewModal
         product={quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
       />
 
-      {/* CartDrawer now gets all its data from the context */}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
       <FlyingImage
@@ -84,7 +83,6 @@ function App() {
       />
 
       {!hideLayout && (
-        // Header will get its cart count from the context
         <Header
           wishlistCount={wishlist.length}
           searchQuery={searchQuery}
@@ -149,7 +147,7 @@ function App() {
           <Route path="/sign-in" element={<Signin />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="*" element={<Signin />} />
-          <Route path="/log" element={<LoginPagee />} />
+          <Route path="/logee" element={<AuthContainer />} />
         </Routes>
       </main>
 

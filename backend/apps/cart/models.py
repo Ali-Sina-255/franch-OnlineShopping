@@ -1,15 +1,17 @@
+from apps.product.models import Product
 from django.contrib.auth import get_user_model
 from django.db import models
-from apps.product.models import Product
 
 User = get_user_model()
 
 import uuid
 class Cart(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     cart_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
+    payment_status = models.CharField(max_length=20, default="pending")
+
     def __str__(self):
         return str(self.cart_id)
 

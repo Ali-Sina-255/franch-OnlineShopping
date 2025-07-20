@@ -1,18 +1,19 @@
 import re
 from decimal import Decimal
 
+from apps.product.models import Product
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from apps.product.models import Product
-
 from .models import Order, OrderProduct, Payment
+from .utils import generate_order
 
 User = get_user_model()
 
 
 class PaymentSerializer(serializers.ModelSerializer):
     amount_paid = serializers.DecimalField(max_digits=10, decimal_places=2)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Payment
@@ -91,10 +92,10 @@ class OrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # The user is derived from the authenticated request, not sent in the payload.
         user = self.context["request"].user
-        
-        # This logic should be expanded to include creating OrderProduct items from the cart.
-        # For now, it correctly creates the Order shell with the right user.
+
         order = Order.objects.create(user=user, **validated_data)
+        order.order_number = generate_order(order.pk)
+        order.save(update_fields=["order_number"])
         return order
 
 
@@ -116,7 +117,6 @@ class OrderProductSerializer(serializers.ModelSerializer):
             "quantity",
             "total_price",
             "product_price",
-            "ordered",
             "created_at",
             "updated_at",
         ]

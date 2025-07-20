@@ -10,36 +10,24 @@ from .models import Cart, CartOrder, CartOrderItem
 class CartSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
     product_id = serializers.PrimaryKeyRelatedField(
-        queryset=Cart.objects.model.product.field.related_model.objects.filter(
-            is_available=True
-        ),
+        queryset=Product.objects.filter(is_available=True),
         source="product",
         write_only=True,
     )
 
     class Meta:
         model = Cart
-        fields = [
-            "id",
-            "product",
-            "product_id",
-            "qty",
-            "total",
-            "cart_id",
-            "date",
-        ]
+        fields = ["id", "product", "product_id", "qty", "total", "cart_id", "date"]
         read_only_fields = ["total", "cart_id", "date", "product"]
 
     def create(self, validated_data):
-        request = self.context.get("request")
-        user = request.user if request and request.user.is_authenticated else None
-        validated_data["user"] = user
+        # Automatically assign the authenticated user
+        validated_data["user"] = self.context["request"].user
         return super().create(validated_data)
 
 
 # Define a serializer for the CartOrderItem model
 class CartOrderItemSerializer(serializers.ModelSerializer):
-
     # product = ProductSerializer()
 
     class Meta:

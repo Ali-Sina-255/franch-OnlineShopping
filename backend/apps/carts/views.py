@@ -31,24 +31,38 @@ class CartApiView(generics.ListCreateAPIView):
         return Cart.objects.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        user = request.user if request.user.is_authenticated else None
-        product = get_object_or_404(Product, id=request.data.get("product_id"))
-        qty = int(request.data.get("qty", 1))
+        data = request.data.copy()
+        user = request.user
+        data["product_id"] = data.get("product_id")
 
+        # Use serializer to validate
+        serializer = self.get_serializer(data=data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        product = serializer.validated_data["product"]
+        qty = serializer.validated_data["qty"]
+
+        # If cart exists, update qty
         cart_qs = Cart.objects.filter(user=user, product=product)
-
         if cart_qs.exists():
             cart = cart_qs.first()
-            cart.qty += qty  # increment quantity
+            new_qty = cart.qty + qty
+            if new_qty > product.stock:
+                return Response(
+                    {"qty": f"Total quantity {new_qty} exceeds stock {product.stock}."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            cart.qty = new_qty
             cart.save()
             created = False
         else:
-            cart = Cart.objects.create(user=user, product=product, qty=qty)
+            cart = serializer.save(user=user)
             created = True
 
         status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
-        serializer = self.get_serializer(cart)
-        return Response(serializer.data, status=status_code)
+        return Response(
+            CartSerializer(cart, context={"request": request}).data, status=status_code
+        )
 
 
 class CartListView(generics.ListAPIView):

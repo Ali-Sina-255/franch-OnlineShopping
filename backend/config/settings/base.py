@@ -45,9 +45,6 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "corsheaders",
     "taggit",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -63,7 +60,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -197,7 +193,7 @@ LOGGING = {
     "loggers": {
         "apps.orders": {
             "handlers": ["console"],
-            "level": "WARNING",  # This will hide INFO logs
+            "level": "WARNING",
             "propagate": False,
         },
     },

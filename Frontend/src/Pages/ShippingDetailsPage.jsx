@@ -6,7 +6,7 @@ import { createOrder } from "../state/checkoutSlice/checkoutSlice";
 import { fetchUserProfile } from "../state/userSlice/userSlice";
 import { Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
-import shippingImage from "../../public/1.jpeg"; // Import your image
+import shippingImage from "../../public/233.webp"; // Import your image
 
 const ShippingDetailsPage = () => {
   const dispatch = useDispatch();

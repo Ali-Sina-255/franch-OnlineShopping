@@ -4,14 +4,18 @@ import { motion } from "framer-motion";
 
 const PasswordCriteria = ({ password }) => {
   const criteria = [
-    { label: "حداقل 6 حرف", met: password.length >= 6 },
-    { label: "حاوی حروف بزرگ", met: /[A-Z]/.test(password) },
-    { label: "حاوی حروف کوچک", met: /[a-z]/.test(password) },
-    { label: "حاوی عدد", met: /\d/.test(password) },
-    { label: "حاوی کاراکترهای خاص", met: /[^A-Za-z0-9]/.test(password) },
+    { label: "At least 6 characters", met: password.length >= 6 },
+    { label: "Contains uppercase letters", met: /[A-Z]/.test(password) },
+    { label: "Contains lowercase letters", met: /[a-z]/.test(password) },
+    { label: "Contains numbers", met: /\d/.test(password) },
+    {
+      label: "Contains special characters",
+      met: /[^A-Za-z0-9]/.test(password),
+    },
   ];
+
   return (
-    <div className="mt-2 space-y-1" dir="rtl">
+    <div className="mt-2 space-y-1">
       {criteria.map((item, index) => (
         <motion.div
           key={item.label}
@@ -44,13 +48,6 @@ const PasswordStrengthMeter = ({ password }) => {
     return strength;
   };
 
-
-
-
-
-
-
-
   const strength = getStrength(password);
 
   const getColor = (strength) => {
@@ -62,23 +59,22 @@ const PasswordStrengthMeter = ({ password }) => {
   };
 
   const getStrengthText = (strength) => {
-    if (strength === 0) return "بسیار ضعیف";
-    if (strength === 1) return "ضعیف";
-    if (strength === 2) return "متوسط";
-    if (strength === 3) return "خوب";
-    return "قوی";
+    if (strength === 0) return "Very Weak";
+    if (strength === 1) return "Weak";
+    if (strength === 2) return "Medium";
+    if (strength === 3) return "Good";
+    return "Strong";
   };
 
   return (
-    <div className="mt-2" dir="rtl">
+    <div className="mt-2">
       {/* Strength Text and Label */}
       <div className="flex justify-between items-center mb-1">
-        <span className="text-xs text-gray-400">قدرت رمز عبور</span>
+        <span className="text-xs text-gray-400">Password Strength</span>
         <motion.span
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          
           className="text-xs font-semibold"
           style={{
             background: `linear-gradient(to right, ${getColor(strength)})`,

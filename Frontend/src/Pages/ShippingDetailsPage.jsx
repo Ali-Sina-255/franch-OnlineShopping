@@ -25,6 +25,7 @@ const ShippingDetailsPage = () => {
     reset,
     formState: { errors, isValid },
   } = useForm({ mode: "onChange" });
+  const { watch } = useForm();
 
   useEffect(() => {
     dispatch(fetchUserProfile());
@@ -101,18 +102,29 @@ const ShippingDetailsPage = () => {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
-                </label>
+              <div className="relative">
                 <input
+                  id="full_name"
+                  type="text"
+                  placeholder="Full Name"
                   {...register("full_name", {
                     required: "Full name is required",
                   })}
-                  className={`w-full px-4 py-3 rounded-lg border ${
+                  className={`peer w-full px-4 py-3 rounded-lg bg-white border ${
                     errors.full_name ? "border-red-500" : "border-gray-300"
-                  } focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                  } focus:outline-none focus:bg-white placeholder-transparent`}
                 />
+                <label
+                  htmlFor="full_name"
+                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+      ${
+        watch("full_name")
+          ? "-top-2 text-xs text-black"
+          : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+      }`}
+                >
+                  Full Name
+                </label>
                 {errors.full_name && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.full_name.message}
@@ -120,12 +132,11 @@ const ShippingDetailsPage = () => {
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
+              <div className="relative">
                 <input
+                  id="email"
                   type="email"
+                  placeholder="Email"
                   {...register("email", {
                     required: "Email is required",
                     pattern: {
@@ -133,10 +144,21 @@ const ShippingDetailsPage = () => {
                       message: "Invalid email address",
                     },
                   })}
-                  className={`w-full px-4 py-3 rounded-lg border ${
+                  className={`peer w-full px-4 py-3 rounded-lg bg-white border ${
                     errors.email ? "border-red-500" : "border-gray-300"
-                  } focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                  } focus:outline-none focus:bg-white placeholder-transparent`}
                 />
+                <label
+                  htmlFor="email"
+                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+      ${
+        watch("email")
+          ? "-top-2 text-xs text-black"
+          : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+      }`}
+                >
+                  Email
+                </label>
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.email.message}
@@ -144,12 +166,11 @@ const ShippingDetailsPage = () => {
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mobile Number
-                </label>
+              <div className="relative">
                 <input
+                  id="mobile"
                   type="tel"
+                  placeholder="Mobile Number"
                   {...register("mobile", {
                     required: "Mobile number is required",
                     pattern: {
@@ -157,10 +178,21 @@ const ShippingDetailsPage = () => {
                       message: "Invalid phone number",
                     },
                   })}
-                  className={`w-full px-4 py-3 rounded-lg border ${
+                  className={`peer w-full px-4 py-3 rounded-lg bg-white border ${
                     errors.mobile ? "border-red-500" : "border-gray-300"
-                  } focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                  } focus:outline-none focus:bg-white placeholder-transparent`}
                 />
+                <label
+                  htmlFor="mobile"
+                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+      ${
+        watch("mobile")
+          ? "-top-2 text-xs text-black"
+          : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+      }`}
+                >
+                  Mobile Number
+                </label>
                 {errors.mobile && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.mobile.message}
@@ -168,16 +200,29 @@ const ShippingDetailsPage = () => {
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="relative">
+                <input
+                  id="address"
+                  type="text"
+                  placeholder="Address"
+                  {...register("address", {
+                    required: "Address is required",
+                  })}
+                  className={`peer w-full px-4 py-3 rounded-lg bg-white border ${
+                    errors.address ? "border-red-500" : "border-gray-300"
+                  } focus:outline-none focus:bg-white placeholder-transparent`}
+                />
+                <label
+                  htmlFor="address"
+                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+      ${
+        watch("address")
+          ? "-top-2 text-xs text-black"
+          : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+      }`}
+                >
                   Address
                 </label>
-                <input
-                  {...register("address", { required: "Address is required" })}
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.address ? "border-red-500" : "border-gray-300"
-                  } focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                />
                 {errors.address && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.address.message}
@@ -186,16 +231,28 @@ const ShippingDetailsPage = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                {/* City */}
+                <div className="relative">
+                  <input
+                    id="city"
+                    type="text"
+                    placeholder="City"
+                    {...register("city", { required: "City is required" })}
+                    className={`peer w-full px-4 py-3 rounded-lg bg-white border ${
+                      errors.city ? "border-red-500" : "border-gray-300"
+                    } focus:outline-none focus:bg-white placeholder-transparent`}
+                  />
+                  <label
+                    htmlFor="city"
+                    className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+        ${
+          watch("city")
+            ? "-top-2 text-xs text-black"
+            : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+        }`}
+                  >
                     City
                   </label>
-                  <input
-                    {...register("city", { required: "City is required" })}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.city ? "border-red-500" : "border-gray-300"
-                    } focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                  />
                   {errors.city && (
                     <p className="mt-1 text-sm text-red-600">
                       {errors.city.message}
@@ -203,16 +260,28 @@ const ShippingDetailsPage = () => {
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                {/* State */}
+                <div className="relative">
+                  <input
+                    id="state"
+                    type="text"
+                    placeholder="State"
+                    {...register("state", { required: "State is required" })}
+                    className={`peer w-full px-4 py-3 rounded-lg bg-white border ${
+                      errors.state ? "border-red-500" : "border-gray-300"
+                    } focus:outline-none focus:bg-white placeholder-transparent`}
+                  />
+                  <label
+                    htmlFor="state"
+                    className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+        ${
+          watch("state")
+            ? "-top-2 text-xs text-black"
+            : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+        }`}
+                  >
                     State
                   </label>
-                  <input
-                    {...register("state", { required: "State is required" })}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.state ? "border-red-500" : "border-gray-300"
-                    } focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                  />
                   {errors.state && (
                     <p className="mt-1 text-sm text-red-600">
                       {errors.state.message}
@@ -221,16 +290,27 @@ const ShippingDetailsPage = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="relative">
+                <input
+                  id="country"
+                  type="text"
+                  placeholder="Country"
+                  {...register("country", { required: "Country is required" })}
+                  className={`peer w-full px-4 py-3 rounded-lg bg-white border ${
+                    errors.country ? "border-red-500" : "border-gray-300"
+                  } focus:outline-none focus:bg-white placeholder-transparent`}
+                />
+                <label
+                  htmlFor="country"
+                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+      ${
+        watch("country")
+          ? "-top-2 text-xs text-black"
+          : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+      }`}
+                >
                   Country
                 </label>
-                <input
-                  {...register("country", { required: "Country is required" })}
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.country ? "border-red-500" : "border-gray-300"
-                  } focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                />
                 {errors.country && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.country.message}

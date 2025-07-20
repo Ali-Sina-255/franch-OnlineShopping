@@ -8,6 +8,7 @@ from .views import (
     CartTotalView,
     CheckoutAPIView,
     CreateOrderView,
+    OrderDeleteAPIView,
     OrderDetailAPIView,
     PaymentSuccessView,
     WishlistAPIView,
@@ -38,6 +39,7 @@ urlpatterns = [
     path("checkout/<str:order_id>/", CheckoutAPIView.as_view(), name="checkout-view"),
     path("payment-success/", PaymentSuccessView.as_view(), name="payment-success"),
     path("orders/", OrderDetailAPIView.as_view(), name="list_orders"),
+    path("orders/<int:pk>/delete/", OrderDeleteAPIView.as_view(), name="order-delete"),
     path(
         "wishlist/create/",
         WishlistCreateAPIView.as_view(),

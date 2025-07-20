@@ -2,9 +2,7 @@ from decimal import Decimal
 
 import requests
 from apps.carts.models import Cart
-from apps.notification.models import Notification
-from apps.notification.serializers import NotificationSerializer
-from apps.product.models import Product
+from apps.notification.views import send_notification
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -13,6 +11,8 @@ from loguru import logger
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+
+from apps.carts.permission import IsAdminOrOwner
 
 from .models import Cart, CartOrder, CartOrderItem, Wishlist
 from .serializers import (
@@ -194,6 +194,11 @@ class CreateOrderView(generics.CreateAPIView):
         )
 
 
+class OrderDeleteAPIView(generics.DestroyAPIView):
+    queryset = CartOrder.objects.all()
+    serializer_class = CartOrderSerializer
+    permission_classes = [IsAuthenticated, IsAdminOrOwner]
+
 class OrderDetailAPIView(generics.GenericAPIView):
     serializer_class = CartOrderSerializer
     permission_classes = [IsAuthenticated]
@@ -268,6 +273,8 @@ class PaymentSuccessView(generics.CreateAPIView):
                         order.save()
 
                         # ✅ Send payment success email
+                        if order.user is not None:
+                            send_notification(user=order.user, order=order)
                         try:
                             send_payment_success_email(order)
                         except Exception as e:
@@ -311,10 +318,14 @@ class WishlistCreateAPIView(generics.CreateAPIView):
         existing = Wishlist.objects.filter(product=product, user=user)
         if existing.exists():
             existing.delete()
-            return Response({"message": "Removed from wishlist"}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Removed from wishlist"}, status=status.HTTP_200_OK
+            )
 
         Wishlist.objects.create(product=product, user=user)
-        return Response({"message": "Added to wishlist"}, status=status.HTTP_201_CREATED)
+        return Response(
+            {"message": "Added to wishlist"}, status=status.HTTP_201_CREATED
+        )
 
 
 class WishlistAPIView(generics.ListAPIView):
@@ -327,4 +338,5 @@ class WishlistAPIView(generics.ListAPIView):
         wishlist = Wishlist.objects.filter(
             user=user,
         )
+        return wishlist
         return wishlist

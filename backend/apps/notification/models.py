@@ -32,3 +32,8 @@ class Notification(models.Model):
             return self.order.oid
         else:
             return "Notification"
+
+
+class Contact(models.Model):
+    name = models.CharField(max_length=255)
+    email = models

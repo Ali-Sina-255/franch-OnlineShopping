@@ -13,7 +13,9 @@ class CartSerializer(serializers.ModelSerializer):
         queryset=Product.objects.filter(is_available=True),
         source="product",
         write_only=True,
+
     )
+    qty = serializers.IntegerField(required=True, min_value=1)  # ✅ Add this
 
     class Meta:
         model = Cart

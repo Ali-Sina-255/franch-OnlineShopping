@@ -71,9 +71,9 @@ const CartItem = ({
               <p className="text-sm text-gray-500 mr-4">Qty:</p>
               <div className="flex items-center border rounded">
                 <button
-                  onClick={() => handleQuantityChange(product.id, item.qty, -1)}
-                  disabled={cartLoading}
-                  className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"
+                  onClick={() => handleQuantityChange(product.id, -1)}
+                  disabled={cartLoading || item.qty <= 1}
+                  className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   aria-label="Decrease quantity"
                 >
                   <Minus size={16} />
@@ -82,7 +82,7 @@ const CartItem = ({
                   {item.qty}
                 </span>
                 <button
-                  onClick={() => handleQuantityChange(product.id, item.qty, 1)}
+                  onClick={() => handleQuantityChange(product.id, 1)}
                   disabled={cartLoading}
                   className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"
                   aria-label="Increase quantity"
@@ -164,20 +164,17 @@ const CartPage = () => {
     dispatch(removeItemFromCart(itemId));
   };
 
-  const handleQuantityChange = (productId, currentQuantity, change) => {
-    const newQuantity = currentQuantity + change;
-
-    if (newQuantity > 0) {
-      dispatch(addItemToCart({ product_id: productId, qty: newQuantity }));
-    } else {
-      const itemToRemove = cartItems.find(
-        (item) => item.product.id === productId
-      );
-      if (itemToRemove) {
-        handleRemoveItem(itemToRemove.id);
-      }
-    }
+  // ========================================================================
+  // THE FIX: Send the CHANGE in quantity (+1 or -1), not the new total.
+  // ========================================================================
+  const handleQuantityChange = (productId, change) => {
+    // We no longer need to calculate the new quantity on the frontend.
+    // We just send the product ID and the amount to change the quantity by.
+    dispatch(addItemToCart({ product_id: productId, qty: change }));
   };
+  // ========================================================================
+  // END OF FIX
+  // ========================================================================
 
   if (cartLoading && cartItems.length === 0) {
     return <LoadingCart />;

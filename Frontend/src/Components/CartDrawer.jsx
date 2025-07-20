@@ -5,28 +5,36 @@ import { X, Trash2, Loader2 } from "lucide-react";
 import { mapProductFromApi } from "../utils/product-mapper";
 import { useSelector, useDispatch } from "react-redux";
 import { removeItemFromCart } from "../state/userSlice/userSlice";
+
 const CartDrawer = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
 
-  const { cartItems, cartLoading } = useSelector((state) => state.user);
+  const { cart, cartItems, cartLoading } = useSelector((state) => state.user);
 
+  // ========================================================================
+  // THE FIX: Calculate subtotal using `item.total` from your new backend model.
+  // We also convert it to a Number() to prevent potential errors.
+  // ========================================================================
   const subtotal = (cartItems || []).reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) => sum + Number(item.total),
     0
   );
+  // ========================================================================
+  // END OF FIX
+  // ========================================================================
 
   const handleRemove = (cartItemId) => {
+    // Pass the item's database ID to the thunk
     dispatch(removeItemFromCart(cartItemId));
   };
 
-  // 🔒 Prevent body scroll when drawer is open
+  // Prevent body scroll when drawer is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
-
     return () => {
       document.body.style.overflow = "";
     };
@@ -114,9 +122,13 @@ const CartDrawer = ({ isOpen, onClose }) => {
                             </p>
                           </div>
                           <div className="flex flex-1 items-end justify-between text-sm">
-                            <p className="text-gray-500">
-                              Qty: {item.quantity}
-                            </p>
+                            {/* ======================================================================== */}
+                            {/* THE FIX: Change `item.quantity` to `item.qty` */}
+                            {/* ======================================================================== */}
+                            <p className="text-gray-500">Qty: {item.qty}</p>
+                            {/* ======================================================================== */}
+                            {/* END OF FIX */}
+                            {/* ======================================================================== */}
                             <button
                               onClick={() => handleRemove(item.id)}
                               type="button"

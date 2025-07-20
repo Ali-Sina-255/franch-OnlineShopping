@@ -173,6 +173,17 @@ class CreateOrderView(generics.CreateAPIView):
         )
 
 
+class OrderDetailAPIView(generics.GenericAPIView):
+    serializer_class = CartOrderSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = CartOrder.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        orders = CartOrder.objects.filter(user=request.user).order_by("-date")
+        serializer = self.get_serializer(orders, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class CheckoutAPIView(generics.RetrieveAPIView):
     serializer_class = CartOrderSerializer
     lookup_field = "order_id"

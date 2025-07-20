@@ -1,28 +1,57 @@
-// src/Pages/CheckoutPage.jsx
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { Loader2, CheckCircle } from "lucide-react";
 import {
   fetchOrderForCheckout,
   processPaypalPayment,
   clearOrderState,
 } from "../state/checkoutSlice/checkoutSlice";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { Loader2, CheckCircle } from "lucide-react";
+
+const LoadingIndicator = () => (
+  <div className="text-center py-20">
+    <Loader2 className="h-12 w-12 animate-spin mx-auto text-indigo-600" />
+  </div>
+);
+
+const PaidOrderMessage = () => (
+  <div className="text-center py-20 flex flex-col items-center">
+    <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
+    <h1 className="text-2xl font-bold">This order has already been paid.</h1>
+  </div>
+);
+
+const OrderSummarySection = ({ order }) => (
+  <div className="space-y-4 border-b pb-4 mb-6">
+    <div className="flex justify-between">
+      <span className="text-gray-600">Order ID:</span>{" "}
+      <span className="font-mono">{order.oid}</span>
+    </div>
+    <div className="flex justify-between">
+      <span className="text-gray-600">Name:</span>{" "}
+      <strong>{order.full_name}</strong>
+    </div>
+    <div className="flex justify-between">
+      <span className="text-gray-600">Email:</span>{" "}
+      <strong>{order.email}</strong>
+    </div>
+    <div className="flex justify-between text-xl font-bold">
+      <span>Order Total:</span> <span>${order.total}</span>
+    </div>
+  </div>
+);
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { orderId } = useParams();
-
   const { order, loading } = useSelector((state) => state.checkout);
 
-  // Fetch the order details when the page loads
   useEffect(() => {
     if (orderId) {
       dispatch(fetchOrderForCheckout(orderId));
     }
-    // Cleanup on component unmount
     return () => {
       dispatch(clearOrderState());
     };
@@ -30,27 +59,16 @@ const CheckoutPage = () => {
 
   const initialOptions = {
     clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
-    currency: "USD", // Match currency with your backend
+    currency: "USD",
     intent: "capture",
   };
 
   if (loading || !order) {
-    return (
-      <div className="text-center py-20">
-        <Loader2 className="h-12 w-12 animate-spin mx-auto text-indigo-600" />
-      </div>
-    );
+    return <LoadingIndicator />;
   }
 
   if (order.payment_status === "paid") {
-    return (
-      <div className="text-center py-20 flex flex-col items-center">
-        <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
-        <h1 className="text-2xl font-bold">
-          This order has already been paid.
-        </h1>
-      </div>
-    );
+    return <PaidOrderMessage />;
   }
 
   return (
@@ -60,26 +78,8 @@ const CheckoutPage = () => {
           Confirm Your Order
         </h1>
 
-        {/* Order Summary */}
-        <div className="space-y-4 border-b pb-4 mb-6">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Order ID:</span>{" "}
-            <span className="font-mono">{order.oid}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Name:</span>{" "}
-            <strong>{order.full_name}</strong>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Email:</span>{" "}
-            <strong>{order.email}</strong>
-          </div>
-          <div className="flex justify-between text-xl font-bold">
-            <span>Order Total:</span> <span>${order.total}</span>
-          </div>
-        </div>
+        <OrderSummarySection order={order} />
 
-        {/* PayPal Payment */}
         <div>
           <h2 className="text-lg font-semibold text-center mb-4">
             Complete Payment

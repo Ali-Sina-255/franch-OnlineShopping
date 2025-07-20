@@ -15,8 +15,9 @@ class CartSerializer(serializers.ModelSerializer):
         queryset=Product.objects.filter(is_available=True),
         source="product",
         write_only=True,
+
     )
-    qty = serializers.IntegerField()
+    qty = serializers.IntegerField(required=True, min_value=1)  # ✅ Add this
 
     class Meta:
         model = Cart
@@ -69,7 +70,6 @@ class CartOrderItemSerializer(serializers.ModelSerializer):
         else:
             # For other methods, set serialization depth to 3.
             self.Meta.depth = 3
-
 
 # Define a serializer for the CartOrder model
 class CartOrderSerializer(serializers.ModelSerializer):

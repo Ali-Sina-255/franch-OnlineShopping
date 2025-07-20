@@ -9,6 +9,7 @@ import { filters } from "../data/products"; // This should be dynamic later
 // --- REDUX IMPORTS ---
 import { useSelector } from "react-redux";
 import MegaMenu from "./MegaMenu";
+
 const navbarItems = [
   { name: "Home", path: "/" },
   { name: "Category", path: "/category" },
@@ -25,11 +26,14 @@ const Header = ({
 }) => {
   // --- REDUX STATE ---
   const { cartItems } = useSelector((state) => state.user);
-  // const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const cartCount = (cartItems || []).reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+
+  // ========================================================================
+  // THE FIX: Change `item.quantity` to `item.qty` to match your new backend model.
+  // ========================================================================
+  const cartCount = (cartItems || []).reduce((sum, item) => sum + item.qty, 0);
+  // ========================================================================
+  // END OF FIX
+  // ========================================================================
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,10 +61,10 @@ const Header = ({
   return (
     <>
       <header
-        className={`sticky  top-0 z-30 transition-all duration-300 ${
+        className={`sticky top-0 z-30 transition-all duration-300 ${
           isScrolled
-            ? "bg-white/80 backdrop-blur-lg  border-indigo-100 shadow-sm"
-            : "bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm  border-indigo-100"
+            ? "bg-white/80 backdrop-blur-lg border-indigo-100 shadow-sm"
+            : "bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm border-indigo-100"
         }`}
       >
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -106,7 +110,6 @@ const Header = ({
                       {item.name}
                     </Link>
 
-                    {/* Show MegaMenu only for "Category" */}
                     {isCategory && (
                       <AnimatePresence>
                         {isShopMenuOpen && (

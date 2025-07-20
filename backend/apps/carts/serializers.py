@@ -67,7 +67,6 @@ class CartOrderItemSerializer(serializers.ModelSerializer):
             # For other methods, set serialization depth to 3.
             self.Meta.depth = 3
 
-
 # Define a serializer for the CartOrder model
 class CartOrderSerializer(serializers.ModelSerializer):
     orderitem = CartOrderItemSerializer(many=True, read_only=True)

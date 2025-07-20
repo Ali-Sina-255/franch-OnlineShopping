@@ -1,17 +1,28 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
+
+// A helper to get a clear error message from a failed API call
 const getErrorMessage = (error) => {
   const errorData = error.response?.data;
   if (!errorData) return error.message || "An unknown error occurred.";
   if (typeof errorData === "string") return errorData;
   if (errorData.detail) return errorData.detail;
-  return Object.values(errorData).flat().join(" ");
+  // This will grab all validation errors from DRF and join them.
+  return Object.entries(errorData)
+    .map(([key, value]) => `${key}: ${value.join(", ")}`)
+    .join("; ");
 };
 
+// This needs to be outside so it can be used in injectStore
+let store;
+
+// Create a reusable axios instance
 const api = axios.create({ baseURL: BASE_URL });
 
+// Use an interceptor to automatically add the auth token to every request
 api.interceptors.request.use((config) => {
   try {
     const token = store.getState().user.accessToken;
@@ -26,18 +37,81 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// --- ASYNC THUNKS FOR PROFILE MANAGEMENT (NO CHANGES) ---
+
+// Fetches the combined user and profile data from your /profiles/me/ endpoint
+export const fetchUserProfile = createAsyncThunk(
+  "user/fetchUserProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/api/v1/profiles/me/");
+      return response.data;
+      console.log(response);
+      
+    } catch (error) {
+      toast.error("Could not load profile.");
+      return rejectWithValue(getErrorMessage(error));
+    }
+  }
+);
+
+// Performs the two-step update required by your backend within a single action
+export const updateUserProfile = createAsyncThunk(
+  "user/updateUserProfile",
+  async (profileData, { rejectWithValue, dispatch }) => {
+    try {
+      // --- STEP 1: Update the User model (first_name, last_name) ---
+      const userPayload = {
+        first_name: profileData.first_name,
+        last_name: profileData.last_name,
+      };
+      await api.put("/api/v1/users/me/", userPayload);
+
+      // --- STEP 2: Update the Profile model (rest of the data) ---
+      const profilePayload = new FormData();
+      profilePayload.append("phone_number", profileData.phone_number || "");
+      profilePayload.append("about_me", profileData.about_me || "");
+      profilePayload.append("gender", profileData.gender);
+      profilePayload.append("country", profileData.country);
+      profilePayload.append("city", profileData.city || "");
+
+      if (
+        profileData.profile_photo &&
+        typeof profileData.profile_photo !== "string"
+      ) {
+        profilePayload.append("profile_photo", profileData.profile_photo);
+      }
+
+      await api.put("/api/v1/profiles/me/update/", profilePayload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      toast.success("Profile updated successfully!");
+
+      const updatedProfile = await dispatch(fetchUserProfile()).unwrap();
+      return updatedProfile;
+    } catch (error) {
+      const message = getErrorMessage(error);
+      toast.error(message || "Failed to update profile.");
+      return rejectWithValue(message);
+    }
+  }
+);
+
+// --- INITIAL STATE ---
 const initialState = {
   currentUser: null,
+  profile: null,
   accessToken: null,
   refreshToken: null,
-  cart: null,
+  cart: null, // This will now store the cart_id
   cartItems: [],
   cartLoading: false,
   error: null,
   loading: false,
 };
 
-// --- AUTH ASYNC THUNKS ---
+// --- AUTH THUNKS (NO CHANGES) ---
 
 export const createUser = createAsyncThunk(
   "user/createUser",
@@ -69,22 +143,11 @@ export const signIn = createAsyncThunk(
       );
       const { access, refresh } = tokenResponse.data;
 
-      const userDetailsResponse = await axios.get(
-        `${BASE_URL}/api/v1/auth/register/`,
-        {
-          headers: { Authorization: `Bearer ${access}` },
-        }
-      );
-
+      dispatch(fetchUserProfile());
       dispatch(fetchUserCart());
+
       toast.success("Login successful!");
-      return {
-        accessToken: access,
-        refreshToken: refresh,
-        userData: Array.isArray(userDetailsResponse.data)
-          ? userDetailsResponse.data[0]
-          : userDetailsResponse.data,
-      };
+      return { accessToken: access, refreshToken: refresh };
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message);
@@ -93,20 +156,24 @@ export const signIn = createAsyncThunk(
   }
 );
 
-// --- CART ASYNC THUNKS ---
+// --- UPDATED CART LOGIC ---
 
 export const fetchUserCart = createAsyncThunk(
   "user/fetchUserCart",
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/api/v1/cart/cart/");
-      let cartData = response.data.results?.[0];
-      if (!cartData) {
-        const createResponse = await api.post("/api/v1/cart/cart/", {});
-        cartData = createResponse.data;
-      }
-      return cartData;
+      const items = response.data;
+      const cartId = items.length > 0 ? items[0].cart_id : null;
+      return { items, cartId };
     } catch (error) {
+      if (
+        error.response &&
+        (error.response.status === 404 ||
+          (error.response.status === 200 && !error.response.data.length))
+      ) {
+        return { items: [], cartId: null };
+      }
       return rejectWithValue(getErrorMessage(error));
     }
   }
@@ -114,18 +181,11 @@ export const fetchUserCart = createAsyncThunk(
 
 export const addItemToCart = createAsyncThunk(
   "user/addItemToCart",
-  async (itemData, { getState, rejectWithValue }) => {
-    const { cartItems } = getState().user;
-    const existingItem = cartItems.find(
-      (item) => item.product.id === itemData.product_id
-    );
-    if (existingItem) {
-      return rejectWithValue("Item already in cart.");
-    }
+  async (itemData, { dispatch, rejectWithValue }) => {
     try {
-      const response = await api.post("/api/v1/cart/cart-items/", itemData);
-      toast.success("Item added to bag!");
-      return response.data;
+      await api.post("/api/v1/cart/cart/", itemData);
+      toast.success("Bag updated!");
+      dispatch(fetchUserCart());
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message);
@@ -136,35 +196,16 @@ export const addItemToCart = createAsyncThunk(
 
 export const removeItemFromCart = createAsyncThunk(
   "user/removeItemFromCart",
-  async (cartItemId, { rejectWithValue }) => {
+  async (itemId, { getState, rejectWithValue }) => {
+    const { cart } = getState().user;
+    if (!cart?.cart_id) {
+      toast.error("Cart not found.");
+      return rejectWithValue("Cart ID not found.");
+    }
     try {
-      await api.delete(`/api/v1/cart/cart-items/${cartItemId}/`);
+      await api.delete(`/api/v1/cart/cart/${cart.cart_id}/delete/${itemId}/`);
       toast.success("Item removed from bag.");
-      return cartItemId;
-    } catch (error) {
-      const message = getErrorMessage(error);
-      toast.error(message);
-      return rejectWithValue(message);
-    }
-  }
-);
-
-// --- NEW THUNK FOR QUANTITY UPDATE ---
-export const updateCartItemQuantity = createAsyncThunk(
-  "user/updateCartItemQuantity",
-  async ({ cartItemId, quantity }, { rejectWithValue }) => {
-    if (quantity <= 0) {
-      return rejectWithValue("Quantity must be greater than 0.");
-    }
-    try {
-      const response = await api.patch(
-        `/api/v1/cart/cart-items/${cartItemId}/`,
-        {
-          quantity: quantity,
-        }
-      );
-      // We don't toast here to avoid it being too "noisy" on every click
-      return response.data;
+      return itemId;
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message);
@@ -174,19 +215,12 @@ export const updateCartItemQuantity = createAsyncThunk(
 );
 
 // --- THE SLICE DEFINITION ---
-
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
     signOutSuccess: (state) => {
-      state.currentUser = null;
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.cart = null;
-      state.cartItems = [];
-      state.error = null;
-      state.loading = false;
+      Object.assign(state, initialState);
       toast("You have been signed out.");
     },
     clearUserError: (state) => {
@@ -202,7 +236,6 @@ const userSlice = createSlice({
       })
       .addCase(signIn.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentUser = action.payload.userData;
         state.accessToken = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
       })
@@ -222,35 +255,25 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Cart Fetching Reducers
+      // Cart Reducers
       .addCase(fetchUserCart.pending, (state) => {
         state.cartLoading = true;
       })
       .addCase(fetchUserCart.fulfilled, (state, action) => {
-        state.cart = action.payload;
-        state.cartItems = action.payload.items || [];
+        state.cartItems = action.payload.items;
+        state.cart = { cart_id: action.payload.cartId };
         state.cartLoading = false;
       })
       .addCase(fetchUserCart.rejected, (state, action) => {
         state.error = action.payload;
         state.cartLoading = false;
       })
-
-      // Add Item Reducers
       .addCase(addItemToCart.pending, (state) => {
         state.cartLoading = true;
       })
-      .addCase(addItemToCart.fulfilled, (state, action) => {
-        state.cartItems.push(action.payload);
-        state.cartLoading = false;
-      })
       .addCase(addItemToCart.rejected, (state, action) => {
-        if (action.payload !== "Item already in cart.") {
-          state.error = action.payload;
-        }
         state.cartLoading = false;
       })
-
       .addCase(removeItemFromCart.pending, (state) => {
         state.cartLoading = true;
       })
@@ -265,17 +288,39 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
-        const index = state.cartItems.findIndex(
-          (item) => item.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.cartItems[index] = action.payload;
-        }
+      // PROFILE REDUCERS
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.loading = true;
       })
-      .addCase(updateCartItemQuantity.rejected, (state, action) => {
-        console.error("Failed to update quantity:", action.payload);
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.profile = action.payload;
+        state.currentUser = {
+          id: action.payload.user_id,
+          email: action.payload.email,
+          first_name: action.payload.first_name,
+          last_name: action.payload.last_name,
+        };
+        state.loading = false;
+      })
+      .addCase(fetchUserProfile.rejected, (state, action) => {
         state.error = action.payload;
+        state.loading = false;
+      })
+      .addCase(updateUserProfile.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.profile = action.payload;
+        state.currentUser = {
+          ...state.currentUser,
+          first_name: action.payload.first_name,
+          last_name: action.payload.last_name,
+        };
+        state.loading = false;
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
+        state.error = action.payload;
+        state.loading = false;
       });
   },
 });
@@ -283,7 +328,6 @@ const userSlice = createSlice({
 export const { signOutSuccess, clearUserError } = userSlice.actions;
 export default userSlice.reducer;
 
-let store;
 export const injectStore = (_store) => {
   store = _store;
 };

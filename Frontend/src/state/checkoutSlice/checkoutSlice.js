@@ -1,11 +1,11 @@
-// src/state/checkoutSlice/js
+// src/state/checkoutSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-hot-toast";
-import { fetchUserCart } from "../userSlice/userSlice"; // To refresh the cart after order
+// THE FIX: Import fetchUserCart instead of clearCart
+import { fetchUserCart } from "../userSlice/userSlice";
 import axios from "axios";
 
-// This helper function creates an API client instance that attaches the auth token.
-// It's the same as your code, just ensures we have the `api` object.
+// Helper to create an API client that attaches the auth token from Redux state.
 const createApiClient = (getState) => {
   const api = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000",
@@ -18,9 +18,72 @@ const createApiClient = (getState) => {
     }
     return config;
   });
-
   return api;
 };
+
+// --- ASYNC THUNKS FOR THE NEW ORDER FLOW ---
+
+// Action to create the order *before* payment, by submitting shipping details.
+export const createOrder = createAsyncThunk(
+  "checkout/createOrder",
+  async ({ shippingDetails, cartId }, { getState, rejectWithValue }) => {
+    const api = createApiClient(getState);
+    try {
+      const payload = { ...shippingDetails, cart_id: cartId };
+      const response = await api.post("/api/v1/cart/orders/create/", payload);
+      toast.success("Order created! Proceeding to payment.");
+      return response.data;
+    } catch (error) {
+      const message = error.response?.data?.detail || "Failed to create order.";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+// Action to fetch details of a specific order for the payment page.
+export const fetchOrderForCheckout = createAsyncThunk(
+  "checkout/fetchOrderForCheckout",
+  async (orderId, { getState, rejectWithValue }) => {
+    const api = createApiClient(getState);
+    try {
+      const response = await api.get(`/api/v1/cart/checkout/${orderId}/`);
+      return response.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.detail || "Could not load order details.";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+// Action to process the payment after PayPal is approved.
+export const processPaypalPayment = createAsyncThunk(
+  "checkout/processPaypalPayment",
+  async (
+    { order_oid, payapl_order_id },
+    { dispatch, getState, rejectWithValue }
+  ) => {
+    const api = createApiClient(getState);
+    try {
+      const payload = { order_oid, payapl_order_id };
+      const response = await api.post("/api/v1/cart/payment-success/", payload);
+
+      // THE FIX: Instead of clearing the cart locally, we re-fetch it from the backend.
+      // Since the backend deleted the cart items, this will return an empty cart.
+      dispatch(fetchUserCart());
+
+      toast.success("Payment successful!");
+      return response.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Payment verification failed.";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
 
 const initialState = {
   order: null,
@@ -28,92 +91,56 @@ const initialState = {
   error: null,
 };
 
-// **THIS IS THE CORRECTED THUNK**
-// It now accepts a structured payload with both order and payment details
-export const placeOrder = createAsyncThunk(
-  "checkout/placeOrder",
-  async (
-    { orderDetails, paypalDetails },
-    { dispatch, getState, rejectWithValue }
-  ) => {
-    const api = createApiClient(getState);
-    try {
-      // --- STEP 1: Create the Payment Record ---
-      console.log(
-        "STEP 1: Creating Payment record with payload:",
-        paypalDetails
-      );
-      const paymentPayload = {
-        payment_id: paypalDetails.id, // The PayPal transaction ID
-        payment_method: "PayPal",
-        amount_paid: paypalDetails.purchase_units[0].amount.value,
-        status: paypalDetails.status, // e.g., "COMPLETED"
-      };
-
-      const paymentResponse = await api.post(
-        "/api/v1/orders/payments/",
-        paymentPayload
-      );
-      const paymentId = paymentResponse.data.id; // Get the DB ID of the new Payment
-      console.log(`SUCCESS: Payment record created with ID: ${paymentId}`);
-
-      // --- STEP 2: Create the Order Record, linking the Payment ---
-      console.log("STEP 2: Creating Order record...");
-      const finalOrderPayload = {
-        ...orderDetails, // All the shipping form data
-        payment: paymentId, // **This is the critical part that was missing**
-      };
-
-      const orderResponse = await api.post(
-        "/api/v1/orders/orders/",
-        finalOrderPayload
-      );
-      console.log("SUCCESS: Order record created:", orderResponse.data);
-
-      toast.success("Order placed successfully!");
-
-      // Refresh the user's cart, which should now be empty on the backend
-      dispatch(fetchUserCart());
-
-      // Return the final, complete order data
-      return orderResponse.data;
-    } catch (error) {
-      const message =
-        error.response?.data?.detail ||
-        error.response?.data?.payment?.[0] ||
-        "Failed to place order. Please check your details.";
-      console.error("Order placement failed:", error.response?.data);
-      toast.error(message);
-      return rejectWithValue(message);
-    }
-  }
-);
-
 const checkoutSlice = createSlice({
   name: "checkout",
   initialState,
   reducers: {
-    clearOrder: (state) => {
+    clearOrderState: (state) => {
       state.order = null;
       state.error = null;
+      state.loading = false;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(placeOrder.pending, (state) => {
+      .addCase(createOrder.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(placeOrder.fulfilled, (state, action) => {
+      .addCase(createOrder.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(createOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchOrderForCheckout.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchOrderForCheckout.fulfilled, (state, action) => {
         state.loading = false;
         state.order = action.payload;
       })
-      .addCase(placeOrder.rejected, (state, action) => {
+      .addCase(fetchOrderForCheckout.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(processPaypalPayment.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(processPaypalPayment.fulfilled, (state) => {
+        state.loading = false;
+        if (state.order) {
+          state.order.payment_status = "paid";
+        }
+      })
+      .addCase(processPaypalPayment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { clearOrder } = checkoutSlice.actions;
+export const { clearOrderState } = checkoutSlice.actions;
 export default checkoutSlice.reducer;

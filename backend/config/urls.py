@@ -22,6 +22,7 @@ urlpatterns = [
     path("api/v1/product/", include("apps.product.urls"), name="product"),
     path("api/v1/profiles/", include("apps.profiles.urls"), name="profiles"),
     path("api/v1/cart/", include("apps.carts.urls"), name="carts"),
+    path("api/v1/notification/", include("apps.carts.urls"), name="carts"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 admin.site.site_header = "Online Shopping Center Admin"

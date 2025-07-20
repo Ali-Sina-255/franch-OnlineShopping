@@ -4,8 +4,6 @@ import { ShieldCheck, AlertTriangle, Tag, Heart, Loader2 } from "lucide-react";
 import { fetchProductById } from "../services/api.js";
 import { mapProductFromApi } from "../utils/product-mapper";
 import { toast } from "react-hot-toast";
-
-// Redux Imports for state and actions
 import { useDispatch, useSelector } from "react-redux";
 import { addItemToCart } from "../state/userSlice/userSlice";
 
@@ -35,20 +33,15 @@ const ProductDetailSkeleton = () => (
 const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  // --- Redux Hooks ---
   const dispatch = useDispatch();
   const { accessToken, cartItems, cartLoading } = useSelector(
     (state) => state.user
   );
-
-  // --- Component State ---
   const [product, setProduct] = useState(null);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState("");
   const imageRef = useRef(null);
 
-  // Effect to fetch product details on component mount or ID change
   useEffect(() => {
     const loadProduct = async () => {
       setIsPageLoading(true);
@@ -70,67 +63,27 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
     loadProduct();
   }, [id]);
 
-  // Handler for adding an item to the cart with built-in debugging
   const handleAddToCart = () => {
-    console.log("--- [DEBUG] handleAddToCart triggered ---");
-
-    // Check 1: Is the product object available?
     if (!product) {
-      console.error(
-        "❌ DEBUG: 'Add to Cart' clicked, but 'product' state is null. Aborting."
-      );
       return;
     }
-    console.log("✅ DEBUG: Product is loaded:", product);
-
-    // Check 2: Is the user logged in?
     if (!accessToken) {
-      console.error(
-        "❌ DEBUG: User is not logged in ('accessToken' is falsy). Aborting."
-      );
       toast.error("Please sign in to add items to your bag.");
-      navigate("/signin"); // Redirect user to sign-in page
+      navigate("/signin");
       return;
     }
-    console.log("✅ DEBUG: User is logged in. Token found.");
 
-    // Check 3: Is the item already in the cart?
-    console.log(
-      `🔎 DEBUG: Checking if product ID ${product.id} is in cartItems:`,
-      cartItems
-    );
+    // ========================================================================
+    // THE FIX: Change the key from `quantity` to `qty` to match the backend.
+    // ========================================================================
+    const itemData = { product_id: product.id, qty: 1 };
+    // ========================================================================
+    // END OF FIX
+    // ========================================================================
 
-    const isAlreadyInCart = cartItems.some((item) => {
-      // Critical check for data integrity from the cart API
-      if (!item.product || typeof item.product.id === "undefined") {
-        console.warn(
-          "⚠️ DEBUG: A cart item is malformed (missing 'product' or 'product.id'):",
-          item
-        );
-        return false;
-      }
-      return item.product.id === product.id;
-    });
-
-    if (isAlreadyInCart) {
-      console.error(
-        `❌ DEBUG: Product ID ${product.id} is already in the cart. Aborting.`
-      );
-      toast.error(`${product.name} is already in your bag.`);
-      return;
-    }
-    console.log(`✅ DEBUG: Product ID ${product.id} is not in the cart.`);
-
-    // If all checks pass, dispatch the action.
-    const itemData = { product_id: product.id, quantity: 1 };
-    console.log(
-      "🚀 DEBUG: All checks passed. Dispatching 'addItemToCart' with payload:",
-      itemData
-    );
     dispatch(addItemToCart(itemData));
   };
 
-  // --- Render Logic ---
   if (isPageLoading) {
     return <ProductDetailSkeleton />;
   }
@@ -156,7 +109,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
 
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-2xl px-8 py-10 md:py-20  sm:px-6 lg:max-w-7xl lg:px-8">
+      <div className="mx-auto max-w-2xl px-8 py-10 md:py-20 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
           {/* Image gallery */}
           <div className="flex flex-col gap-6">
@@ -267,7 +220,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
             <div className="mt-10 flex items-center gap-x-4">
               <button
                 onClick={handleAddToCart}
-                disabled={isPageLoading || cartLoading} // Disable button when page or cart is loading
+                disabled={isPageLoading || cartLoading}
                 className="flex-1 flex items-center justify-center rounded-md border border-transparent bg-gray-900 px-8 py-3 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {cartLoading ? (
@@ -278,7 +231,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
               </button>
               <button
                 onClick={() => onToggleWishlist(product.id)}
-                disabled={isPageLoading} // Disable wishlist button too while page is loading
+                disabled={isPageLoading}
                 className="flex items-center justify-center rounded-md p-3 text-gray-400 border border-gray-300 hover:bg-gray-100 hover:text-red-500 transition-colors disabled:opacity-50"
               >
                 <Heart

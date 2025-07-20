@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import requests
 from apps.carts.models import Cart
-from apps.product.models import Product
+from apps.notification.views import send_notification
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -12,16 +12,61 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Cart, CartOrder, CartOrderItem
-from .serializers import CartOrderItem, CartOrderSerializer, CartSerializer
+from apps.carts.permission import IsAdminOrOwner
+
+from .models import Cart, CartOrder, CartOrderItem, Wishlist
+from .serializers import (
+    CartOrderItem,
+    CartOrderSerializer,
+    CartSerializer,
+    WishlistCreateSerializer,
+)
 from .utils import send_payment_success_email
 
 User = get_user_model()
 
 
 # from .serializers import CartSerializer
+#     serializer_class = CartSerializer
+#     permission_classes = [IsAuthenticated]
 
+#     def get_queryset(self):
+#         # Return only carts of the logged-in user
+#         return Cart.objects.filter(user=self.request.user)
 
+#     def create(self, request, *args, **kwargs):
+#         data = request.data.copy()
+#         user = request.user
+#         data["product_id"] = data.get("product_id")
+
+#         # Use serializer to validate
+#         serializer = self.get_serializer(data=data, context={"request": request})
+#         serializer.is_valid(raise_exception=True)
+
+#         product = serializer.validated_data["product"]
+#         qty = serializer.validated_data["qty"]
+
+#         # If cart exists, update qty
+#         cart_qs = Cart.objects.filter(user=user, product=product)
+#         if cart_qs.exists():
+#             cart = cart_qs.first()
+#             new_qty = cart.qty + qty
+#             if new_qty > product.stock:
+#                 return Response(
+#                     {"qty": f"Total quantity {new_qty} exceeds stock {product.stock}."},
+#                     status=status.HTTP_400_BAD_REQUEST,
+#                 )
+#             cart.qty = new_qty
+#             cart.save()
+#             created = False
+#         else:
+#             cart = serializer.save(user=user)
+#             created = True
+
+#         status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
+#         return Response(
+#             CartSerializer(cart, context={"request": request}).data, status=status_code
+#         )
 class CartApiView(generics.ListCreateAPIView):
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
@@ -31,25 +76,38 @@ class CartApiView(generics.ListCreateAPIView):
         return Cart.objects.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        user = request.user if request.user.is_authenticated else None
-        product = get_object_or_404(Product, id=request.data.get("product_id"))
-        qty = int(request.data.get("qty", 1))
+        data = request.data.copy()
+        user = request.user
+        data["product_id"] = data.get("product_id")
 
+        # Use serializer to validate
+        serializer = self.get_serializer(data=data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        product = serializer.validated_data["product"]
+        qty = serializer.validated_data["qty"]
+
+        # If cart exists, update qty
         cart_qs = Cart.objects.filter(user=user, product=product)
-
         if cart_qs.exists():
             cart = cart_qs.first()
-            cart.qty += qty  # increment quantity
+            new_qty = cart.qty + qty
+            if new_qty > product.stock:
+                return Response(
+                    {"qty": f"Total quantity {new_qty} exceeds stock {product.stock}."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            cart.qty = new_qty
             cart.save()
             created = False
         else:
-            cart = Cart.objects.create(user=user, product=product, qty=qty)
+            cart = serializer.save(user=user)
             created = True
 
         status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
-        serializer = self.get_serializer(cart)
-        return Response(serializer.data, status=status_code)
-
+        return Response(
+            CartSerializer(cart, context={"request": request}).data, status=status_code
+        )
 
 class CartListView(generics.ListAPIView):
     serializer_class = CartSerializer
@@ -173,6 +231,22 @@ class CreateOrderView(generics.CreateAPIView):
         )
 
 
+class OrderDeleteAPIView(generics.DestroyAPIView):
+    queryset = CartOrder.objects.all()
+    serializer_class = CartOrderSerializer
+    permission_classes = [IsAuthenticated, IsAdminOrOwner]
+
+class OrderDetailAPIView(generics.GenericAPIView):
+    serializer_class = CartOrderSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = CartOrder.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        orders = CartOrder.objects.filter(user=request.user).order_by("-date")
+        serializer = self.get_serializer(orders, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class CheckoutAPIView(generics.RetrieveAPIView):
     serializer_class = CartOrderSerializer
     lookup_field = "order_id"
@@ -236,6 +310,8 @@ class PaymentSuccessView(generics.CreateAPIView):
                         order.save()
 
                         # ✅ Send payment success email
+                        if order.user is not None:
+                            send_notification(user=order.user, order=order)
                         try:
                             send_payment_success_email(order)
                         except Exception as e:
@@ -264,3 +340,40 @@ class PaymentSuccessView(generics.CreateAPIView):
             {"message": "No valid PayPal order ID provided"},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class WishlistCreateAPIView(generics.CreateAPIView):
+    serializer_class = WishlistCreateSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        product = serializer.validated_data["product_id"]
+        user = request.user
+
+        existing = Wishlist.objects.filter(product=product, user=user)
+        if existing.exists():
+            existing.delete()
+            return Response(
+                {"message": "Removed from wishlist"}, status=status.HTTP_200_OK
+            )
+
+        Wishlist.objects.create(product=product, user=user)
+        return Response(
+            {"message": "Added to wishlist"}, status=status.HTTP_201_CREATED
+        )
+
+
+class WishlistAPIView(generics.ListAPIView):
+    serializer_class = WishlistCreateSerializer
+    permission_classes = (AllowAny,)
+
+    def get_queryset(self):
+        user_id = self.kwargs["user_id"]
+        user = User.objects.get(id=user_id)
+        wishlist = Wishlist.objects.filter(
+            user=user,
+        )
+        return wishlist
+        return wishlist

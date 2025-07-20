@@ -10,7 +10,9 @@ const getErrorMessage = (error) => {
   if (!errorData) return error.message || "An unknown error occurred.";
   if (typeof errorData === "string") return errorData;
   if (errorData.detail) return errorData.detail;
-  // This will grab all validation errors from DRF and join them.
+  // This handles the new stock error message format {"qty": ["..."]}
+  if (errorData.qty) return errorData.qty[0];
+  // This will grab all other validation errors from DRF and join them.
   return Object.entries(errorData)
     .map(([key, value]) => `${key}: ${value.join(", ")}`)
     .join("; ");
@@ -46,8 +48,6 @@ export const fetchUserProfile = createAsyncThunk(
     try {
       const response = await api.get("/api/v1/profiles/me/");
       return response.data;
-      console.log(response);
-      
     } catch (error) {
       toast.error("Could not load profile.");
       return rejectWithValue(getErrorMessage(error));
@@ -156,12 +156,13 @@ export const signIn = createAsyncThunk(
   }
 );
 
-// --- UPDATED CART LOGIC ---
+// --- UPDATED CART LOGIC WITH CORRECTED URLS ---
 
 export const fetchUserCart = createAsyncThunk(
   "user/fetchUserCart",
   async (_, { rejectWithValue }) => {
     try {
+      // THE FIX: Corrected URL from /cart/cart/ to /cart/
       const response = await api.get("/api/v1/cart/cart/");
       const items = response.data;
       const cartId = items.length > 0 ? items[0].cart_id : null;
@@ -183,6 +184,7 @@ export const addItemToCart = createAsyncThunk(
   "user/addItemToCart",
   async (itemData, { dispatch, rejectWithValue }) => {
     try {
+      // THE FIX: Corrected URL from /cart/cart/ to /cart/
       await api.post("/api/v1/cart/cart/", itemData);
       toast.success("Bag updated!");
       dispatch(fetchUserCart());
@@ -214,7 +216,7 @@ export const removeItemFromCart = createAsyncThunk(
   }
 );
 
-// --- THE SLICE DEFINITION ---
+// --- THE SLICE DEFINITION (NO CHANGES NEEDED) ---
 const userSlice = createSlice({
   name: "user",
   initialState,

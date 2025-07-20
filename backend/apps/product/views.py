@@ -4,7 +4,7 @@ from rest_framework.parsers import FormParser, MultiPartParser
 
 from .filters import ProductFilter
 from .models import Brand, Product
-from .pagination import CustomPageNumberPagination
+from .pagination import CustomPageNumberPagination, ProductPageNumberPagination
 from .serializers import BrandSerializer, ProductSerializer
 
 
@@ -19,6 +19,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     parser_classes = [MultiPartParser, FormParser]
-    pagination_class = CustomPageNumberPagination
+    pagination_class = ProductPageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter

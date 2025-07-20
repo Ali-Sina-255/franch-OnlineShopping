@@ -4,21 +4,17 @@ import { toast } from "react-hot-toast";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
 
-// A helper to get a clear error message from a failed API call
 const getErrorMessage = (error) => {
   const errorData = error.response?.data;
   if (!errorData) return error.message || "An unknown error occurred.";
   if (typeof errorData === "string") return errorData;
   if (errorData.detail) return errorData.detail;
-  // This handles the new stock error message format {"qty": ["..."]}
   if (errorData.qty) return errorData.qty[0];
-  // This will grab all other validation errors from DRF and join them.
   return Object.entries(errorData)
     .map(([key, value]) => `${key}: ${value.join(", ")}`)
     .join("; ");
 };
 
-// This needs to be outside so it can be used in injectStore
 let store;
 
 // Create a reusable axios instance

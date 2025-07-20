@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
-import { Loader2, PackageSearch } from "lucide-react";
-import { store } from "../../../state/store"; // Adjust this path to your Redux store if it's different
+import { Loader2, PackageSearch, Search, Filter } from "lucide-react";
+import { store } from "../../../state/store"; // Adjust path if needed
 import axios from "axios";
 
 // This function creates an API client that automatically includes the auth token.
@@ -11,7 +11,6 @@ const createApiClient = () => {
   });
 
   api.interceptors.request.use((config) => {
-    // Make sure the Redux store is available before trying to get state
     if (store) {
       const token = store.getState().user.accessToken;
       if (token) {
@@ -50,19 +49,23 @@ const StatusBadge = ({ status }) => {
 };
 
 const OrderManagement = () => {
-  const [orders, setOrders] = useState([]);
+  const [allOrders, setAllOrders] = useState([]); // Stores the original, full list of orders
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // --- NEW: State for search and filter ---
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all"); 
+
+  // Fetch all orders once on component mount
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       setError(null);
       try {
         const api = createApiClient();
-        // UPDATED: Point to the correct new endpoint from your urls.py
         const response = await api.get("/api/v1/cart/orders/");
-        setOrders(response.data);
+        setAllOrders(response.data);
       } catch (err) {
         const errorMessage =
           err.response?.data?.detail || "Failed to fetch your orders.";
@@ -75,6 +78,42 @@ const OrderManagement = () => {
 
     fetchOrders();
   }, []);
+
+  // --- NEW: Memoized filtering logic ---
+  // This recalculates the filteredOrders only when the source data or filters change.
+  const filteredOrders = useMemo(() => {
+    return allOrders
+      .filter((order) => {
+        // Filter by payment status
+        if (
+          statusFilter !== "all" &&
+          order.payment_status.toLowerCase() !== statusFilter
+        ) {
+          return false;
+        }
+        return true;
+      })
+      .filter((order) => {
+        // Filter by search term (checks Order ID and Customer Name)
+        if (searchTerm.trim() === "") {
+          return true;
+        }
+        const lowercasedSearch = searchTerm.toLowerCase();
+        return (
+          order.oid.toLowerCase().includes(lowercasedSearch) ||
+          order.full_name.toLowerCase().includes(lowercasedSearch)
+        );
+      });
+  }, [allOrders, searchTerm, statusFilter]);
+
+  // Unique payment statuses for the filter dropdown
+  const paymentStatuses = useMemo(
+    () => [
+      "all",
+      ...new Set(allOrders.map((o) => o.payment_status.toLowerCase())),
+    ],
+    [allOrders]
+  );
 
   if (loading) {
     return (
@@ -94,18 +133,45 @@ const OrderManagement = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-full">
-      <div className="sm:flex sm:items-center">
+      <div className="sm:flex sm:items-center sm:justify-between">
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-bold text-gray-900">Your Orders</h1>
           <p className="mt-2 text-sm text-gray-700">
             A list of all the orders you have placed.
           </p>
         </div>
+        {/* --- NEW: Search and Filter UI --- */}
+        <div className="mt-4 sm:mt-0 sm:ml-4 flex items-center gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by ID or Name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+            >
+              {paymentStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
       <div className="mt-8 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            {orders.length > 0 ? (
+            {filteredOrders.length > 0 ? (
               <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead className="bg-gray-50">
@@ -149,8 +215,8 @@ const OrderManagement = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {/* UPDATED: Map the fields from your new CartOrder model */}
-                    {orders.map((order) => (
+                    {/* UPDATED: Map over the `filteredOrders` array */}
+                    {filteredOrders.map((order) => (
                       <tr key={order.oid}>
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-mono text-indigo-600 sm:pl-6">
                           {order.oid}
@@ -182,7 +248,7 @@ const OrderManagement = () => {
                   No Orders Found
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  You haven't placed any orders yet.
+                  Your search or filter criteria did not match any orders.
                 </p>
               </div>
             )}

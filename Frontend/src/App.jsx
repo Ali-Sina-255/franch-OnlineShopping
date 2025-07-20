@@ -18,10 +18,10 @@ import DashboardPage from "./Components/dashboard/DashboardPage";
 import CheckoutPage from "./Pages/CheckoutPage";
 import OrderSuccessPage from "./Pages/OrderSuccessPage";
 import PaymentsSuccess from "./Pages/PaymentsSuccess";
-import ShippingDetailsPage from "./Pages/ShippingDetailsPage";
-import AuthContainer from "./features/authentication/components/AuthContainer";
-import About from "./Pages/About";
 import ContactUs from "./Pages/ContactUs";
+import About from "./Pages/About";
+import ShippingDetailsPage from "./Pages/ShippingDetailsPage";
+
 function App() {
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -104,13 +104,7 @@ function App() {
           />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/about" element={<About />} />
-          <Route
-            path="/cart"
-            element={
-              // CartPage no longer needs any props
-              <CartPage />
-            }
-          />
+          <Route path="/cart" element={<CartPage />} />
           <Route
             path="/wishlist"
             element={
@@ -141,7 +135,10 @@ function App() {
           <Route path="/sign-in" element={<Signin />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="*" element={<Signin />} />
-          <Route path="/logee" element={<AuthContainer />} />
+          <Route
+            path="/payment-success/:order_oid/"
+            element={<PaymentsSuccess />}
+          />
         </Routes>
       </main>
 

@@ -13,6 +13,8 @@ class UserSerializer(serializers.ModelSerializer):
     country = CountryField(source="profile.country")
     city = serializers.CharField(source="profile.city")
 
+    profile_photo = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
@@ -26,6 +28,14 @@ class UserSerializer(serializers.ModelSerializer):
             "country",
             "city",
         ]
+
+    def get_profile_photo(self, obj):
+        try:
+            if obj.profile.profile_photo and hasattr(obj.profile.profile_photo, "url"):
+                return obj.profile.profile_photo.url
+        except Exception:
+            pass
+        return None
 
     def to_representation(self, instance):
         representation = super(UserSerializer, self).to_representation(instance)
@@ -69,3 +79,10 @@ class CustomRegisterSerializer(serializers.ModelSerializer):
         user.set_password(self.validated_data["password1"])
         user.save()
         return user
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    otp = serializers.CharField(max_length=10)
+    uidb64 = serializers.CharField()
+    reset_token = serializers.CharField()
+    new_password = serializers.CharField(write_only=True, min_length=8)

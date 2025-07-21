@@ -19,6 +19,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.CharField(
         verbose_name=_("Email"), max_length=255, db_index=True, unique=True
     )
+    otp = models.CharField(max_length=1000, null=True, blank=True)
+    reset_token = models.CharField(max_length=1000, null=True, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)

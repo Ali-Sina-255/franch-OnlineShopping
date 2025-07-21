@@ -22,6 +22,8 @@ import ShippingDetailsPage from "./Pages/ShippingDetailsPage";
 import AuthContainer from "./features/authentication/components/AuthContainer";
 import About from "./Pages/About";
 import ContactUs from "./Pages/ContactUs";
+import ForgotPassword from "./Pages/ForgotPassword";
+import CreateNewPassword from "./Pages/CreatePassword";
 function App() {
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -142,6 +144,8 @@ function App() {
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="*" element={<Signin />} />
           <Route path="/logee" element={<AuthContainer />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/create-new-password" element={<CreateNewPassword />} />
         </Routes>
       </main>
 

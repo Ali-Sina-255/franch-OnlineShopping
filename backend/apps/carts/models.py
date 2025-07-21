@@ -156,3 +156,23 @@ class Wishlist(models.Model):
             return self.product.title
         else:
             return "Wishlist"
+
+
+class Return(models.Model):
+    order_item = models.ForeignKey(
+        CartOrderItem, on_delete=models.CASCADE, related_name="returns"
+    )
+    reason = models.TextField(null=True, blank=True)
+    date_returned = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=50,
+        choices=[
+            ("pending", "Pending"),
+            ("approved", "Approved"),
+            ("rejected", "Rejected"),
+        ],
+        default="pending",
+    )
+
+    def __str__(self):
+        return f"Return for {self.order_item} - {self.status}"

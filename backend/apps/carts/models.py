@@ -8,7 +8,6 @@ User = get_user_model()
 import uuid
 
 
-
 class Cart(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 

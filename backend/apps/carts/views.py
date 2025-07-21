@@ -3,29 +3,30 @@ from decimal import Decimal
 import requests
 from apps.carts.models import Cart
 from apps.carts.permission import IsAdminOrOwner
-from apps.notification.views import send_notification
+from apps.product.models import Product
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db import transaction
+from django.db import models, transaction
+from django.db.models import Count, DecimalField, F, IntegerField, Q, Sum, Value
+from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 from loguru import logger
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Cart, CartOrder, CartOrderItem, Wishlist
 from .serializers import (
     CartOrderItem,
     CartOrderSerializer,
     CartSerializer,
+    ProductSalesSummarySerializer,
     WishlistCreateSerializer,
 )
 from .utils import send_payment_success_email
 
 User = get_user_model()
-
-
-# from .serializers import CartSerializer
 
 
 class CartApiView(generics.ListCreateAPIView):
@@ -339,4 +340,121 @@ class WishlistAPIView(generics.ListAPIView):
             user=user,
         )
         return wishlist
-        return wishlist
+
+
+class ProductSalesStatsAPIView(APIView):
+    def get(self, request, product_id):
+        # Filter order items with the given product
+        order_items = CartOrderItem.objects.filter(product_id=product_id)
+
+        # Filter only orders that are paid or fulfilled for sales and orders
+        valid_orders = CartOrder.objects.filter(
+            Q(payment_status="paid") | Q(order_status="Fulfilled")
+        )
+
+        # Order items linked to valid orders
+        valid_order_items = order_items.filter(order__in=valid_orders)
+
+        total_sales_agg = valid_order_items.aggregate(total_sales=Sum("total"))
+        total_sales = total_sales_agg["total_sales"] or 0
+
+        # Total orders with that product and valid status
+        total_orders = (
+            valid_orders.filter(orderitem__product_id=product_id).distinct().count()
+        )
+
+        # Total distinct customers who ordered the product
+        total_customers = (
+            valid_orders.filter(orderitem__product_id=product_id)
+            .values("user_id")
+            .distinct()
+            .count()
+        )
+
+        # Calculate returns = orders with product which are cancelled or refunded
+        returns_orders = (
+            CartOrder.objects.filter(
+                Q(order_status="Cancelled")
+                | Q(payment_status__in=["refunded", "refunding"])
+            )
+            .filter(orderitem__product_id=product_id)
+            .distinct()
+        )
+
+        total_returns = returns_orders.count()
+
+        return Response(
+            {
+                "product_id": product_id,
+                "total_sales": total_sales,
+                "total_orders": total_orders,
+                "total_customers": total_customers,
+                "total_returns": total_returns,
+            }
+        )
+
+
+class ProductSalesSummaryListAPIView(APIView):
+    def get(self, request):
+        # Annotate all products with aggregated sales/order info:
+        products = Product.objects.all().annotate(
+            total_sales=Coalesce(
+                Sum(
+                    "order_items__total",
+                    filter=Q(order_items__order__order_status="Fulfilled")
+                    & Q(order_items__order__payment_status="paid"),
+                    output_field=DecimalField(max_digits=12, decimal_places=2),
+                ),
+                0,
+                output_field=DecimalField(max_digits=12, decimal_places=2),
+            ),
+            total_orders=Coalesce(
+                Count(
+                    "order_items__order",
+                    distinct=True,
+                    filter=Q(order_items__order__order_status="Fulfilled")
+                    & Q(order_items__order__payment_status="paid"),
+                    output_field=IntegerField(),
+                ),
+                0,
+                output_field=IntegerField(),
+            ),
+            total_customers=Coalesce(
+                Count(
+                    "order_items__order__user",
+                    distinct=True,
+                    filter=Q(order_items__order__order_status="Fulfilled")
+                    & Q(order_items__order__payment_status="paid"),
+                    output_field=IntegerField(),
+                ),
+                0,
+                output_field=IntegerField(),
+            ),
+            total_returns=Coalesce(
+                Count(
+                    "order_items",
+                    filter=Q(
+                        order_items__order__order_status__in=["Cancelled", "Refunded"]
+                    ),
+                    output_field=IntegerField(),
+                ),
+                0,
+                output_field=IntegerField(),
+            ),
+        )
+
+        # Prepare response data and convert Decimal to float
+        results = [
+            {
+                "product_id": product.id,
+                "product_name": product.product_name,
+                "total_sales": float(product.total_sales),
+                "total_orders": product.total_orders,
+                "total_customers": product.total_customers,
+                "total_returns": product.total_returns,
+            }
+            for product in products
+        ]
+
+        serializer = ProductSalesSummarySerializer(results, many=True)
+        return Response(serializer.data)

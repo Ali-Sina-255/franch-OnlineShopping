@@ -8,6 +8,25 @@ const HomePage = (props) => {
   const [animationComplete, setAnimationComplete] = useState(false);
   const timeoutRef = useRef(null);
 
+  const productListRef = useRef(null);
+
+
+  useEffect(() => {
+  
+    if (props.searchQuery && productListRef.current) {
+      const headerOffset = 80; // Adjust this value to match your sticky header's height
+      const elementPosition =
+        productListRef.current.getBoundingClientRect().top;
+      const offsetPosition =
+        elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  }, [props.searchQuery]); // This effect will only run when the `searchQuery` prop changes.
+
   const slides = [
     {
       id: 1,
@@ -29,7 +48,6 @@ const HomePage = (props) => {
     },
   ];
 
-  // Auto-rotate slides
   const resetTimeout = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -47,7 +65,6 @@ const HomePage = (props) => {
     };
   }, [currentSlide, slides.length]);
 
-  // Mark animation complete after initial load
   useEffect(() => {
     const timer = setTimeout(() => setAnimationComplete(true), 3000);
     return () => clearTimeout(timer);
@@ -55,7 +72,7 @@ const HomePage = (props) => {
 
   return (
     <div className="relative">
-      {/* --- Modern Hero Slider --- */}
+     
       <div className="relative h-screen max-h-[600px] w-full overflow-hidden">
         <AnimatePresence initial={false}>
           <motion.div
@@ -73,17 +90,12 @@ const HomePage = (props) => {
           />
         </AnimatePresence>
 
-        {/* Modern Text Reveal */}
         <div className="absolute inset-0 flex items-center justify-center z-10 px-4">
           <div className="max-w-4xl text-center">
             <motion.h1
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{
-                delay: 0.3,
-                duration: 0.8,
-                ease: "easeOut",
-              }}
+              transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
               className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight"
             >
               Second-Hand, <span className="text-amber-400">First-Class</span>{" "}
@@ -93,11 +105,7 @@ const HomePage = (props) => {
             <motion.p
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{
-                delay: 0.6,
-                duration: 0.8,
-                ease: "easeOut",
-              }}
+              transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
               className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-10"
             >
               Discover curated vintage and pre-loved pieces to build a wardrobe
@@ -107,11 +115,7 @@ const HomePage = (props) => {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{
-                delay: 0.9,
-                duration: 0.5,
-                ease: "easeOut",
-              }}
+              transition={{ delay: 0.9, duration: 0.5, ease: "easeOut" }}
             >
               <a
                 href="#product-grid"
@@ -137,7 +141,6 @@ const HomePage = (props) => {
           </div>
         </div>
 
-        {/* Modern Navigation Dots */}
         <div className="absolute bottom-8 left-0 right-0 z-10">
           <div className="flex justify-center gap-3">
             {slides.map((_, index) => (
@@ -154,7 +157,12 @@ const HomePage = (props) => {
         </div>
       </div>
 
-      <div id="product-grid">
+      {/* 
+        ========================================================================
+        THE FIX: Step 3 - Attach the ref to the container of the ProductListPage.
+        ========================================================================
+      */}
+      <div id="product-grid" ref={productListRef}>
         <ProductListPage {...props} />
       </div>
     </div>

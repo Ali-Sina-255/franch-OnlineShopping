@@ -1,21 +1,23 @@
-// Dashboard.js
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import MainContent from "./MainContent";
-import { FaBell, FaEnvelope } from "react-icons/fa";
-import { FaSearch } from "react-icons/fa";
+import { FaBell, FaEnvelope, FaSearch, FaUser } from "react-icons/fa";
+
+// --- 1. IMPORT `useSelector` TO READ FROM THE REDUX STORE ---
+import { useSelector } from "react-redux";
 
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const notificationsCount = 3;
   const messagesCount = 5;
-  const user = {
-    name: " M Anwar",
-    image: "https://i.pravatar.cc/40?img=3", // Replace with your user image
-  };
 
+  // --- 2. READ THE DYNAMIC USER PROFILE FROM REDUX ---
+  // We select the `profile` object from the `user` slice.
+  // This object contains first_name, last_name, and profile_photo.
+  const { profile } = useSelector((state) => state.user);
+  console.log(profile);
+  
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white">
       <Sidebar
@@ -59,14 +61,26 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* User Profile */}
+            {/* --- 3. DYNAMIC USER PROFILE SECTION --- */}
             <div className="flex items-center gap-2 cursor-pointer">
-              <img
-                src={user.image}
-                alt="User"
-                className="w-8 h-8 rounded-full object-cover"
-              />
-              <span className=" font-semibold text-gray-500">{user.name}</span>
+              {/* Check if a profile photo exists, otherwise show a fallback icon */}
+              {profile?.first_name ? (
+                <img
+                  src={profile.first_name}
+                  alt="User"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                  <FaUser className="text-gray-600" />
+                </div>
+              )}
+              {/* Display the user's full name from the profile object */}
+              <span className="font-semibold text-gray-500">
+                {profile
+                  ? `${profile.first_name} ${profile.first_name}`
+                  : "Loading..."}
+              </span>
             </div>
           </div>
         </div>

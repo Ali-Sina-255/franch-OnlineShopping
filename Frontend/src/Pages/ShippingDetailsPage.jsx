@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { createOrder } from "../state/checkoutSlice/checkoutSlice";
 import { fetchUserProfile } from "../state/userSlice/userSlice";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "react-toastify";
-import shippingImage from "../../public/233.webp"; // Import your image
 
 const ShippingDetailsPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [activeQuestion, setActiveQuestion] = useState(null);
 
   const {
     cart,
@@ -45,6 +45,38 @@ const ShippingDetailsPage = () => {
     }
   }, [profile, reset]);
 
+  const toggleQuestion = (index) => {
+    setActiveQuestion(activeQuestion === index ? null : index);
+  };
+
+  const faqs = [
+    {
+      question: "How long does delivery take?",
+      answer:
+        "Standard delivery takes 3-5 business days. Express delivery is available for an additional fee and takes 1-2 business days.",
+    },
+    {
+      question: "Do you ship internationally?",
+      answer:
+        "Yes, we ship to most countries worldwide. International delivery times vary by destination.",
+    },
+    {
+      question: "Can I change my shipping address after ordering?",
+      answer:
+        "You can change your shipping address within 1 hour of placing your order by contacting our customer service.",
+    },
+    {
+      question: "What shipping carriers do you use?",
+      answer:
+        "We work with major carriers including FedEx, UPS, and DHL, depending on your location and the shipping method selected.",
+    },
+    {
+      question: "How can I track my order?",
+      answer:
+        "Once your order is shipped, you'll receive a tracking number via email that you can use to track your package.",
+    },
+  ];
+
   const onSubmit = (data) => {
     if (!cart?.cart_id) {
       toast.error("Cart not found. Please add items to your cart again.");
@@ -68,23 +100,62 @@ const ShippingDetailsPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="flex flex-col lg:flex-row h-full">
-        {/* Image Section */}
-        <div className="lg:w-1/2 bg-gray-100 hidden lg:block">
-          <div className="h-full w-full flex items-center justify-center p-12">
-            <div className="relative w-full h-full rounded-xl overflow-hidden">
-              <img
-                src={shippingImage}
-                alt="Shipping illustration"
-                className="w-full h-full object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end p-8">
-                <div className="text-white">
-                  <h2 className="text-3xl font-bold mb-2">Almost There!</h2>
-                  <p className="text-lg">
-                    Just a few details to complete your order
-                  </p>
+        {/* FAQ Section */}
+        <div className="lg:w-1/2 bg-gray-50 p-8 hidden lg:block">
+          <div className="max-w-md mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Delivery Information
+            </h2>
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div key={index} className="border-b border-gray-200 pb-4">
+                  <button
+                    onClick={() => toggleQuestion(index)}
+                    className="flex items-center justify-between w-full text-left focus:outline-none"
+                  >
+                    <span className="text-lg font-medium text-gray-900">
+                      {faq.question}
+                    </span>
+                    {activeQuestion === index ? (
+                      <ChevronUp className="h-5 w-5 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-gray-500" />
+                    )}
+                  </button>
+                  {activeQuestion === index && (
+                    <div className="mt-2 text-gray-600">
+                      <p>{faq.answer}</p>
+                    </div>
+                  )}
                 </div>
-              </div>
+              ))}
+            </div>
+
+            <div className="mt-8 bg-indigo-50 p-6 rounded-lg">
+              <h3 className="text-lg font-medium text-indigo-800 mb-3">
+                Need help with your order?
+              </h3>
+              <p className="text-gray-700 mb-4">
+                Our customer service team is available to assist you with any
+                questions about shipping or your order.
+              </p>
+              <button className="text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center">
+                Contact Us
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
         </div>

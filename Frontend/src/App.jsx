@@ -21,7 +21,8 @@ import PaymentsSuccess from "./Pages/PaymentsSuccess";
 import ContactUs from "./Pages/ContactUs";
 import About from "./Pages/About";
 import ShippingDetailsPage from "./Pages/ShippingDetailsPage";
-
+import CookieConsentBanner from "./Components/CookieConsentBanner";
+import CookiePolicyPage from "./Pages/CookiePolicyPage";
 function App() {
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -115,15 +116,12 @@ function App() {
               />
             }
           />
-
-          {/* --- UPDATED PRIVATE ROUTES --- */}
+          <Route path="/cookie-policy" element={<CookiePolicyPage />} />
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard/*" element={<DashboardPage />} />
 
-            {/* The new route for entering shipping details */}
             <Route path="/shipping-details" element={<ShippingDetailsPage />} />
 
-            {/* The old checkout route is now the PAYMENT page, requiring an orderId */}
             <Route path="/checkout/:orderId" element={<CheckoutPage />} />
 
             <Route
@@ -143,6 +141,7 @@ function App() {
       </main>
 
       {!hideLayout && <Footer />}
+      <CookieConsentBanner />
     </div>
   );
 }

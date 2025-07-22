@@ -23,7 +23,6 @@ const createApiClient = () => {
   return api;
 };
 
-// A helper component to render status badges with appropriate colors
 const StatusBadge = ({ status }) => {
   const statusStyles = {
     paid: "bg-green-100 text-green-700 ring-green-600/20",
@@ -53,11 +52,9 @@ const OrderManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // --- NEW: State for search and filter ---
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all"); 
 
-  // Fetch all orders once on component mount
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);

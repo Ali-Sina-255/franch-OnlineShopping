@@ -135,6 +135,9 @@ function App() {
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="*" element={<Signin />} />
           <Route path="/logee" element={<AuthContainer />} />
+          
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/create-new-password" element={<CreateNewPassword />} />
         </Routes>
       </main>
 

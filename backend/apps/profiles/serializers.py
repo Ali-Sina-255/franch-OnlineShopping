@@ -39,9 +39,26 @@ class ProfileSerializers(serializers.ModelSerializer):
     def get_profile_photo(self, obj):
         return obj.profile_photo.url
 
+    def update(self, instance, validated_data):
+        # Extract nested user data
+        user_data = validated_data.pop("user", {})
+
+        # Update profile fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Update user fields
+        user = instance.user
+        for attr, value in user_data.items():
+            setattr(user, attr, value)
+        user.save()
+
+        return instance
+
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
-    country = CountryField(name_only=True)
+    country = CountryField(name_only=True, read_only=True)
 
     class Meta:
         model = Profile
@@ -53,3 +70,10 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             "country",
             "city",
         ]
+
+    def update(self, instance, validated_data):
+        # Update each field manually
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance

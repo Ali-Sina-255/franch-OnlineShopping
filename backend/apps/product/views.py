@@ -24,3 +24,4 @@ class ProductViewSet(viewsets.ModelViewSet):
     filterset_class = ProductFilter
     search_fields = ['product_name', 'tags__name', 'details__icontains', 'condition', 'description']
     
+    

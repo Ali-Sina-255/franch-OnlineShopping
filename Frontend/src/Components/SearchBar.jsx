@@ -11,7 +11,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
   const modalRef = useRef(null);
   const navigate = useNavigate();
 
-  // No changes needed for the core "debouncing" search logic
+  // No changes to the core search logic
   useEffect(() => {
     const handler = setTimeout(() => {
       if (inputValue !== searchQuery) {
@@ -28,21 +28,20 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
     setInputValue(searchQuery);
   }, [searchQuery]);
 
-  // No changes to recent search logic
   useEffect(() => {
     const savedSearches =
       JSON.parse(localStorage.getItem("recentSearches")) || [];
     setRecentSearches(savedSearches);
   }, []);
+
   useEffect(() => {
     localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
   }, [recentSearches]);
 
-  // Helper functions
   const handleSearchClick = () => setIsExpanded(true);
   const handleCancelClick = () => {
     setIsExpanded(false);
-    setInputValue(searchQuery);
+    setInputValue(searchQuery); // Reset to the active search query on cancel
   };
   const handleClearInput = () => setInputValue("");
 
@@ -63,43 +62,42 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
     navigate("/");
   };
 
-  const handleClearRecent = () => {
-    setRecentSearches([]);
-  };
-
-  // Body scroll lock (no changes)
   useEffect(() => {
-    /* ... */
-  }, [isExpanded]);
-  useEffect(() => {
-    /* ... */
+    document.body.style.overflow = isExpanded ? "hidden" : "auto";
+    return () => (document.body.style.overflow = "auto");
   }, [isExpanded]);
 
-  const popularSearches = [
-    "Vintage Tee",
-    "Denim Jacket",
-    "Leather Bag",
-    "Floral Dress",
-    "Boots",
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        setIsExpanded(false);
+        setInputValue(searchQuery);
+      }
+    };
+    if (isExpanded) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isExpanded]);
+
+  const constantItems = [
+    "Nike",
+    "air max",
+    "killshot",
+    "jordan",
+    "converse",
+    "vans",
   ];
   const backdropVariants = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
-  const modalVariants = {
-    hidden: { y: -50, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 300, damping: 30 },
-    },
-    exit: { y: -50, opacity: 0, transition: { duration: 0.2 } },
-  };
 
   return (
     <div className={`relative ${isExpanded ? "w-full" : ""}`}>
+      {/* This is your original compact search bar - unchanged */}
       <div
-        className="flex items-center gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-full px-1.5 md:px-4 py-1.5 transition-all duration-300 cursor-pointer"
+        className="flex items-center gap-2 bg-white border hover:bg-gray-300 rounded-full px-1.5 md:px-4 py-1.5 transition-all duration-300 cursor-pointer"
         onClick={handleSearchClick}
       >
-        <FiSearch size={20} className="text-gray-500" />
+        <FiSearch size={24} className="text-gray-500" />
         <span className="hidden md:block bg-transparent outline-none w-32 text-gray-500 text-sm truncate">
           {searchQuery || "Search..."}
         </span>
@@ -109,37 +107,51 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
         {isExpanded && (
           <>
             <motion.div
-              className="fixed inset-0 bg-black/60 z-40"
+              className="fixed inset-0 bg-black/50 z-30"
               variants={backdropVariants}
               initial="hidden"
               animate="visible"
               exit="hidden"
               onClick={handleCancelClick}
             />
+            {/* This is your original modal structure - unchanged */}
             <motion.div
               ref={modalRef}
-              className="fixed top-0 left-0 right-0 bg-white shadow-2xl z-50"
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
+              className="fixed top-0 left-0 right-0 px-8 pb-20 py-3 bg-white w-full z-40"
+              initial={{ y: -30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -30, opacity: 0 }}
+              transition={{ duration: 0.2 }}
             >
-              <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                {/* Search Input Form */}
-                <form onSubmit={handleSearchSubmit} className="relative w-full">
+              <div className="md:flex justify-between items-center border-gray-200 px-4">
+                <div className="flex items-center justify-between gap-x-1 mb-3 md:mb-0">
+                  {/* Your website name is preserved */}
+                  <p className="text-xl md:text-2xl font-bold">ChiqFirg</p>
+                  <button
+                    onClick={handleCancelClick}
+                    className="md:hidden py-2 text-gray-800 font-semibold hover:text-gray-500 text-lg transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                <form
+                  onSubmit={handleSearchSubmit}
+                  // THE FIX: Added 'relative' to position the clear button
+                  className="relative flex items-center gap-2 hover:bg-gray-300 bg-gray-200 border rounded-full px-4 py-2 transition-all duration-300"
+                >
                   <FiSearch
-                    size={22}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                    size={24}
+                    className="text-gray-500 hidden md:block"
                   />
                   <input
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Search for products, tags, or colors..."
-                    className="w-full bg-gray-100 border-2 border-transparent rounded-full py-3 pl-12 pr-10 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                    placeholder="Search for products, brands, and tags..."
+                    className="flex bg-transparent w-[800px] outline-none text-gray-800"
                     autoFocus
                   />
-                  {/* The new "Clear" button */}
+                  {/* THE FIX: Added the clear button, which only appears when there is text */}
                   {inputValue && (
                     <button
                       type="button"
@@ -150,53 +162,48 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
                     </button>
                   )}
                 </form>
-
-                {/* Suggestions Section */}
-                <div className="mt-6 space-y-6">
-                  {recentSearches.length > 0 && (
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <h4 className="text-sm font-semibold text-gray-600">
-                          Recent Searches
-                        </h4>
-                        <button
-                          onClick={handleClearRecent}
-                          className="text-xs font-medium text-indigo-600 hover:underline"
-                        >
-                          Clear
-                        </button>
-                      </div>
-                      <ul className="flex flex-wrap gap-2">
-                        {recentSearches.map((item, index) => (
-                          <li
-                            key={index}
-                            onClick={() => handleSuggestionClick(item)}
-                            className="text-sm py-1.5 px-4 rounded-full bg-gray-100 hover:bg-indigo-100 hover:text-indigo-700 cursor-pointer transition-colors"
-                          >
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-600 mb-2">
-                      Popular Searches
+                <button
+                  onClick={handleCancelClick}
+                  className="hidden md:block py-2 text-gray-800 font-semibold hover:text-gray-500 text-lg transition"
+                >
+                  Cancel
+                </button>
+              </div>
+              {/* This is your original suggestions layout - unchanged */}
+              <div className="md:w-[850px] mx-auto mt-6">
+                <h4 className="text-gray-500 text-md font-semibold p-4">
+                  Popular Search Terms
+                </h4>
+                <ul className="flex items-center flex-wrap gap-4 mb-4 px-4">
+                  {constantItems.map((item, index) => (
+                    <li
+                      key={index}
+                      // THE FIX: Added onClick to make suggestions interactive
+                      onClick={() => handleSuggestionClick(item)}
+                      className="text-black text-base py-1.5 hover:bg-gray-300 px-5 rounded-full bg-gray-200 cursor-pointer"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                {recentSearches.length > 0 && (
+                  <>
+                    <h4 className="text-gray-500 text-md font-semibold p-4">
+                      Recent Searches
                     </h4>
-                    <ul className="flex flex-wrap gap-2">
-                      {popularSearches.map((item, index) => (
+                    <ul className="flex items-center flex-wrap gap-4 mb-4 px-4">
+                      {recentSearches.map((item, index) => (
                         <li
                           key={index}
                           onClick={() => handleSuggestionClick(item)}
-                          className="text-sm py-1.5 px-4 rounded-full bg-gray-100 hover:bg-indigo-100 hover:text-indigo-700 cursor-pointer transition-colors"
+                          className="text-black text-base py-1.5 hover:bg-gray-300 px-5 rounded-full bg-gray-100 cursor-pointer"
                         >
                           {item}
                         </li>
                       ))}
                     </ul>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             </motion.div>
           </>

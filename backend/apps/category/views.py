@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions
 
 from .models import AttributeType, AttributeValue, Category
@@ -28,6 +29,9 @@ class AttributeTypeListView(generics.ListCreateAPIView):
     permission_class = [permissions.IsAuthenticated]
     pagination_class = CustomPageNumberPagination
 
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["name"]
+
 
 class AttributeTypeDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = AttributeType.objects.select_related("category").all()
@@ -41,10 +45,13 @@ class AttributeValueListView(generics.ListCreateAPIView):
     serializer_class = AttributeValueSerializer
     permission_class = [permissions.IsAuthenticated]
     pagination_class = CustomPageNumberPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["attribute_value"]
 
 
 class AttributeValueDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = AttributeValue.objects.select_related("attribute").all()
     serializer_class = AttributeValueSerializer
     permission_class = [permissions.IsAuthenticated]
+    pagination_class = CustomPageNumberPagination
     pagination_class = CustomPageNumberPagination

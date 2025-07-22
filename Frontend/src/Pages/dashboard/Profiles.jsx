@@ -15,12 +15,13 @@ const FormInput = ({
   errors,
   type = "text",
   icon: Icon,
+  rules = { required: `${label} is required.` },
 }) => (
   <div className="relative">
     <Controller
       name={name}
       control={control}
-      rules={{ required: `${label} is required.` }}
+      rules={rules}
       render={({ field }) => (
         <>
           {Icon && (
@@ -63,9 +64,11 @@ function Profile() {
     handleSubmit,
     reset,
     setValue,
-    formState: { errors }, // Correctly destructuring 'errors' here
+    formState: { errors },
   } = useForm({
     defaultValues: {
+      username: "",
+      email: "",
       first_name: "",
       last_name: "",
       phone_number: "",
@@ -77,18 +80,17 @@ function Profile() {
     },
   });
 
-  // Fetch profile data on component mount if user is logged in
+  // Fetch profile data on mount if user logged in
   useEffect(() => {
     if (accessToken && !profile) {
-      // Only fetch if we don't have a profile yet
       dispatch(fetchUserProfile());
     }
   }, [accessToken, profile, dispatch]);
 
-  // When profile data from Redux updates, populate the form
+  // Populate form when profile data arrives
   useEffect(() => {
     if (profile) {
-      reset(profile); // Populates all form fields
+      reset(profile);
       setPhotoPreview(profile.profile_photo);
     }
   }, [profile, reset]);
@@ -102,6 +104,8 @@ function Profile() {
   };
 
   const onSubmit = (data) => {
+    console.log("Form Data Submitted:", data);
+    dispatch(updateUserProfile(data));
     dispatch(updateUserProfile(data));
   };
 
@@ -166,6 +170,21 @@ function Profile() {
               Personal Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormInput
+                control={control}
+                name="username"
+                label="Username"
+                errors={errors}
+                icon={User}
+              />
+              <FormInput
+                control={control}
+                name="email"
+                label="Email"
+                type="email"
+                errors={errors}
+                icon={Mail}
+              />
               <FormInput
                 control={control}
                 name="first_name"
@@ -239,17 +258,26 @@ function Profile() {
               <Controller
                 name="country"
                 control={control}
+                rules={{ required: "Country is required." }}
                 render={({ field }) => (
                   <select
                     {...field}
-                    className="w-full rounded-lg border-gray-300 py-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    className={`w-full rounded-lg border-gray-300 py-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 ${
+                      errors.country ? "border-red-600" : ""
+                    }`}
                   >
+                    <option value="">Select Country</option>
                     <option value="AF">Afghanistan</option>
                     <option value="US">USA</option>
                     <option value="UK">UK</option>
                   </select>
                 )}
               />
+              {errors.country && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.country.message}
+                </p>
+              )}
             </div>
           </div>
 

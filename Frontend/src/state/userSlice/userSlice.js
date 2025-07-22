@@ -60,15 +60,13 @@ export const updateUserProfile = createAsyncThunk(
   "user/updateUserProfile",
   async (profileData, { rejectWithValue, dispatch }) => {
     try {
-      // --- STEP 1: Update the User model (first_name, last_name) ---
-      const userPayload = {
-        first_name: profileData.first_name,
-        last_name: profileData.last_name,
-      };
-      await api.put("/api/v1/users/me/", userPayload);
-
-      // --- STEP 2: Update the Profile model (rest of the data) ---
       const profilePayload = new FormData();
+
+      // Append all required and optional fields
+      profilePayload.append("username", profileData.username);
+      profilePayload.append("email", profileData.email);
+      profilePayload.append("first_name", profileData.first_name);
+      profilePayload.append("last_name", profileData.last_name);
       profilePayload.append("phone_number", profileData.phone_number || "");
       profilePayload.append("about_me", profileData.about_me || "");
       profilePayload.append("gender", profileData.gender);
@@ -82,6 +80,7 @@ export const updateUserProfile = createAsyncThunk(
         profilePayload.append("profile_photo", profileData.profile_photo);
       }
 
+      // Send single PUT request with all fields
       await api.put("/api/v1/profiles/me/update/", profilePayload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -240,6 +239,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.accessToken = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
+        state.currentUser = action.payload.data;
       })
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;

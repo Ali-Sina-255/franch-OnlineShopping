@@ -22,8 +22,8 @@ import ContactUs from "./Pages/ContactUs";
 import About from "./Pages/About";
 import ShippingDetailsPage from "./Pages/ShippingDetailsPage";
 import AuthContainer from "./features/authentication/components/AuthContainer";
-import About from "./Pages/About";
-import ContactUs from "./Pages/ContactUs";
+// import About from "./Pages/About";
+// import ContactUs from "./Pages/ContactUs";
 function App() {
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");

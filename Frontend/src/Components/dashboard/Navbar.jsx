@@ -8,15 +8,14 @@ import {
   FaUser,
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { signOutSuccess } from "../../state/userSlice/userSlice"; // Adjust path if needed
+import { signOutSuccess } from "../../state/userSlice/userSlice"; 
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import ProfileModal from "./ProfileModal"; // Adjust path if needed
-import moment from "moment-jalaali"; // <<<--- IMPORT moment-jalaali
-import { shamsiMonths } from "../../utils/dateConvert"; // <<<--- IMPORT your month array (Adjust path)
+import ProfileModal from "./ProfileModal"; 
+import moment from "moment-jalaali"; 
+import { shamsiMonths } from "../../utils/dateConvert"; 
 
 moment.loadPersian({ usePersianDigits: true, dialect: "persian-modern" });
-
 const Navbar = () => {
   const [dateInfo, setDateInfo] = useState({
     day: "",

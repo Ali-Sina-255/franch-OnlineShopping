@@ -18,12 +18,12 @@ import DashboardPage from "./Components/dashboard/DashboardPage";
 import CheckoutPage from "./Pages/CheckoutPage";
 import OrderSuccessPage from "./Pages/OrderSuccessPage";
 import PaymentsSuccess from "./Pages/PaymentsSuccess";
+import ContactUs from "./Pages/ContactUs";
+import About from "./Pages/About";
 import ShippingDetailsPage from "./Pages/ShippingDetailsPage";
 import AuthContainer from "./features/authentication/components/AuthContainer";
 import About from "./Pages/About";
 import ContactUs from "./Pages/ContactUs";
-import ForgotPassword from "./Pages/ForgotPassword";
-import CreateNewPassword from "./Pages/CreatePassword";
 function App() {
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -106,13 +106,7 @@ function App() {
           />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/about" element={<About />} />
-          <Route
-            path="/cart"
-            element={
-              // CartPage no longer needs any props
-              <CartPage />
-            }
-          />
+          <Route path="/cart" element={<CartPage />} />
           <Route
             path="/wishlist"
             element={
@@ -123,15 +117,12 @@ function App() {
               />
             }
           />
-
-          {/* --- UPDATED PRIVATE ROUTES --- */}
+          <Route path="/cookie-policy" element={<CookiePolicyPage />} />
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard/*" element={<DashboardPage />} />
 
-            {/* The new route for entering shipping details */}
             <Route path="/shipping-details" element={<ShippingDetailsPage />} />
 
-            {/* The old checkout route is now the PAYMENT page, requiring an orderId */}
             <Route path="/checkout/:orderId" element={<CheckoutPage />} />
 
             <Route
@@ -144,12 +135,11 @@ function App() {
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="*" element={<Signin />} />
           <Route path="/logee" element={<AuthContainer />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/create-new-password" element={<CreateNewPassword />} />
         </Routes>
       </main>
 
       {!hideLayout && <Footer />}
+      <CookieConsentBanner />
     </div>
   );
 }

@@ -1,7 +1,7 @@
+// src/pages/ProductListPage.jsx
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSearchParams } from "react-router-dom"; // 1. Import the hook
 import { fetchProducts, extractUniqueAttributes } from "../services/api";
 import { mapProductFromApi } from "../utils/product-mapper";
 import ProductCard from "../Components/ProductCard";
@@ -22,21 +22,9 @@ const ProductListPage = ({
   wishlist,
   onToggleWishlist,
 }) => {
-  // 2. Read the URL for a 'category' parameter
-  const [searchParams] = useSearchParams();
-  const categoryFromUrl = searchParams.get("category");
-
   // State management
   const [productsToShow, setProductsToShow] = useState([]);
-
-  // 3. Initialize activeFilters, giving priority to the category from the URL
-  const [activeFilters, setActiveFilters] = useState(() => {
-    if (categoryFromUrl) {
-      return { categories: new Set([categoryFromUrl]) };
-    }
-    return {};
-  });
-
+  const [activeFilters, setActiveFilters] = useState({});
   const [sortOption, setSortOption] = useState("newest");
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,8 +37,6 @@ const ProductListPage = ({
     colors: [],
     sizes: [],
     conditions: ["New", "Used", "Other"],
-    // We will add categories here dynamically
-    categories: [],
   });
 
   const { minPrice, maxPrice } = useMemo(
@@ -71,7 +57,6 @@ const ProductListPage = ({
           brands: extractUniqueAttributes(allProducts, "brand"),
           colors: extractUniqueAttributes(allProducts, "color"),
           sizes: extractUniqueAttributes(allProducts, "size"),
-          // You might also want to populate categories dynamically if your API supports it
         }));
       } catch (error) {
         console.error("Failed to fetch filter data:", error);
@@ -80,22 +65,6 @@ const ProductListPage = ({
 
     getFilterData();
   }, []);
-
-  // 4. Add an effect to react to changes in the URL category parameter
-  useEffect(() => {
-    if (categoryFromUrl) {
-      // When the URL changes, update the active filters and reset to the first page
-      setActiveFilters({ categories: new Set([categoryFromUrl]) });
-      setCurrentPage(1);
-    } else {
-      // If the category is removed from the URL, clear only that filter
-      setActiveFilters((prev) => {
-        const newFilters = { ...prev };
-        delete newFilters.categories;
-        return newFilters;
-      });
-    }
-  }, [categoryFromUrl]);
 
   // Reset price range when min/max changes
   useEffect(() => {
@@ -109,6 +78,7 @@ const ProductListPage = ({
         setIsSortOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -119,13 +89,16 @@ const ProductListPage = ({
     setActiveFilters((prev) => {
       const filterKey = filterType.toLowerCase();
       const newFilters = { ...prev };
+
       if (!newFilters[filterKey]) newFilters[filterKey] = new Set();
+
       if (newFilters[filterKey].has(value)) {
         newFilters[filterKey].delete(value);
         if (newFilters[filterKey].size === 0) delete newFilters[filterKey];
       } else {
         newFilters[filterKey].add(value);
       }
+
       return newFilters;
     });
   };
@@ -159,11 +132,8 @@ const ProductListPage = ({
       // Build attribute queries
       const attributeQueries = [];
       Object.keys(activeFilters).forEach((key) => {
-        // 5. Ensure "categories" is included when building the API query
-        if (["brands", "colors", "sizes", "categories"].includes(key)) {
-          // Adjust key for API if needed (e.g., 'categories' becomes 'category')
-          const filterKey =
-            key === "categories" ? "category" : key.slice(0, -1);
+        if (["brands", "colors", "sizes"].includes(key)) {
+          const filterKey = key.slice(0, -1);
           Array.from(activeFilters[key]).forEach((value) =>
             attributeQueries.push(`${filterKey}:${value}`)
           );
@@ -178,6 +148,7 @@ const ProductListPage = ({
         const { data } = await fetchProducts(params);
         const mappedProducts = data.results.map(mapProductFromApi);
 
+        // Apply sorting
         if (sortOption === "price-asc") {
           mappedProducts.sort((a, b) => a.price - b.price);
         } else if (sortOption === "price-desc") {
@@ -204,11 +175,13 @@ const ProductListPage = ({
     maxPrice,
   ]);
 
+  // Derived values
   const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
 
   return (
     <div className="bg-gradient-to-b from-indigo-50/20 to-white">
       <main className="mx-auto max-w-[95%] px-8 sm:px-6 lg:px-8">
+        {/* Page header with sort controls */}
         <div className="flex items-baseline justify-between border-b border-indigo-100 pb-6 pt-12">
           <h1 className=" text-xl md:text-2xl lg:text-4xl font-bold tracking-tight text-indigo-900">
             Premium Secondhand Fashion
@@ -262,8 +235,10 @@ const ProductListPage = ({
           </div>
         </div>
 
+        {/* Main content area */}
         <section className="pb-24 pt-6">
           <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+            {/* Filters sidebar */}
             <Filters
               onFilterChange={handleFilterChange}
               priceRange={priceRange}
@@ -275,6 +250,7 @@ const ProductListPage = ({
               filterOptions={filterOptions}
             />
 
+            {/* Product section */}
             <div className="lg:col-span-3">
               {isLoading ? (
                 <div className="grid grid-cols-1 gap-x-3 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-4">

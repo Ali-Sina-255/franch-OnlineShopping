@@ -1,9 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, viewsets
 from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
+from rest_framework.filters import SearchFilter
 from .filters import ProductFilter
 from .models import Brand, Product
 from .pagination import CustomPageNumberPagination, ProductPageNumberPagination
@@ -22,5 +20,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     parser_classes = [MultiPartParser, FormParser]
     pagination_class = ProductPageNumberPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter] 
     filterset_class = ProductFilter
+    search_fields = ['product_name', 'tags__name', 'details__icontains', 'condition', 'description']
+    

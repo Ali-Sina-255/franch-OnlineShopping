@@ -1,5 +1,8 @@
+// src/Components/AccordionFilterSection.jsx
 import React, { useState } from "react";
+
 const AccordionFilterSection = ({
+  filterKey, // THE FIX: Receive the data key
   title,
   options,
   onFilterChange,
@@ -61,7 +64,8 @@ const AccordionFilterSection = ({
                 <input
                   type="checkbox"
                   className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  onChange={() => onFilterChange(title, option)}
+                  // THE FIX: Pass the filterKey ("brands") instead of the title ("Brands")
+                  onChange={() => onFilterChange(filterKey, option)}
                 />
                 <span className="text-sm text-gray-700">{option}</span>
               </label>

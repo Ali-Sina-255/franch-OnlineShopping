@@ -18,39 +18,38 @@ const Filters = ({
     priceRange[1] < maxPrice;
 
   const filterSections = [
-    {
-      key: "brands",
-      title: "Brands",
-      searchable: true,
-      condition: filterOptions.brands.length > 0,
-      defaultOpen: false,
-    },
+    // ========================================================================
+    // THE FIX: The "brands" section is removed entirely because your backend
+    // Product model does not have a 'brand' field, so there is no data for it.
+    // ========================================================================
     {
       key: "sizes",
       title: "Sizes",
       searchable: false,
-      condition: filterOptions.sizes.length > 0,
+      // We add a safety check: `filterOptions.sizes && ...`
+      // This ensures the code doesn't crash if the data hasn't loaded yet.
+      condition: filterOptions.sizes && filterOptions.sizes.length > 0,
       defaultOpen: false,
     },
     {
       key: "conditions",
       title: "Conditions",
       searchable: false,
-      condition: filterOptions.conditions.length > 0,
+      condition:
+        filterOptions.conditions && filterOptions.conditions.length > 0,
       defaultOpen: false,
     },
     {
       key: "colors",
       title: "Colors",
       searchable: true,
-      condition: filterOptions.colors.length > 0,
+      condition: filterOptions.colors && filterOptions.colors.length > 0,
       defaultOpen: false,
     },
   ];
 
   return (
-    <aside className="lg:col-span-1 bg-white p-6 rounded-xl border border-gray-200 self-start shadow-sm lg:sticky  top-4">
-      {/* Changed from sticky to lg:sticky */}
+    <aside className="lg:col-span-1 bg-white p-6 rounded-xl border border-gray-200 self-start shadow-sm lg:sticky top-4">
       <div className="space-y-6">
         <h2 className="text-lg font-medium text-gray-900">Filters</h2>
 
@@ -74,9 +73,11 @@ const Filters = ({
         <div className="space-y-4">
           {filterSections.map(
             ({ key, title, searchable, condition, defaultOpen }) =>
+              // This `condition` check will now safely evaluate to false if data is missing
               condition && (
                 <AccordionFilterSection
                   key={key}
+                  filterKey={key} // Pass the key for the handler
                   title={title}
                   options={filterOptions[key]}
                   onFilterChange={onFilterChange}

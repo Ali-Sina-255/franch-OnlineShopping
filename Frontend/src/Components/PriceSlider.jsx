@@ -7,7 +7,7 @@ import "rc-slider/assets/index.css"; // Import the slider's CSS
 const PriceSlider = ({ min, max, values, onChange }) => {
   // Don't render if the max price hasn't been calculated yet
   if (max === 0) return null;
-
+    
   return (
     <div className="py-6">
       <h3 className="font-medium text-gray-900 mb-4">Price</h3>

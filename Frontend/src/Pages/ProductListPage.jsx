@@ -1,8 +1,7 @@
-// src/pages/ProductListPage.jsx
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { fetchProducts, extractUniqueAttributes } from "../services/api";
+import { fetchProducts } from "../services/api";
 import { mapProductFromApi } from "../utils/product-mapper";
 import ProductCard from "../Components/ProductCard";
 import ProductCardSkeleton from "../Components/ProductCardSkeleton";
@@ -22,7 +21,7 @@ const ProductListPage = ({
   wishlist,
   onToggleWishlist,
 }) => {
-  // State management
+  // State management (no changes)
   const [productsToShow, setProductsToShow] = useState([]);
   const [activeFilters, setActiveFilters] = useState({});
   const [sortOption, setSortOption] = useState("newest");
@@ -33,7 +32,7 @@ const ProductListPage = ({
   const sortRef = useRef(null);
 
   const [filterOptions, setFilterOptions] = useState({
-    brands: [],
+    // THE FIX: "brands" is removed as it does not exist in your backend Product model.
     colors: [],
     sizes: [],
     conditions: ["New", "Used", "Other"],
@@ -45,8 +44,18 @@ const ProductListPage = ({
   );
   const [priceRange, setPriceRange] = useState([minPrice, maxPrice]);
 
-  // Data fetching for filters
   useEffect(() => {
+    // This helper function only needs to look inside the `attributes` object now.
+    const extractUniqueValues = (products, key) => {
+      const valueSet = new Set();
+      products.forEach((product) => {
+        if (product.attributes && product.attributes[key]) {
+          valueSet.add(product.attributes[key]);
+        }
+      });
+      return Array.from(valueSet).sort();
+    };
+
     const getFilterData = async () => {
       try {
         const { data } = await fetchProducts({ page_size: 100 });
@@ -54,9 +63,9 @@ const ProductListPage = ({
 
         setFilterOptions((prev) => ({
           ...prev,
-          brands: extractUniqueAttributes(allProducts, "brand"),
-          colors: extractUniqueAttributes(allProducts, "color"),
-          sizes: extractUniqueAttributes(allProducts, "size"),
+          // We no longer try to extract "brands".
+          colors: extractUniqueValues(allProducts, "color"),
+          sizes: extractUniqueValues(allProducts, "size"),
         }));
       } catch (error) {
         console.error("Failed to fetch filter data:", error);
@@ -66,12 +75,11 @@ const ProductListPage = ({
     getFilterData();
   }, []);
 
-  // Reset price range when min/max changes
+  // No changes to these useEffects
   useEffect(() => {
     setPriceRange([minPrice, maxPrice]);
   }, [minPrice, maxPrice]);
 
-  // Close sort dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sortRef.current && !sortRef.current.contains(event.target)) {
@@ -83,22 +91,19 @@ const ProductListPage = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filter handling
+  // No changes to handler functions
   const handleFilterChange = (filterType, value) => {
     setCurrentPage(1);
     setActiveFilters((prev) => {
       const filterKey = filterType.toLowerCase();
       const newFilters = { ...prev };
-
       if (!newFilters[filterKey]) newFilters[filterKey] = new Set();
-
       if (newFilters[filterKey].has(value)) {
         newFilters[filterKey].delete(value);
         if (newFilters[filterKey].size === 0) delete newFilters[filterKey];
       } else {
         newFilters[filterKey].add(value);
       }
-
       return newFilters;
     });
   };
@@ -112,7 +117,7 @@ const ProductListPage = ({
       .forEach((c) => (c.checked = false));
   };
 
-  // Product fetching with filters
+  // This useEffect correctly uses the `searchQuery` prop to filter by `tags`
   useEffect(() => {
     const fetchFilteredProducts = async () => {
       setIsLoading(true);
@@ -122,23 +127,25 @@ const ProductListPage = ({
         page_size: ITEMS_PER_PAGE,
         price_min: priceRange[0] > minPrice ? priceRange[0] : undefined,
         price_max: priceRange[1] < maxPrice ? priceRange[1] : undefined,
-        tags: searchQuery || undefined,
+        // THE FIX: Ensure the search query is sent as the 'tags' parameter.
+        search: searchQuery || undefined,
         condition:
           activeFilters.conditions?.size > 0
             ? Array.from(activeFilters.conditions)[0]
             : undefined,
       };
 
-      // Build attribute queries
-      const attributeQueries = [];
-      Object.keys(activeFilters).forEach((key) => {
-        if (["brands", "colors", "sizes"].includes(key)) {
-          const filterKey = key.slice(0, -1);
-          Array.from(activeFilters[key]).forEach((value) =>
-            attributeQueries.push(`${filterKey}:${value}`)
-          );
-        }
-      });
+      // Build attribute queries ONLY for nested attributes like color and size
+ const attributeQueries = [];
+ Object.keys(activeFilters).forEach((key) => {
+   // We no longer handle 'brands' here as it was removed
+   if (["colors", "sizes"].includes(key)) {
+     const filterKey = key.slice(0, -1);
+     Array.from(activeFilters[key]).forEach((value) =>
+       attributeQueries.push(`${filterKey}:${value}`)
+     );
+   }
+ });
 
       if (attributeQueries.length > 0) {
         params.attributes = attributeQueries.join(",");
@@ -148,7 +155,6 @@ const ProductListPage = ({
         const { data } = await fetchProducts(params);
         const mappedProducts = data.results.map(mapProductFromApi);
 
-        // Apply sorting
         if (sortOption === "price-asc") {
           mappedProducts.sort((a, b) => a.price - b.price);
         } else if (sortOption === "price-desc") {
@@ -168,20 +174,18 @@ const ProductListPage = ({
   }, [
     activeFilters,
     sortOption,
-    searchQuery,
+    searchQuery, // This dependency ensures the component re-fetches when you type
     priceRange,
     currentPage,
     minPrice,
     maxPrice,
   ]);
 
-  // Derived values
   const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
 
   return (
     <div className="bg-gradient-to-b from-indigo-50/20 to-white">
       <main className="mx-auto max-w-[95%] px-8 sm:px-6 lg:px-8">
-        {/* Page header with sort controls */}
         <div className="flex items-baseline justify-between border-b border-indigo-100 pb-6 pt-12">
           <h1 className=" text-xl md:text-2xl lg:text-4xl font-bold tracking-tight text-indigo-900">
             Premium Secondhand Fashion
@@ -235,10 +239,8 @@ const ProductListPage = ({
           </div>
         </div>
 
-        {/* Main content area */}
         <section className="pb-24 pt-6">
           <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
-            {/* Filters sidebar */}
             <Filters
               onFilterChange={handleFilterChange}
               priceRange={priceRange}
@@ -249,8 +251,6 @@ const ProductListPage = ({
               activeFilters={activeFilters}
               filterOptions={filterOptions}
             />
-
-            {/* Product section */}
             <div className="lg:col-span-3">
               {isLoading ? (
                 <div className="grid grid-cols-1 gap-x-3 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-4">

@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
@@ -21,11 +20,15 @@ import PaymentsSuccess from "./Pages/PaymentsSuccess";
 import ContactUs from "./Pages/ContactUs";
 import About from "./Pages/About";
 import ShippingDetailsPage from "./Pages/ShippingDetailsPage";
+import CookiePolicyPage from "./Pages/CookiePolicyPage";
+import CookieConsentBanner from "./Components/CookieConsentBanner";
 import AuthContainer from "./features/authentication/components/AuthContainer";
-// import About from "./Pages/About";
-// import ContactUs from "./Pages/ContactUs";
+import ForgotPassword from "./Pages/ForgotPassword";
+import CreateNewPassword from "./Pages/CreatePassword";
+
 function App() {
   const [wishlist, setWishlist] = useState([]);
+  // THE SEARCH STATE IS MANAGED HERE AT THE TOP LEVEL
   const [searchQuery, setSearchQuery] = useState("");
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -34,7 +37,10 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname !== "/") setSearchQuery("");
+    // Only clear search query when navigating away from the homepage
+    if (location.pathname !== "/") {
+      setSearchQuery("");
+    }
     setQuickViewProduct(null);
     setIsCartOpen(false);
   }, [location.pathname]);
@@ -75,6 +81,7 @@ function App() {
       {!hideLayout && (
         <Header
           wishlistCount={wishlist.length}
+          // PASS THE SEARCH STATE AND SETTER DOWN TO THE HEADER
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onCartClick={() => setIsCartOpen(true)}
@@ -87,6 +94,7 @@ function App() {
           <Route
             path="/"
             element={
+              // PASS THE SEARCH QUERY DOWN TO THE HOMEPAGE/PRODUCT LIST
               <HomePage
                 searchQuery={searchQuery}
                 onQuickView={setQuickViewProduct}
@@ -120,11 +128,8 @@ function App() {
           <Route path="/cookie-policy" element={<CookiePolicyPage />} />
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard/*" element={<DashboardPage />} />
-
             <Route path="/shipping-details" element={<ShippingDetailsPage />} />
-
             <Route path="/checkout/:orderId" element={<CheckoutPage />} />
-
             <Route
               path="/order-success/:orderNumber"
               element={<OrderSuccessPage />}
@@ -135,7 +140,6 @@ function App() {
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="*" element={<Signin />} />
           <Route path="/logee" element={<AuthContainer />} />
-          
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/create-new-password" element={<CreateNewPassword />} />
         </Routes>

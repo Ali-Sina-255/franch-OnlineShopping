@@ -168,7 +168,7 @@ const Header = ({
           </div>
         </nav>
       </header>
-
+{/* new changes */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <MobileMenu

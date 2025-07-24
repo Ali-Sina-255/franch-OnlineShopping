@@ -10,17 +10,16 @@ import "react-loading-skeleton/dist/skeleton.css";
 // Components
 import OrderStatusChart from "./OrderStatusChart";
 import TopSaleProducts from "./TopSaleProducts";
-import ErrorBoundary from "../../Pages/ErrorBoundary"; // Assuming correct path
 import {
   fetchProductSalesSummary,
-  fetchProducts,
   fetchRecentOrders,
+  fetchProduct,
 } from "../../services/api";
 
 const Dashboard = () => {
   const queryClient = useQueryClient();
 
-  // Data fetching with proper error handling
+  // Data fetching for dashboard cards
   const {
     data: salesSummary = [],
     isLoading: summaryLoading,
@@ -31,15 +30,17 @@ const Dashboard = () => {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Data fetching for total product count
   const {
     data: productsData,
     isLoading: productsLoading,
     isError: productsError,
   } = useQuery({
     queryKey: ["productsCount"],
-    queryFn: () => fetchProducts({ page_size: 1 }),
+    queryFn: () => fetchProduct({ page_size: 1 }),
   });
 
+  // Data fetching for the recent orders table
   const {
     data: recentOrders = [],
     isLoading: ordersLoading,
@@ -49,7 +50,11 @@ const Dashboard = () => {
     queryFn: fetchRecentOrders,
   });
 
-  // Calculate stats with fallbacks
+  // Derived state for overall loading and error status
+  const isLoading = summaryLoading || productsLoading;
+  const hasError = summaryError || productsError || ordersError;
+
+  // Calculate stats for display cards
   const stats = {
     sales: salesSummary.reduce(
       (sum, item) => sum + (item?.total_sales || 0),
@@ -70,14 +75,11 @@ const Dashboard = () => {
     ),
   };
 
-  const isLoading = summaryLoading || productsLoading;
-  const hasError = summaryError || productsError || ordersError;
-
-  // Refresh data function
+  // Function to manually refresh all dashboard data
   const handleRefresh = () => {
-    queryClient.invalidateQueries({
-      queryKey: ["productSalesSummary", "productsCount", "recentOrders"],
-    });
+    queryClient.invalidateQueries({ queryKey: ["productSalesSummary"] });
+    queryClient.invalidateQueries({ queryKey: ["productsCount"] });
+    queryClient.invalidateQueries({ queryKey: ["recentOrders"] });
   };
 
   if (hasError) {
@@ -103,7 +105,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header with refresh button */}
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
         <button
@@ -167,7 +169,8 @@ const Dashboard = () => {
   );
 };
 
-// StatCard component
+// --- Sub-components for the Dashboard ---
+
 const StatCard = ({ icon, title, value, loading, bgColor }) => (
   <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow flex items-center gap-4">
     <div className={`p-3 ${bgColor} rounded-md`}>{icon}</div>
@@ -182,7 +185,6 @@ const StatCard = ({ icon, title, value, loading, bgColor }) => (
   </div>
 );
 
-// RecentOrdersTable component
 const RecentOrdersTable = ({ orders, loading }) => (
   <div className="bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-x-auto">
     <div className="flex justify-between items-center mb-4">
@@ -191,13 +193,12 @@ const RecentOrdersTable = ({ orders, loading }) => (
         View All
       </button>
     </div>
-
     {loading ? (
       <Skeleton count={5} height={60} className="mb-2" />
     ) : (
       <table className="w-full text-sm text-left text-gray-600">
-        <thead>
-          <tr className="bg-gray-100 text-xs text-gray-500 uppercase">
+        <thead className="bg-gray-100 text-xs text-gray-500 uppercase">
+          <tr>
             <th className="p-3">Date</th>
             <th className="p-3">Customer</th>
             <th className="p-3">Product (First Item)</th>
@@ -218,13 +219,10 @@ const RecentOrdersTable = ({ orders, loading }) => (
   </div>
 );
 
-// OrderRow component
 const OrderRow = ({ order }) => {
-  // Safely access the first item in the order for summary purposes.
   const firstItem = order.orderitem?.[0];
   const product = firstItem?.product || {};
 
-  // Determine status color for styling
   const getStatusClass = (status) => {
     switch (status) {
       case "Fulfilled":
@@ -249,7 +247,7 @@ const OrderRow = ({ order }) => {
       <td className="p-3 flex items-center gap-3">
         <img
           src={product.image_url || "https://placehold.co/100x100"}
-          alt={product.product_name || "Product Image"}
+          alt={product.product_name || "Product"}
           className="w-12 h-12 object-cover rounded-md"
         />
         <div>

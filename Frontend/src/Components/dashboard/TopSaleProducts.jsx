@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const products = [
   {
@@ -66,7 +68,7 @@ const products = [
   },
 ];
 
-const TopSaleProducts = () => {
+const TopSaleProducts = ({ isLoading }) => {
   const [selectedMonth, setSelectedMonth] = useState("July");
 
   const months = [
@@ -85,42 +87,60 @@ const TopSaleProducts = () => {
   ];
 
   return (
-    <div className="text-gray-700 bg-white rounded-md p-5">
+    <div className="text-gray-700">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Top Sale Products</h2>
-        <select
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          className="border border-gray-300 rounded-md px-5 py-1 text-sm focus:outline-none"
-        >
-          {months.map((month) => (
-            <option key={month} value={month}>
-              {month}
-            </option>
-          ))}
-        </select>
+        {isLoading ? (
+          <Skeleton width={120} height={32} />
+        ) : (
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="border border-gray-300 rounded-md px-5 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          >
+            {months.map((month) => (
+              <option key={month} value={month}>
+                {month}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="rounded-lg flex h-20 gap-x-2 items-center  shadow-sm"
-          >
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-16 h-16 border object-cover rounded"
-            />
-            <div>
-              <h3 className=" text-sm font-medium">{product.name}</h3>
-              <p className="text-sm text-gray-500">{product.price}</p>
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[...Array(9)].map((_, i) => (
+            <div key={i} className="flex h-20 gap-x-2 items-center">
+              <Skeleton circle width={64} height={64} />
+              <div className="w-full">
+                <Skeleton width={100} height={16} />
+                <Skeleton width={60} height={14} />
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="rounded-lg flex h-20 gap-x-2 items-center p-2 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-16 h-16 border object-cover rounded"
+              />
+              <div>
+                <h3 className="text-sm font-medium">{product.name}</h3>
+                <p className="text-sm text-gray-500">{product.price}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

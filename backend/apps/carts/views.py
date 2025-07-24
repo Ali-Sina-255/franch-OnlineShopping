@@ -202,13 +202,22 @@ class OrderDeleteAPIView(generics.DestroyAPIView):
 
 class OrderDetailAPIView(generics.GenericAPIView):
     serializer_class = CartOrderSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     queryset = CartOrder.objects.all()
 
     def get(self, request, *args, **kwargs):
-        orders = CartOrder.objects.filter(user=request.user).order_by("-date")
+        if request.user.is_authenticated:
+             
+         
+            orders = CartOrder.objects.filter(user=request.user).order_by("-date")
+        else :
+            orders = CartOrder.objects.none()
+
         serializer = self.get_serializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
 
 
 class CheckoutAPIView(generics.RetrieveAPIView):

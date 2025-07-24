@@ -9,7 +9,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("authToken");
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; 
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -62,7 +62,6 @@ export const removeItemFromCart = async (cartItemId) => {
   await api.delete(`cart/cart-items/${cartItemId}/`);
 };
 
-
 export const extractUniqueAttributes = (products, attributeKey) => {
   const valueSet = new Set();
   products.forEach((product) => {
@@ -71,4 +70,56 @@ export const extractUniqueAttributes = (products, attributeKey) => {
     }
   });
   return Array.from(valueSet).sort();
+};
+
+// Add this new export for product sales summary
+export const fetchProductSalesSummary = async () => {
+  try {
+    const response = await api.get("cart/product-sales-summary/");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sales summary:", error);
+    // ✅ FIX: Re-throw the error so React Query can handle it.
+    throw error;
+  }
+};
+
+// Add this for recent orders
+export const fetchRecentOrders = async () => {
+  try {
+    const response = await api.get("cart/orders/", {
+      // params: {
+      //   ordering: "-date",
+      //   page_size: 5,
+      // },
+    });
+    console.log(response);
+    
+    return response.data.results || [];
+  } catch (error) {
+    console.error("Error fetching recent orders:", error);
+    // ✅ FIX: Re-throw the error so React Query can handle it.
+    throw error;
+  }
+};
+
+export const fetchAllProducts = async () => {
+  let allProducts = [];
+  let currentPageUrl = "product/product/?page_size=100";
+
+  try {
+    while (currentPageUrl) {
+      const response = await api.get(currentPageUrl);
+      const data = response.data;
+
+      if (data.results) {
+        allProducts = allProducts.concat(data.results);
+      }
+      currentPageUrl = data.next ? data.next.replace(API_BASE_URL, "") : null;
+    }
+    return allProducts;
+  } catch (error) {
+    console.error("Error fetching all products:", error);
+    throw error;
+  }
 };

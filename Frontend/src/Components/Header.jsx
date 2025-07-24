@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Search, User, ShoppingBag, Menu, X, Heart } from "lucide-react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import MegaMenu from "./MegaMenu";
 import SearchBar from "./SearchBar";
 import MobileMenu from "./MobileMenu";
-
 const navbarItems = [
   { name: "Home", path: "/" },
   { name: "Category", path: "/category" },
@@ -73,6 +71,7 @@ const Header = ({
             : "bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm border-indigo-100"
         }`}
       >
+        
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center lg:hidden">
@@ -168,7 +167,6 @@ const Header = ({
           </div>
         </nav>
       </header>
-{/* new changes */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <MobileMenu

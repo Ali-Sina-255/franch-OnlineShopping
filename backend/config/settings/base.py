@@ -1,6 +1,6 @@
 import os
 from datetime import timedelta
-from os import getenv, path
+from os import path
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -40,7 +40,7 @@ LOCAL_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    "drf_spectacular",
+    "drf_yasg",
     "rest_framework",
     "django_filters",
     "corsheaders",
@@ -162,10 +162,7 @@ REST_FRAMEWORK = {
 
 # Simple JWT settings
 SIMPLE_JWT = {
-    "AUTH_HDEFAULT_FROM_EMAILEADER_TYPES": (
-        "Bearer",
-        "JWT",
-    ),
+    "AUTH_HDEFAULT_FROM_EMAILEADER_TYPES": ("Bearer",),
     "ACCESS_TOKEN_LIFETIME": timedelta(days=2),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
     "ROTATE_REFRESH_TOKENS": True,

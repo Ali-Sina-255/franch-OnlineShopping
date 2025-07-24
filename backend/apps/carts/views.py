@@ -211,7 +211,7 @@ class OrderDetailAPIView(generics.GenericAPIView):
          
             orders = CartOrder.objects.filter(user=request.user).order_by("-date")
         else :
-            orders = CartOrder.objects.none()
+            orders = CartOrder.objects.all()
 
         serializer = self.get_serializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

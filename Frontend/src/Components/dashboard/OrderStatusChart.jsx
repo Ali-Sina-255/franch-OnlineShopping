@@ -1,4 +1,3 @@
-// components/OrderStatusChart.js
 import React from "react";
 import {
   BarChart,
@@ -10,6 +9,8 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const data = [
   { name: "Jan", Orders: 120, Sales: 100, Returns: 10 },
@@ -26,22 +27,35 @@ const data = [
   { name: "Dec", Orders: 250, Sales: 230, Returns: 11 },
 ];
 
-const OrderStatusChart = () => {
+const OrderStatusChart = ({ isLoading }) => {
   return (
-    <div className="bg-white p-5 rounded-md shadow-md">
-      <h2 className="text-lg font-semibold text-gray-700 mb-4">Order Status</h2>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="Orders" fill="#3b82f6" />
-          <Bar dataKey="Sales" fill="#10b981" />
-          <Bar dataKey="Returns" fill="#ef4444" />
-        </BarChart>
-      </ResponsiveContainer>
+    <div>
+      <h2 className="text-lg font-semibold text-gray-700 mb-4">
+        Order Status
+      </h2>
+      {isLoading ? (
+        <Skeleton height={300} />
+      ) : (
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "white",
+                borderRadius: "8px",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                border: "none",
+              }}
+            />
+            <Legend />
+            <Bar dataKey="Orders" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="Sales" fill="#10b981" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="Returns" fill="#ef4444" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Brand, MultiProductImages, Product
+from .models import Brand, DeliveryCouriers, MultiProductImages, Product
 
 
 class MultiProductImagesSerializer(serializers.ModelSerializer):
@@ -116,3 +116,11 @@ class ProductSerializer(serializers.ModelSerializer):
             ).delete()
 
         return instance
+
+
+class DeliveryCouriersSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DeliveryCouriers
+        fields = ["id", "user", "location", "created_at", "updated_at"]
+        read_only_fields = ["user"]

@@ -41,8 +41,6 @@ const ProductCollectionPage = () => {
   }, [activeFilters]); // Refetch products when filters change
 
   const handleFilterChange = (filterId, valueId) => {
-    // Logic to handle updating the activeFilters state
-    // This is a basic example; you might need more complex logic
     setActiveFilters((prev) => ({
       ...prev,
       [filterId]: valueId,
@@ -68,11 +66,6 @@ const ProductCollectionPage = () => {
           {error && (
             <div className="text-center py-10 text-red-500">{error}</div>
           )}
-
-          {/*
-            Pass both 'products' and the 'isLoading' state to the grid.
-            This ensures the grid knows when to show a loading message vs. the actual products.
-          */}
           <ProductGrid products={products} isLoading={isLoading} />
         </section>
       </div>

@@ -1,7 +1,9 @@
-import { toast } from "react-toastify";
-import axios from "axios";
 import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Lock, Loader } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -13,7 +15,7 @@ function CreateNewPassword() {
   const [searchParams] = useSearchParams();
 
   const otp = searchParams.get("otp");
-  const uuidb64 = searchParams.get("uuidb64"); // Already encoded by backend
+  const uuidb64 = searchParams.get("uuidb64");
   const refresh_token = searchParams.get("refresh_token");
 
   const handleSubmit = async (e) => {
@@ -23,85 +25,136 @@ function CreateNewPassword() {
       toast.error("Please fill out both password fields.");
       return;
     }
-
     if (confirmPassword !== password) {
       toast.error("Passwords do not match");
       return;
     }
 
     setIsLoading(true);
-
-    const data = {
-      password,
-      otp,
-      uuidb64, // Use directly
-      refresh_token,
-    };
+    const data = { password, otp, uuidb64, refresh_token };
 
     try {
       await axios.post(`${BASE_URL}/api/v1/auth/user/password-change/`, data);
-      toast.success("Password changed successfully");
+      toast.success("Password changed successfully! You can now log in.");
       navigate("/sign-in");
     } catch (error) {
-      toast.error("Error: " + (error.response?.data?.message || error.message));
+      toast.error(
+        error.response?.data?.detail ||
+          "An error occurred. The link may be invalid or expired."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-6 bg-white shadow-md rounded-md">
-        <h1 className="text-2xl font-bold text-center text-gray-700 mb-4">
-          Create New Password
-        </h1>
-        <p className="text-center text-gray-600 mb-6">
-          Choose a new password for your account
-        </p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Enter New Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="**************"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Confirm New Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="**************"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-md"
-            disabled={isLoading}
+    <div
+      className="w-full h-screen flex justify-center items-center parallax-bg"
+      style={{
+        backgroundImage: 'url("/1.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div
+        className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"
+        style={{ zIndex: 1 }}
+      ></div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md w-full bg-gray-900/80 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden relative z-10 border border-white/20"
+      >
+        <div className="p-8">
+          <motion.h2
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-3xl font-extrabold mb-2 text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text"
           >
-            {isLoading ? "Saving..." : "Save New Password"}
-          </button>
-        </form>
-      </div>
+            Create New Password
+          </motion.h2>
+          <p className="text-center text-gray-400 mb-8">
+            Your new password must be secure and different from previous ones.
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="relative"
+            >
+              <Lock
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="password"
+                placeholder="Enter New Password"
+                value={password}
+                onChange={(e) => setPassword(e.targe.value)}
+                required
+                className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="relative"
+            >
+              <Lock
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="password"
+                placeholder="Confirm New Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+            </motion.div>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-700 text-white font-bold rounded-lg shadow-lg hover:from-cyan-600 hover:via-blue-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader className="w-6 h-6 animate-spin mx-auto" />
+              ) : (
+                "Save New Password"
+              )}
+            </motion.button>
+          </form>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+          className="px-8 py-4 bg-gray-800/70 flex justify-center"
+        >
+          <p className="text-sm text-gray-300">
+            Back to{" "}
+            <Link
+              to="/sign-in"
+              className="text-cyan-400 hover:underline font-semibold"
+            >
+              Login
+            </Link>
+          </p>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

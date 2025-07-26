@@ -1,6 +1,9 @@
-import axios from "axios";
 import React, { useState } from "react";
+import axios from "axios";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Mail, Loader } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -8,7 +11,8 @@ function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!email) {
       toast.error("Please enter your email address.");
       return;
@@ -16,73 +20,109 @@ function ForgotPassword() {
 
     setIsLoading(true);
     try {
-      const response = await axios.get(
-        `${BASE_URL}/api/v1/auth/user/password-reset/${email}`
+      await axios.get(`${BASE_URL}/api/v1/auth/user/password-reset/${email}`);
+      toast.success(
+        "Email sent successfully. Please check your inbox for instructions."
       );
-      console.log(response.data);
-      toast.success("Email sent successfully. Please check your inbox.");
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred. Please try again later.");
+      toast.error(
+        error.response?.data?.detail || "An error occurred. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <section className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Forgot Password</h1>
-          <p className="text-gray-600">
-            Let's help you get back into your account
+    <div
+      className="w-full h-screen flex justify-center items-center parallax-bg"
+      style={{
+        backgroundImage: 'url("/1.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div
+        className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"
+        style={{ zIndex: 1 }}
+      ></div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md w-full bg-gray-900/80 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden relative z-10 border border-white/20"
+      >
+        <div className="p-8">
+          <motion.h2
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-3xl font-extrabold mb-2 text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text"
+          >
+            Forgot Password
+          </motion.h2>
+          <p className="text-center text-gray-400 mb-8">
+            Enter your email to receive a reset link.
           </p>
-        </div>
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-        >
-          <div>
-            <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-medium text-gray-700"
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="relative"
             >
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="johndoe@gmail.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <button
+              <Mail
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+            </motion.div>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-700 text-white font-bold rounded-lg shadow-lg hover:from-cyan-600 hover:via-blue-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               type="submit"
-              className={`w-full px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none ${
-                isLoading ? "opacity-75 cursor-not-allowed" : ""
-              }`}
               disabled={isLoading}
             >
               {isLoading ? (
-                <>
-                  Processing{" "}
-                  <span className="spinner-border spinner-border-sm"></span>
-                </>
+                <Loader className="w-6 h-6 animate-spin mx-auto" />
               ) : (
-                "Reset Password"
+                "Send Reset Link"
               )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </section>
+            </motion.button>
+          </form>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+          className="px-8 py-4 bg-gray-800/70 flex justify-center"
+        >
+          <p className="text-sm text-gray-300">
+            Remember your password?{" "}
+            <Link
+              to="/sign-in"
+              className="text-cyan-400 hover:underline font-semibold"
+            >
+              Login
+            </Link>
+          </p>
+        </motion.div>
+      </motion.div>
+    </div>
   );
 }
 

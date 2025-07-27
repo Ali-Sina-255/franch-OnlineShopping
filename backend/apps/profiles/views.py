@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -43,8 +43,8 @@ class UpdateProfileAPIView(generics.UpdateAPIView):
     serializer_class = ProfileSerializers
     pagination_class = ProfilePagination
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser]
     renderer_classes = [ProfileJsonRenderers]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_object(self):
         profile = self.request.user.profile
@@ -56,3 +56,5 @@ class UpdateProfileAPIView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+

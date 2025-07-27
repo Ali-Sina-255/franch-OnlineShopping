@@ -1,4 +1,3 @@
-from apps.product.models import Product
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
@@ -8,9 +7,8 @@ User = get_user_model()
 import uuid
 
 
-
 class Cart(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey("product.Product", on_delete=models.CASCADE)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="carts")
     qty = models.PositiveIntegerField(default=1, null=True, blank=True)
@@ -104,7 +102,7 @@ class CartOrderItem(models.Model):
         CartOrder, on_delete=models.CASCADE, related_name="orderitem"
     )
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name="order_items"
+        "product.Product", on_delete=models.CASCADE, related_name="order_items"
     )
     qty = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
@@ -143,7 +141,7 @@ class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     # A foreign key relationship to the Product model with CASCADE deletion, specifying a related name
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name="wishlist"
+        "product.Product", on_delete=models.CASCADE, related_name="wishlist"
     )
     # Date and time field
     date = models.DateTimeField(auto_now_add=True)
@@ -157,3 +155,23 @@ class Wishlist(models.Model):
             return self.product.title
         else:
             return "Wishlist"
+
+
+class Return(models.Model):
+    order_item = models.ForeignKey(
+        CartOrderItem, on_delete=models.CASCADE, related_name="returns"
+    )
+    reason = models.TextField(null=True, blank=True)
+    date_returned = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=50,
+        choices=[
+            ("pending", "Pending"),
+            ("approved", "Approved"),
+            ("rejected", "Rejected"),
+        ],
+        default="pending",
+    )
+
+    def __str__(self):
+        return f"Return for {self.order_item} - {self.status}"

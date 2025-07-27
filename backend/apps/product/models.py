@@ -1,6 +1,10 @@
+from apps.carts.models import CartOrder
 from apps.category.models import Category
+from django.contrib.auth import get_user_model
 from django.db import models
 from taggit.managers import TaggableManager
+
+User = get_user_model()
 
 
 class Brand(models.Model):
@@ -62,4 +66,18 @@ class MultiProductImages(models.Model):
     image = models.ImageField(upload_to="product/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class DeliveryCouriers(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    order = models.ForeignKey(CartOrder, on_delete=models.CASCADE)
+    location = models.CharField(max_length=1000)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["location"]
+        verbose_name_plural = "Delivery Couriers"
+
+    def __str__(self):
+        return self.location[:40]

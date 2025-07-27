@@ -10,9 +10,7 @@ const getErrorMessage = (error) => {
   if (!errorData) return error.message || "An unknown error occurred.";
   if (typeof errorData === "string") return errorData;
   if (errorData.detail) return errorData.detail;
-  // This handles the new stock error message format {"qty": ["..."]}
-  if (errorData.qty) return errorData.qty[0];
-  // This will grab all other validation errors from DRF and join them.
+  // This will grab all validation errors from DRF and join them.
   return Object.entries(errorData)
     .map(([key, value]) => `${key}: ${value.join(", ")}`)
     .join("; ");
@@ -60,15 +58,13 @@ export const updateUserProfile = createAsyncThunk(
   "user/updateUserProfile",
   async (profileData, { rejectWithValue, dispatch }) => {
     try {
-      // --- STEP 1: Update the User model (first_name, last_name) ---
-      const userPayload = {
-        first_name: profileData.first_name,
-        last_name: profileData.last_name,
-      };
-      await api.put("/api/v1/users/me/", userPayload);
-
-      // --- STEP 2: Update the Profile model (rest of the data) ---
       const profilePayload = new FormData();
+
+      // Append all required and optional fields
+      profilePayload.append("username", profileData.username);
+      profilePayload.append("email", profileData.email);
+      profilePayload.append("first_name", profileData.first_name);
+      profilePayload.append("last_name", profileData.last_name);
       profilePayload.append("phone_number", profileData.phone_number || "");
       profilePayload.append("about_me", profileData.about_me || "");
       profilePayload.append("gender", profileData.gender);
@@ -82,6 +78,7 @@ export const updateUserProfile = createAsyncThunk(
         profilePayload.append("profile_photo", profileData.profile_photo);
       }
 
+      // Send single PUT request with all fields
       await api.put("/api/v1/profiles/me/update/", profilePayload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -97,19 +94,6 @@ export const updateUserProfile = createAsyncThunk(
     }
   }
 );
-
-// --- INITIAL STATE ---
-const initialState = {
-  currentUser: null,
-  profile: null,
-  accessToken: null,
-  refreshToken: null,
-  cart: null, // This will now store the cart_id
-  cartItems: [],
-  cartLoading: false,
-  error: null,
-  loading: false,
-};
 
 // --- AUTH THUNKS (NO CHANGES) ---
 
@@ -143,11 +127,22 @@ export const signIn = createAsyncThunk(
       );
       const { access, refresh } = tokenResponse.data;
 
-      dispatch(fetchUserProfile());
+      const profileResponse = await axios.get(
+        `${BASE_URL}/api/v1/profiles/me/`,
+        {
+          headers: { Authorization: `Bearer ${access}` },
+        }
+      );
+      const profileData = profileResponse.data;
+
       dispatch(fetchUserCart());
 
       toast.success("Login successful!");
-      return { accessToken: access, refreshToken: refresh };
+      return {
+        accessToken: access,
+        refreshToken: refresh,
+        profile: profileData,
+      };
     } catch (error) {
       const message = getErrorMessage(error);
       toast.error(message);
@@ -156,13 +151,12 @@ export const signIn = createAsyncThunk(
   }
 );
 
-// --- UPDATED CART LOGIC WITH CORRECTED URLS ---
+// --- CART THUNKS (NO CHANGES) ---
 
 export const fetchUserCart = createAsyncThunk(
   "user/fetchUserCart",
   async (_, { rejectWithValue }) => {
     try {
-      // THE FIX: Corrected URL from /cart/cart/ to /cart/
       const response = await api.get("/api/v1/cart/cart/");
       const items = response.data;
       const cartId = items.length > 0 ? items[0].cart_id : null;
@@ -184,7 +178,6 @@ export const addItemToCart = createAsyncThunk(
   "user/addItemToCart",
   async (itemData, { dispatch, rejectWithValue }) => {
     try {
-      // THE FIX: Corrected URL from /cart/cart/ to /cart/
       await api.post("/api/v1/cart/cart/", itemData);
       toast.success("Bag updated!");
       dispatch(fetchUserCart());
@@ -216,7 +209,19 @@ export const removeItemFromCart = createAsyncThunk(
   }
 );
 
-// --- THE SLICE DEFINITION (NO CHANGES NEEDED) ---
+// --- THE SLICE DEFINITION ---
+const initialState = {
+  currentUser: null,
+  profile: null,
+  accessToken: null,
+  refreshToken: null,
+  cart: null,
+  cartItems: [],
+  cartLoading: false,
+  error: null,
+  loading: false,
+};
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -240,6 +245,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.accessToken = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
+        state.currentUser = action.payload.data;
       })
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
@@ -296,12 +302,18 @@ const userSlice = createSlice({
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.profile = action.payload;
+        // ========================================================================
+        // THE FIX: Use the correct key 'id' from the payload here as well
+        // ========================================================================
         state.currentUser = {
-          id: action.payload.user_id,
+          id: action.payload.id, // Corrected from user_id
           email: action.payload.email,
           first_name: action.payload.first_name,
           last_name: action.payload.last_name,
         };
+        // ========================================================================
+        // END OF FIX
+        // ========================================================================
         state.loading = false;
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {

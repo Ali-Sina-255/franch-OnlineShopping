@@ -11,20 +11,17 @@ const ATTRIBUTE_TYPE_CHOICES = ["dropdown", "input", "date", "checkbox"];
 const Attribute = () => {
   const token = useSelector((state) => state.user.accessToken);
 
-  // State for main form
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [attributeName, setAttributeName] = useState("");
   const [attributeType, setAttributeType] = useState("input");
   const [editingAttributeId, setEditingAttributeId] = useState(null);
 
-  // State for displaying attributes and their values
   const [attributesForCategory, setAttributesForCategory] = useState([]);
   const [allAttributeValues, setAllAttributeValues] = useState([]);
   const [managingValuesFor, setManagingValuesFor] = useState(null); // Which attribute we are adding values to
   const [newValue, setNewValue] = useState("");
 
-  // State for dropdowns
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -41,11 +38,9 @@ const Attribute = () => {
 
   const fetchAllAttributeValues = async () => {
     try {
-      // NOTE: This assumes you have a URL for listing all attribute values.
-      // Based on your backend code, this view exists but might need to be added to urls.py.
-      // Assuming the URL is '/api/v1/category/attribute-value/'
+
       const response = await axios.get(
-        `${BASE_URL}/api/v1/category/attribute-value/`,
+        `${BASE_URL}/api/v1/category/attribute/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

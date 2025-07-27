@@ -11,6 +11,8 @@ from .views import (
     OrderDeleteAPIView,
     OrderDetailAPIView,
     PaymentSuccessView,
+    ProductSalesStatsAPIView,
+    ProductSalesSummaryListAPIView,
     WishlistAPIView,
     WishlistCreateAPIView,
 )
@@ -49,5 +51,15 @@ urlpatterns = [
         "wishlist/<user_id>/",
         WishlistAPIView.as_view(),
         name="customer-wishlist",
+    ),
+    path(
+        "products/<int:product_id>/stats/",
+        ProductSalesStatsAPIView.as_view(),
+        name="product-sales-stats",
+    ),
+    path(
+        "product-sales-summary/",
+        ProductSalesSummaryListAPIView.as_view(),
+        name="product-sales-summary",
     ),
 ]

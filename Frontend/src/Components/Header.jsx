@@ -1,14 +1,9 @@
-// src/components/Header.jsx
-
 import React, { useState, useEffect } from "react";
 import { Search, User, ShoppingBag, Menu, X, Heart } from "lucide-react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Plus, Minus } from "lucide-react"; // Add at top
 import axios from "axios";
 import { toast } from "react-hot-toast";
-
-// --- REDUX IMPORTS ---
 import { useSelector } from "react-redux";
 import MegaMenu from "./MegaMenu";
 import SearchBar from "./SearchBar";
@@ -28,19 +23,9 @@ const Header = ({
   onCartClick,
   cartRef,
 }) => {
-  // --- REDUX STATE ---
   const { cartItems } = useSelector((state) => state.user);
-
-  // ========================================================================
-  // THE FIX: Change `item.quantity` to `item.qty` to match your new backend model.
-  // ========================================================================
   const cartCount = (cartItems || []).reduce((sum, item) => sum + item.qty, 0);
-  // ========================================================================
-  // END OF FIX
-  // ========================================================================
 
-  const navigate = useNavigate();
-  const location = useLocation();
   const [isShopMenuOpen, setShopMenuOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -55,23 +40,11 @@ const Header = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (location.pathname !== "/") navigate("/");
-  };
-
-  const mobileMenuVariants = {
-    hidden: { x: "-100%" },
-    visible: { x: 0, transition: { duration: 0.3, ease: "easeInOut" } },
-    exit: { x: "-100%", transition: { duration: 0.2, ease: "easeIn" } },
-  };
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         setCategoryLoading(true);
         const response = await axios.get(`${BASE_URL}/api/v1/category/`);
-
         if (response.data && Array.isArray(response.data.results)) {
           setCategories(response.data.results);
         } else if (Array.isArray(response.data)) {
@@ -86,7 +59,6 @@ const Header = ({
         setCategoryLoading(false);
       }
     };
-
     fetchCategories();
   }, []);
 
@@ -99,9 +71,9 @@ const Header = ({
             : "bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm border-indigo-100"
         }`}
       >
+        
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            {/* Mobile menu button */}
             <div className="flex items-center lg:hidden">
               <button
                 onClick={() => setMobileMenuOpen(true)}
@@ -111,7 +83,6 @@ const Header = ({
               </button>
             </div>
 
-            {/* Logo */}
             <div className="flex items-center">
               <Link
                 to="/"
@@ -121,11 +92,9 @@ const Header = ({
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
             <div className="hidden lg:flex lg:items-center lg:space-x-8 relative">
               {navbarItems.map((item, index) => {
                 const isCategory = item.name === "Category";
-
                 return (
                   <div
                     key={index}
@@ -141,7 +110,6 @@ const Header = ({
                     >
                       {item.name}
                     </Link>
-
                     {isCategory && (
                       <AnimatePresence>
                         {isShopMenuOpen && (
@@ -159,9 +127,12 @@ const Header = ({
               })}
             </div>
 
-            {/* Icons and Search */}
             <div className="flex items-center justify-end gap-x-4">
-              <SearchBar />
+              {/* PASS THE PROPS DOWN TO THE SEARCHBAR COMPONENT */}
+              <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
               <Link
                 to="/account"
                 className="p-2 text-indigo-700 hover:text-indigo-900 hidden lg:block transition-colors duration-200"
@@ -196,8 +167,6 @@ const Header = ({
           </div>
         </nav>
       </header>
-
-      {/* Mobile Menu Slide-out */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <MobileMenu

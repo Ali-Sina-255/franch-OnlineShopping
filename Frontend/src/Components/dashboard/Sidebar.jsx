@@ -2,16 +2,15 @@
 import React, { useState } from "react";
 import { FaBoxOpen, FaHome, FaServicestack, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { signOutSuccess } from "../../state/userSlice/userSlice"; // Make sure path is correct
+import { signOutSuccess } from "../../state/userSlice/userSlice"; 
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { Fa3, FaBuilding } from "react-icons/fa6";
+import { FaBuilding } from "react-icons/fa6";
 import { MdDashboardCustomize } from "react-icons/md";
 import { MdLocalLaundryService } from "react-icons/md";
-import { Home, LucideUserRoundPlus } from "lucide-react";
+import { LucideUserRoundPlus } from "lucide-react";
     
-
 
 
 const Sidebar = ({ setActiveComponent }) => {
@@ -21,7 +20,6 @@ const Sidebar = ({ setActiveComponent }) => {
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
   const MySwal = withReactContent(Swal);
-
   const handleSignOut = () => {
     MySwal.fire({
       title: "Are you sure?",
@@ -38,8 +36,9 @@ const Sidebar = ({ setActiveComponent }) => {
       }
     });
   };
-
+  
   const AllComponents = [
+    
     {
       name: "Home",
       value: "home",
@@ -75,20 +74,19 @@ const Sidebar = ({ setActiveComponent }) => {
       value: "proflie",
       icon: <FaUser className="text-blue-500" />,
     },
-
     {
       name: "Logout",
       value: "signout",
       icon: <FaSignOutAlt className="text-rose-500" />,
-    },
+    },  
   ];
-
+  
   let accessibleComponents = [];
 
-  if (currentUser?.role?.[0] === 0 || currentUser?.role?.[0] === 1) {
+  if (currentUser?.isAdmin === true || currentUser?.role?.[0] === 1) {
     accessibleComponents = AllComponents;
   } else if (currentUser?.role?.[0] === 2) {
-    const allowedForRole2 = [
+    const allowedForRole2 = [                                                                                                                                                                                                                                                                                                                                                               
       "home",
       "ServiceManager",
       "RentManger",
@@ -98,26 +96,23 @@ const Sidebar = ({ setActiveComponent }) => {
       "financial",
       "signout",
     ];
+
     accessibleComponents = AllComponents.filter((item) =>
       allowedForRole2.includes(item.value)
     );
   } else {
-    // نقش‌های دیگر یا کاربر لاگین نشده => فقط خروج
     accessibleComponents = AllComponents.filter(
       (item) => item.value === "signout"
     );
   }
-
   return (
     <div
       className={`h-full transition-all duration-300 ease-in-out w-64 bg-white `}
     >
       <header className="flex items-center gap-5 p-5  font-bold text-xl">
         <Link to="/" className="flex items-center justify-center p-1 bg-gray-300 h-10 w-10 rounded-full">
-          {/* <img src="/logo.png" alt="Logo" className="h-10 w-10" /> */}
           <FaUser className=" text-[#7209b7]" size={24} />
         </Link>
-
         <Link to='/' className="text-lg font-semibold  text-[#7209b7] whitespace-nowrap">
           CHIQ FRIP
         </Link>
@@ -175,5 +170,4 @@ const Sidebar = ({ setActiveComponent }) => {
     </div>
   );
 };
-
 export default Sidebar;

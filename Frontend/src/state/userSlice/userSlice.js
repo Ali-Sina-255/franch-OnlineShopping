@@ -157,7 +157,7 @@ export const fetchUserCart = createAsyncThunk(
   "user/fetchUserCart",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/api/v1/cart/cart/");
+      const response = await api.get("/api/v1/cart/");
       const items = response.data;
       const cartId = items.length > 0 ? items[0].cart_id : null;
       return { items, cartId };
@@ -178,7 +178,7 @@ export const addItemToCart = createAsyncThunk(
   "user/addItemToCart",
   async (itemData, { dispatch, rejectWithValue }) => {
     try {
-      await api.post("/api/v1/cart/cart/", itemData);
+      await api.post("/api/v1/cart/", itemData);
       toast.success("Bag updated!");
       dispatch(fetchUserCart());
     } catch (error) {
@@ -198,7 +198,7 @@ export const removeItemFromCart = createAsyncThunk(
       return rejectWithValue("Cart ID not found.");
     }
     try {
-      await api.delete(`/api/v1/cart/cart/${cart.cart_id}/delete/${itemId}/`);
+      await api.delete(`/api/v1/cart/${cart.cart_id}/delete/${itemId}/`);
       toast.success("Item removed from bag.");
       return itemId;
     } catch (error) {
@@ -241,12 +241,30 @@ const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
+      // ========================================================================
+      // THE FIX: This reducer now correctly processes the payload from the signIn thunk.
+      // ========================================================================
       .addCase(signIn.fulfilled, (state, action) => {
         state.loading = false;
         state.accessToken = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
-        state.currentUser = action.payload.data;
+
+        // Set the full profile data from the payload
+        state.profile = action.payload.profile;
+
+        // Create the smaller, summary `currentUser` object from the profile data
+        state.currentUser = {
+          // Your ProfileSerializer returns the profile ID as `id`. Let's use that,
+          // along with the user details which are sourced from the user model.
+          id: action.payload.profile.id,
+          email: action.payload.profile.email,
+          first_name: action.payload.profile.first_name,
+          last_name: action.payload.profile.last_name,
+        };
       })
+      // ========================================================================
+      // END OF FIX
+      // ========================================================================
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
@@ -263,7 +281,7 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Cart Reducers
+      // Cart Reducers (NO CHANGES)
       .addCase(fetchUserCart.pending, (state) => {
         state.cartLoading = true;
       })
@@ -296,24 +314,18 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
-      // PROFILE REDUCERS
+      // PROFILE REDUCERS (NO CHANGES)
       .addCase(fetchUserProfile.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.profile = action.payload;
-        // ========================================================================
-        // THE FIX: Use the correct key 'id' from the payload here as well
-        // ========================================================================
         state.currentUser = {
-          id: action.payload.id, // Corrected from user_id
+          id: action.payload.id,
           email: action.payload.email,
           first_name: action.payload.first_name,
           last_name: action.payload.last_name,
         };
-        // ========================================================================
-        // END OF FIX
-        // ========================================================================
         state.loading = false;
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {

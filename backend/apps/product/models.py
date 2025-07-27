@@ -27,7 +27,6 @@ class Product(models.Model):
         O = "wo", "Woman"
 
     product_name = models.CharField(max_length=255)
-
     description = models.TextField()
     details = models.JSONField(default=list, blank=True)
     tags = TaggableManager()
@@ -40,7 +39,6 @@ class Product(models.Model):
     condition = models.CharField(
         max_length=20, choices=ConditionChoices.choices, default=ConditionChoices.NW
     )
-
     price = models.IntegerField()
     stock = models.IntegerField()
     image_url = models.ImageField(upload_to="product/image", blank=True, null=True)
@@ -57,8 +55,6 @@ class Product(models.Model):
 
     def __str__(self) -> str:
         return self.product_name
-
-
 class MultiProductImages(models.Model):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="multi_images"
@@ -66,8 +62,6 @@ class MultiProductImages(models.Model):
     image = models.ImageField(upload_to="product/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-
 class DeliveryCouriers(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     order = models.ForeignKey(CartOrder, on_delete=models.CASCADE)

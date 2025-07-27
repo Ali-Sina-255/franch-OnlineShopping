@@ -14,8 +14,8 @@ const navbarItems = [
   { name: "Contact Us", path: "/contact" },
   { name: "About Us", path: "/about" },
 ];
-const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
 const Header = ({
   wishlistCount,
   searchQuery,
@@ -25,7 +25,6 @@ const Header = ({
 }) => {
   const { cartItems } = useSelector((state) => state.user);
   const cartCount = (cartItems || []).reduce((sum, item) => sum + item.qty, 0);
-
   const [isShopMenuOpen, setShopMenuOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -88,7 +87,7 @@ const Header = ({
                 to="/"
                 className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent"
               >
-                ChigFrip
+                Chiq Frip
               </Link>
             </div>
 
@@ -128,7 +127,6 @@ const Header = ({
             </div>
 
             <div className="flex items-center justify-end gap-x-4">
-              {/* PASS THE PROPS DOWN TO THE SEARCHBAR COMPONENT */}
               <SearchBar
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}

@@ -9,6 +9,10 @@ from .managers import CustomUserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    class ROLE_CHOICES(models.TextChoices):
+        admin = "ADMIN", "Admin"
+        user = "user", "User"
+
     pkid = models.BigAutoField(primary_key=True, editable=True)
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     username = models.CharField(
@@ -19,6 +23,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.CharField(
         verbose_name=_("Email"), max_length=255, db_index=True, unique=True
     )
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES.choices,
+        default=ROLE_CHOICES.user,
+        blank=True,
+        null=True,
+    )
+
     otp = models.CharField(max_length=1000, null=True, blank=True)
     reset_token = models.CharField(max_length=1000, null=True, blank=True)
     is_staff = models.BooleanField(default=False)

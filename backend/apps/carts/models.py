@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
@@ -9,9 +11,8 @@ import uuid
 
 class Cart(models.Model):
     product = models.ForeignKey("product.Product", on_delete=models.CASCADE)
-
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="carts")
-    qty = models.PositiveIntegerField(default=1, null=True, blank=True)
+    qty = models.PositiveIntegerField(default=1)
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     cart_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     date = models.DateTimeField(auto_now_add=True)
@@ -20,7 +21,6 @@ class Cart(models.Model):
         return f"{self.cart_id} - {self.product.product_name}"
 
     def save(self, *args, **kwargs):
-
         if self.product and self.qty:
             self.total = self.product.price * self.qty
         super().save(*args, **kwargs)
@@ -87,6 +87,17 @@ class CartOrder(models.Model):
 
     def calculate_total(self):
         return sum(item.total for item in self.get_order_items())
+
+    @property
+    def delivery_cost(self):
+        delivery = self.deliverycouriers_set.last()
+        if delivery:
+            return delivery.calculate_delivery_cost()
+        return Decimal("0.00")
+
+    @property
+    def grand_total(self):
+        return self.total + self.delivery_cost
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -174,4 +185,8 @@ class Return(models.Model):
     )
 
     def __str__(self):
+        return f"Return for {self.order_item} - {self.status}"
+
+    def __str__(self):
+        return f"Return for {self.order_item} - {self.status}"
         return f"Return for {self.order_item} - {self.status}"

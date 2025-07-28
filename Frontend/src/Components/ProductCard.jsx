@@ -14,6 +14,7 @@ const ProductCard = ({ product, wishlist, onToggleWishlist }) => {
   return (
     <Link
       to={`/product/${product.id}`}
+      onClick={() => scrollTo(0, 0)}
       className="group relative  rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 h-full flex flex-col"
     >
       {/* Image section - fixed height */}

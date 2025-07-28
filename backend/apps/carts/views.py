@@ -207,17 +207,13 @@ class OrderDetailAPIView(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-             
-         
+
             orders = CartOrder.objects.filter(user=request.user).order_by("-date")
-        else :
+        else:
             orders = CartOrder.objects.all()
 
         serializer = self.get_serializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-
 
 
 class CheckoutAPIView(generics.RetrieveAPIView):

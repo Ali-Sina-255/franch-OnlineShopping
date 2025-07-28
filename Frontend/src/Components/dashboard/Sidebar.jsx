@@ -1,8 +1,13 @@
-// Sidebar.js (Corrected Role Handling)
 import React, { useState } from "react";
-import { FaBoxOpen, FaHome, FaServicestack, FaSignOutAlt, FaUser } from "react-icons/fa";
+import {
+  FaBoxOpen,
+  FaHome,
+  FaServicestack,
+  FaSignOutAlt,
+  FaUser,
+} from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { signOutSuccess } from "../../state/userSlice/userSlice"; 
+import { signOutSuccess } from "../../state/userSlice/userSlice";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -10,8 +15,6 @@ import { FaBuilding } from "react-icons/fa6";
 import { MdDashboardCustomize } from "react-icons/md";
 import { MdLocalLaundryService } from "react-icons/md";
 import { LucideUserRoundPlus } from "lucide-react";
-    
-
 
 const Sidebar = ({ setActiveComponent }) => {
   const [selectedC, setSelectedC] = useState("home");
@@ -36,9 +39,8 @@ const Sidebar = ({ setActiveComponent }) => {
       }
     });
   };
-  
+
   const AllComponents = [
-    
     {
       name: "Home",
       value: "home",
@@ -78,15 +80,15 @@ const Sidebar = ({ setActiveComponent }) => {
       name: "Logout",
       value: "signout",
       icon: <FaSignOutAlt className="text-rose-500" />,
-    },  
+    },
   ];
-  
+
   let accessibleComponents = [];
 
   if (currentUser?.isAdmin === true || currentUser?.role?.[0] === 1) {
     accessibleComponents = AllComponents;
   } else if (currentUser?.role?.[0] === 2) {
-    const allowedForRole2 = [                                                                                                                                                                                                                                                                                                                                                               
+    const allowedForRole2 = [
       "home",
       "ServiceManager",
       "RentManger",
@@ -105,36 +107,44 @@ const Sidebar = ({ setActiveComponent }) => {
       (item) => item.value === "signout"
     );
   }
+
   return (
     <div
-      className={`h-full transition-all duration-300 ease-in-out w-64 bg-white `}
+      className={`h-full transition-all duration-300 ease-in-out w-[70px] md:w-[80px] lg:w-64 bg-white`}
     >
-      <header className="flex items-center gap-5 p-5  font-bold text-xl">
-        <Link to="/" className="flex items-center justify-center p-1 bg-gray-300 h-10 w-10 rounded-full">
-          <FaUser className=" text-[#7209b7]" size={24} />
+      <header className="flex items-center justify-center lg:justify-start gap-5 p-5 font-bold text-xl">
+        <Link
+          to="/"
+          className="flex items-center justify-center p-2 bg-gray-300 md:h-10 md:w-10 rounded-full"
+        >
+          <FaUser className="text-[#7209b7]" size={24} />
         </Link>
-        <Link to='/' className="text-lg font-semibold  text-[#7209b7] whitespace-nowrap">
+        <Link
+          to="/"
+          className="text-lg font-semibold text-[#7209b7] whitespace-nowrap hidden md:inline"
+        >
           CHIQ FRIP
         </Link>
       </header>
-      <ul className=" mx-2">
+      <ul className="mx-2">
         {AllComponents.map((component, index) => (
-          <li key={index} className="relative group cursor-pointer ">
+          <li key={index} className="relative group cursor-pointer">
             {component.value === "signout" ? (
               <a
                 onClick={handleSignOut}
                 onMouseEnter={() => setActiveC(component.value)}
                 onMouseLeave={() => setActiveC(selectedC)}
-                className={`relative flex items-center w-full gap-x-3 px-4 rounded-md py-3 transition-all duration-300
-            ${
-              activeC === component.value
-                ? "bg-gray-200 text-primary"
-                : "hover:bg-gray-200 hover:bg-opacity-20 text-black"
-                  }`}
-                
+                className={`relative flex items-center w-full gap-x-3  justify-center lg:justify-start px-4 rounded-md py-3 transition-all duration-300
+              ${
+                activeC === component.value
+                  ? "bg-gray-200 text-primary"
+                  : "hover:bg-gray-200 hover:bg-opacity-20 text-black"
+              }`}
               >
-                <span className="text-xl">{component.icon}</span>
-                <span className="text-base font-semibold whitespace-nowrap">
+                <span className="text-xl md:text-2xl lg:text-xl">
+                  {component.icon}
+                </span>
+                <span className="text-base font-semibold whitespace-nowrap hidden lg:inline">
                   {component.name}
                 </span>
               </a>
@@ -147,15 +157,17 @@ const Sidebar = ({ setActiveComponent }) => {
                 }}
                 onMouseEnter={() => setActiveC(component.value)}
                 onMouseLeave={() => setActiveC(selectedC)}
-                className={`relative flex items-center gap-x-3 w-full px-4  rounded-md py-3 transition-all duration-300
-            ${
-              activeC === component.value
-                ? "bg-gray-200 text-primary "
-                : "hover:bg-gray-200 hover:bg-opacity-20 text-black"
-            }`}
+                className={`relative flex items-center justify-center lg:justify-start gap-x-3 w-full px-4 rounded-md py-3 transition-all duration-300
+              ${
+                activeC === component.value
+                  ? "bg-gray-200 text-primary "
+                  : "hover:bg-gray-200 hover:bg-opacity-20 text-black"
+              }`}
               >
-                <span className="text-xl">{component.icon}</span>
-                <span className="text-base font-semibold whitespace-nowrap">
+                <span className="text-xl md:text-2xl lg:text-xl">
+                  {component.icon}
+                </span>
+                <span className="text-base font-semibold whitespace-nowrap hidden lg:inline">
                   {component.name}
                 </span>
               </a>
@@ -170,4 +182,5 @@ const Sidebar = ({ setActiveComponent }) => {
     </div>
   );
 };
+
 export default Sidebar;

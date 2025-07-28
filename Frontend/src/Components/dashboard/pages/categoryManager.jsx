@@ -133,7 +133,7 @@ const CategoryManagement = () => {
   };
 
   return (
-    <div  className="p-6 w-full px-5">
+    <div className="p-6 w-full px-5">
       {/* Form Section */}
       <div className="w-full py-4 px-5 shadow-lg bg-white pb-14 rounded-md">
         <h2 className="text-xl text-center font-bold mb-4">
@@ -171,25 +171,27 @@ const CategoryManagement = () => {
         {/* Table Section */}
         <div
           id="category-table"
-          className="w-full max-w-5xl mx-auto bg-white p-5 mt-5 rounded-lg shadow-md overflow-x-auto"
+          className="w-full max-w-5xl mx-auto bg-white mt-5 border border-gray-200 overflow-x-auto"
         >
           <table className="w-full">
             <thead className="bg-green text-gray-100 text-center">
               <tr className="bg-gray-100">
-                <th className="border text-black px-6 py-2.5 font-semibold">
+                <th className=" text-black px-6 py-2.5 font-semibold">
                   Category Name
                 </th>
-                <th className="border px-6 text-black py-2.5 font-semibold">
+                <th className=" px-6 text-black py-2.5 font-semibold">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody>
               {currentCategories.length > 0 ? (
-                currentCategories.map((category) => (
+                currentCategories.map((category, index) => (
                   <tr
                     key={category.id}
-                    className="text-center border-b cursor-pointer hover:bg-gray-100"
+                    className={`text-center border-b cursor-pointer hover:bg-gray-50 ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                    }`}
                   >
                     <td className="px-6 py-2">{category.name}</td>
                     <td className="flex items-center justify-center gap-x-5 px-6 py-2">

@@ -104,7 +104,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6  min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
@@ -193,28 +193,31 @@ const RecentOrdersTable = ({ orders, loading }) => (
         View All
       </button>
     </div>
+
     {loading ? (
       <Skeleton count={5} height={60} className="mb-2" />
     ) : (
-      <table className="w-full text-sm text-left text-gray-600">
-        <thead className="bg-gray-100 text-xs text-gray-500 uppercase">
-          <tr>
-            <th className="p-3">Date</th>
-            <th className="p-3">Customer</th>
-            <th className="p-3">Product (First Item)</th>
-            <th className="p-3">Status</th>
-            <th className="p-3">Qty</th>
-            <th className="p-3">Total</th>
-            <th className="p-3">Shipping</th>
-            <th className="p-3 text-center">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <OrderRow key={order.id} order={order} />
-          ))}
-        </tbody>
-      </table>
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-[900px] border w-full text-sm text-left text-gray-600">
+          <thead className="bg-gray-100 text-xs text-gray-500 uppercase">
+            <tr>
+              <th className="p-3">Date</th>
+              <th className="p-3">Customer</th>
+              <th className="p-3">Product (First Item)</th>
+              <th className="p-3">Status</th>
+              <th className="p-3">Qty</th>
+              <th className="p-3">Total</th>
+              <th className="p-3">Shipping</th>
+              <th className="p-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <OrderRow key={order.id} order={order} />
+            ))}
+          </tbody>
+        </table>
+      </div>
     )}
   </div>
 );
@@ -237,7 +240,7 @@ const OrderRow = ({ order }) => {
   };
 
   return (
-    <tr className="border-b hover:bg-gray-50 transition duration-200">
+    <tr className="border-b hover:bg-gray-50 transition duration-200 overflow-x-scroll">
       <td className="p-3 whitespace-nowrap">
         {new Date(order.date).toLocaleDateString()}
       </td>

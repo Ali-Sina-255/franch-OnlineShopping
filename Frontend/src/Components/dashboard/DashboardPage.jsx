@@ -39,7 +39,8 @@ const Dashboard = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="relative">
+            {/* Notification and Message Icons */}
+            {/* <div className="relative">
               <FaBell className="text-gray-600 text-xl cursor-pointer" />
               {notificationsCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
@@ -54,7 +55,7 @@ const Dashboard = () => {
                   {messagesCount}
                 </span>
               )}
-            </div>
+            </div> */}
 
             <div className="flex items-center gap-2 cursor-pointer">
               <AnimatePresence mode="wait">

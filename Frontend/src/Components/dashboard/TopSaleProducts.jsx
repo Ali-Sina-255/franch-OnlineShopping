@@ -48,7 +48,7 @@ const TopSaleProducts = ({ isLoading: isDashboardLoading }) => {
     isDashboardLoading || topProductsDetailsQueries.some((q) => q.isLoading);
 
   return (
-    <div className="text-gray-700">
+    <div className="text-gray-700 bg-white rounded-lg p-5">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Top Selling Products</h2>
       </div>

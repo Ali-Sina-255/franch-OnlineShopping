@@ -150,10 +150,12 @@ export default function ProductList({ setActiveComponent }) {
                   </td>
                 </tr>
               ) : filteredProducts.length > 0 ? (
-                filteredProducts.map((product) => (
+                filteredProducts.map((product, index) => (
                   <tr
                     key={product.id}
-                    className="bg-white border-b hover:bg-gray-50"
+                    className={` border-b hover:bg-gray-50 cursor-pointer ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                    } `}
                   >
                     <td className="px-6 py-4">
                       <img

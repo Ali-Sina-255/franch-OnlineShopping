@@ -69,7 +69,7 @@ const Dashboard = () => {
                     <div className="w-8 h-8 rounded-full bg-gray-300 animate-pulse"></div>
                     <div className="w-24 h-4 bg-gray-300 rounded animate-pulse"></div>
                   </motion.div>
-                ) : (
+                ) :  (
                   <motion.div
                     key="profile"
                     initial={{ opacity: 0 }}

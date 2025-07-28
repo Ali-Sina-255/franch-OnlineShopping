@@ -140,7 +140,6 @@ export const signIn = createAsyncThunk(
   }
 );
 
-// --- CART THUNKS ---
 
 export const fetchUserCart = createAsyncThunk(
   "user/fetchUserCart",
@@ -198,7 +197,6 @@ export const removeItemFromCart = createAsyncThunk(
   }
 );
 
-// --- THE SLICE DEFINITION ---
 const initialState = {
   currentUser: null,
   profile: null,
@@ -225,7 +223,6 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Auth Reducers
       .addCase(signIn.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -235,7 +232,6 @@ const userSlice = createSlice({
         state.accessToken = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
 
-        // ===== FIX: Unwrap the nested profile from the sign-in payload =====
         const actualProfile = action.payload.profile.profile;
         state.profile = actualProfile;
         state.currentUser = {

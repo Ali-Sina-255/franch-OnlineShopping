@@ -5,9 +5,7 @@ import { FaBell, FaEnvelope, FaSearch, FaUser } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 
-// You can get this from your environment variables, just like in your slice
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
-
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
   const [isFocused, setIsFocused] = useState(false);
@@ -15,13 +13,10 @@ const Dashboard = () => {
   const messagesCount = 5;
   const { profile, loading } = useSelector((state) => state.user);
 
-  // ========================================================================
-  // THE FIX: Construct the full image URL
-  // ========================================================================
+
   const fullProfilePhotoUrl = profile?.profile_photo
     ? `${BASE_URL}${profile.profile_photo}`
     : null;
-  // ========================================================================
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white">
@@ -31,7 +26,6 @@ const Dashboard = () => {
       />
       <div className="flex flex-col flex-1 h-screen overflow-hidden">
         <div className="bg-gray-100 py-2 w-full flex items-center justify-between px-4 shadow-sm">
-          {/* Search Box */}
           <div className="relative flex items-center">
             <FaSearch className="absolute left-3 text-gray-600 text-base pointer-events-none" />
             <input
@@ -45,7 +39,6 @@ const Dashboard = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Notification and Message Icons */}
             <div className="relative">
               <FaBell className="text-gray-600 text-xl cursor-pointer" />
               {notificationsCount > 0 && (
@@ -63,7 +56,6 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* User Profile Section */}
             <div className="flex items-center gap-2 cursor-pointer">
               <AnimatePresence mode="wait">
                 {loading && !profile ? (
@@ -85,9 +77,7 @@ const Dashboard = () => {
                     exit={{ opacity: 0 }}
                     className="flex items-center gap-2"
                   >
-                    {/* ====================================================== */}
-                    {/* THE FIX: Use the full, absolute URL for the image      */}
-                    {/* ====================================================== */}
+                 
                     {fullProfilePhotoUrl ? (
                       <img
                         src={fullProfilePhotoUrl}
@@ -99,7 +89,6 @@ const Dashboard = () => {
                         <FaUser className="text-gray-600" />
                       </div>
                     )}
-                    {/* ====================================================== */}
                     <span className="font-semibold text-gray-500">
                       {profile
                         ? `${profile.first_name} ${profile.last_name}`

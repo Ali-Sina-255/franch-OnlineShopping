@@ -3,7 +3,10 @@ import Sidebar from "./Sidebar";
 import MainContent from "./MainContent";
 import { FaBell, FaEnvelope, FaSearch, FaUser } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { AnimatePresence, motion } from "framer-motion"; 
+import { AnimatePresence, motion } from "framer-motion";
+
+// You can get this from your environment variables, just like in your slice
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
 
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
@@ -11,6 +14,14 @@ const Dashboard = () => {
   const notificationsCount = 3;
   const messagesCount = 5;
   const { profile, loading } = useSelector((state) => state.user);
+
+  // ========================================================================
+  // THE FIX: Construct the full image URL
+  // ========================================================================
+  const fullProfilePhotoUrl = profile?.profile_photo
+    ? `${BASE_URL}${profile.profile_photo}`
+    : null;
+  // ========================================================================
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white">
@@ -34,6 +45,7 @@ const Dashboard = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Notification and Message Icons */}
             <div className="relative">
               <FaBell className="text-gray-600 text-xl cursor-pointer" />
               {notificationsCount > 0 && (
@@ -42,7 +54,6 @@ const Dashboard = () => {
                 </span>
               )}
             </div>
-
             <div className="relative">
               <FaEnvelope className="text-gray-600 text-xl cursor-pointer" />
               {messagesCount > 0 && (
@@ -51,9 +62,10 @@ const Dashboard = () => {
                 </span>
               )}
             </div>
+
+            {/* User Profile Section */}
             <div className="flex items-center gap-2 cursor-pointer">
               <AnimatePresence mode="wait">
-                {/* If loading and profile is not yet available, show a placeholder */}
                 {loading && !profile ? (
                   <motion.div
                     key="loading"
@@ -73,9 +85,12 @@ const Dashboard = () => {
                     exit={{ opacity: 0 }}
                     className="flex items-center gap-2"
                   >
-                    {profile?.profile_photo ? (
+                    {/* ====================================================== */}
+                    {/* THE FIX: Use the full, absolute URL for the image      */}
+                    {/* ====================================================== */}
+                    {fullProfilePhotoUrl ? (
                       <img
-                        src={profile.profile_photo}
+                        src={fullProfilePhotoUrl}
                         alt="User"
                         className="w-8 h-8 rounded-full object-cover"
                       />
@@ -84,6 +99,7 @@ const Dashboard = () => {
                         <FaUser className="text-gray-600" />
                       </div>
                     )}
+                    {/* ====================================================== */}
                     <span className="font-semibold text-gray-500">
                       {profile
                         ? `${profile.first_name} ${profile.last_name}`
@@ -93,7 +109,6 @@ const Dashboard = () => {
                 )}
               </AnimatePresence>
             </div>
-        
           </div>
         </div>
         <main className="flex-1 overflow-y-auto custom-scrollbar">

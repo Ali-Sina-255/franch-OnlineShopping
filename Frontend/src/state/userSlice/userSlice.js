@@ -37,9 +37,8 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// --- ASYNC THUNKS FOR PROFILE MANAGEMENT (NO CHANGES) ---
+// --- ASYNC THUNKS FOR PROFILE MANAGEMENT ---
 
-// Fetches the combined user and profile data from your /profiles/me/ endpoint
 export const fetchUserProfile = createAsyncThunk(
   "user/fetchUserProfile",
   async (_, { rejectWithValue }) => {
@@ -53,14 +52,11 @@ export const fetchUserProfile = createAsyncThunk(
   }
 );
 
-// Performs the two-step update required by your backend within a single action
 export const updateUserProfile = createAsyncThunk(
   "user/updateUserProfile",
   async (profileData, { rejectWithValue, dispatch }) => {
     try {
       const profilePayload = new FormData();
-
-      // Append all required and optional fields
       profilePayload.append("username", profileData.username);
       profilePayload.append("email", profileData.email);
       profilePayload.append("first_name", profileData.first_name);
@@ -70,21 +66,16 @@ export const updateUserProfile = createAsyncThunk(
       profilePayload.append("gender", profileData.gender);
       profilePayload.append("country", profileData.country);
       profilePayload.append("city", profileData.city || "");
-
       if (
         profileData.profile_photo &&
         typeof profileData.profile_photo !== "string"
       ) {
         profilePayload.append("profile_photo", profileData.profile_photo);
       }
-
-      // Send single PUT request with all fields
       await api.put("/api/v1/profiles/me/update/", profilePayload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       toast.success("Profile updated successfully!");
-
       const updatedProfile = await dispatch(fetchUserProfile()).unwrap();
       return updatedProfile;
     } catch (error) {
@@ -95,7 +86,7 @@ export const updateUserProfile = createAsyncThunk(
   }
 );
 
-// --- AUTH THUNKS (NO CHANGES) ---
+// --- AUTH THUNKS ---
 
 export const createUser = createAsyncThunk(
   "user/createUser",
@@ -133,11 +124,8 @@ export const signIn = createAsyncThunk(
           headers: { Authorization: `Bearer ${access}` },
         }
       );
-      //  new changes
       const profileData = profileResponse.data;
-
       dispatch(fetchUserCart());
-
       toast.success("Login successful!");
       return {
         accessToken: access,
@@ -152,13 +140,13 @@ export const signIn = createAsyncThunk(
   }
 );
 
-// --- CART THUNKS (NO CHANGES) ---
+// --- CART THUNKS ---
 
 export const fetchUserCart = createAsyncThunk(
   "user/fetchUserCart",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/api/v1/cart/");
+      const response = await api.get("/api/v1/cart/cart/");
       const items = response.data;
       const cartId = items.length > 0 ? items[0].cart_id : null;
       return { items, cartId };
@@ -179,7 +167,7 @@ export const addItemToCart = createAsyncThunk(
   "user/addItemToCart",
   async (itemData, { dispatch, rejectWithValue }) => {
     try {
-      await api.post("/api/v1/cart/", itemData);
+      await api.post("/api/v1/cart/cart/", itemData);
       toast.success("Bag updated!");
       dispatch(fetchUserCart());
     } catch (error) {
@@ -199,7 +187,7 @@ export const removeItemFromCart = createAsyncThunk(
       return rejectWithValue("Cart ID not found.");
     }
     try {
-      await api.delete(`/api/v1/cart/${cart.cart_id}/delete/${itemId}/`);
+      await api.delete(`/api/v1/cart/cart/${cart.cart_id}/delete/${itemId}/`);
       toast.success("Item removed from bag.");
       return itemId;
     } catch (error) {
@@ -242,30 +230,21 @@ const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      // ========================================================================
-      // THE FIX: This reducer now correctly processes the payload from the signIn thunk.
-      // ========================================================================
       .addCase(signIn.fulfilled, (state, action) => {
         state.loading = false;
         state.accessToken = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
 
-        // Set the full profile data from the payload
-        state.profile = action.payload.profile;
-
-        // Create the smaller, summary `currentUser` object from the profile data
+        // ===== FIX: Unwrap the nested profile from the sign-in payload =====
+        const actualProfile = action.payload.profile.profile;
+        state.profile = actualProfile;
         state.currentUser = {
-          // Your ProfileSerializer returns the profile ID as `id`. Let's use that,
-          // along with the user details which are sourced from the user model.
-          id: action.payload.profile.id,
-          email: action.payload.profile.email,
-          first_name: action.payload.profile.first_name,
-          last_name: action.payload.profile.last_name,
+          id: actualProfile.id,
+          email: actualProfile.email,
+          first_name: actualProfile.first_name,
+          last_name: actualProfile.last_name,
         };
       })
-      // ========================================================================
-      // END OF FIX
-      // ========================================================================
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
@@ -282,7 +261,7 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Cart Reducers (NO CHANGES)
+      // Cart Reducers
       .addCase(fetchUserCart.pending, (state) => {
         state.cartLoading = true;
       })
@@ -315,17 +294,19 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
-      // PROFILE REDUCERS (NO CHANGES)
+      // PROFILE REDUCERS
       .addCase(fetchUserProfile.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
-        state.profile = action.payload;
+        // ===== FIX: Unwrap the nested profile object from the API response =====
+        const actualProfile = action.payload.profile;
+        state.profile = actualProfile;
         state.currentUser = {
-          id: action.payload.id,
-          email: action.payload.email,
-          first_name: action.payload.first_name,
-          last_name: action.payload.last_name,
+          id: actualProfile.id,
+          email: actualProfile.email,
+          first_name: actualProfile.first_name,
+          last_name: actualProfile.last_name,
         };
         state.loading = false;
       })
@@ -337,11 +318,13 @@ const userSlice = createSlice({
         state.loading = true;
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
-        state.profile = action.payload;
+        // ===== FIX: Unwrap the nested profile here as well =====
+        const actualProfile = action.payload.profile;
+        state.profile = actualProfile;
         state.currentUser = {
           ...state.currentUser,
-          first_name: action.payload.first_name,
-          last_name: action.payload.last_name,
+          first_name: actualProfile.first_name,
+          last_name: actualProfile.last_name,
         };
         state.loading = false;
       })

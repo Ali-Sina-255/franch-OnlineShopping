@@ -24,24 +24,24 @@ const FormInput = ({
       rules={rules}
       render={({ field }) => (
         <>
-          {Icon && (
-            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          )}
+         
           <input
             {...field}
             type={type}
             placeholder={label}
-            className={`peer block w-full rounded-lg border-gray-300 py-3 shadow-sm transition-colors duration-200 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 ${
-              Icon ? "pl-10" : "pl-4"
+            className={`peer block w-full rounded-lg border focus:outline-none border-gray-300 py-3 shadow-sm transition-colors duration-200  ${
+              Icon ? "pl-4" : "pl-4"
             } pr-4 placeholder-transparent`}
           />
           <label
             htmlFor={name}
-            className={`absolute left-2 -top-2.5 bg-white px-1 text-sm text-gray-500 transition-all duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-indigo-600 ${
-              Icon
-                ? "peer-placeholder-shown:left-9"
-                : "peer-placeholder-shown:left-3"
-            }`}
+            className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
+    ${
+      field.value && field.value.length > 0
+        ? "-top-2 text-xs text-black"
+        : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+    }
+  `}
           >
             {label}
           </label>
@@ -126,7 +126,7 @@ function Profile() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+    <div className=" p-3 md:p-6">
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         {/* Profile Header */}
         <div className="p-8 bg-gray-50 border-b border-gray-200">
@@ -228,8 +228,14 @@ function Profile() {
                 <textarea
                   {...field}
                   rows="4"
+                  style={{
+                    maxHeight: "7.5em", // 5 rows max height (5 × 1.5em line height)
+                    lineHeight: "1.5em",
+                    overflowY: "auto",
+                    resize: "vertical", // optional: user can resize vertically only up to maxHeight
+                  }}
                   placeholder="Tell us a little about yourself..."
-                  className="w-full rounded-lg border-gray-300 shadow-sm transition-colors duration-200 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="w-full rounded-lg border-gray-300 shadow-sm transition-colors duration-200 focus:border-indigo-500 border p-3"
                 />
               )}
             />
@@ -282,7 +288,7 @@ function Profile() {
           </div>
 
           {/* Form Actions */}
-          <div className="pt-6 border-t border-gray-200 flex justify-end">
+          <div className="pt-6 border-t border-gray-200 flex justify-center md:justify-end">
             <button
               type="submit"
               disabled={loading}

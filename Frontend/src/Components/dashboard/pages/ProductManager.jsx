@@ -134,13 +134,13 @@ export default function ProductManager() {
   };
 
   return (
-    <div className="p-6 ">
+    <div className="p-3 md:p-6 ">
       <div className=" bg-white p-6 shadow-md rounded-md">
         <h2 className="text-2xl font-bold mb-6">
           {editingId ? "Edit Product" : "Add New Product"}
         </h2>
         <form onSubmit={handleSubmit} className="">
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div>
               <label className="block mb-1 font-medium">Product Name</label>
               <input
@@ -225,7 +225,7 @@ export default function ProductManager() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div className="col-span-1">
               <label className="block mb-1 font-medium">Material</label>
               <input
@@ -261,6 +261,12 @@ export default function ProductManager() {
               onChange={handleFormChange}
               className="input-field w-full"
               rows="4"
+              style={{
+                maxHeight: "7.5em", // 5 rows max height (5 × 1.5em line height)
+                lineHeight: "1.5em",
+                overflowY: "auto",
+                resize: "vertical", // optional: user can resize vertically only up to maxHeight
+              }}
               required
             />
           </div>
@@ -286,7 +292,13 @@ export default function ProductManager() {
               value={formData.seller_notes}
               onChange={handleFormChange}
               className="input-field w-full"
-              rows="3"
+              rows="4"
+              style={{
+                maxHeight: "7.5em", // 5 rows max height (5 × 1.5em line height)
+                lineHeight: "1.5em",
+                overflowY: "auto",
+                resize: "vertical", // optional: user can resize vertically only up to maxHeight
+              }}
               required
             />
           </div>

@@ -38,7 +38,6 @@ const Attribute = () => {
 
   const fetchAllAttributeValues = async () => {
     try {
-
       const response = await axios.get(
         `${BASE_URL}/api/v1/category/attribute/`,
         {
@@ -203,7 +202,7 @@ const Attribute = () => {
   );
 
   return (
-    <div className="p-6 w-full space-y-8">
+    <div className="p-3 md:p-6 w-full space-y-8">
       {/* --- FORM SECTION --- */}
       <div className="bg-white p-6 rounded-md shadow-md">
         <h2 className="text-xl font-bold mb-4">
@@ -299,11 +298,11 @@ const Attribute = () => {
             {selectedCategory?.name || "No Category Selected"}
           </span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ">
           {/* Attribute List */}
-          <div className="border rounded-md p-4">
+          <div className="border rounded-md p-4 overflow-auto">
             <h3 className="font-semibold text-lg mb-2">Attribute List</h3>
-            <table className="min-w-full">
+            <table className="min-w-[500px] overflow-x-auto">
               <thead className="bg-gray-100">
                 <tr>
                   <th className="px-4 py-2 text-left">Name</th>

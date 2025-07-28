@@ -77,7 +77,7 @@ class CartOrderItemSerializer(serializers.ModelSerializer):
 class CartOrderSerializer(serializers.ModelSerializer):
     orderitem = CartOrderItemSerializer(many=True, read_only=True)
     total = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
-    grand_total = serializers.SerializerMethodField()
+    total = serializers.SerializerMethodField()
 
     class Meta:
         model = CartOrder
@@ -85,7 +85,6 @@ class CartOrderSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "total",
-            "grand_total",
             "payment_status",
             "order_status",
             "full_name",
@@ -100,13 +99,25 @@ class CartOrderSerializer(serializers.ModelSerializer):
             "orderitem",
         ]
 
-    def get_grand_total(self, obj):
-        base = Decimal(obj.total or 0)
-        try:
-            delivery = obj.deliverycouriers_set.latest("created_at").delivery_cost
-        except (DeliveryCouriers.DoesNotExist, AttributeError):
-            delivery = Decimal("0")
-        return base + delivery
+    def get_total(self, obj):
+        """
+        Calculates order total plus delivery cost.
+        """
+        base = obj.calculate_total()
+        delivery = obj.deliverycouriers_set.last()
+        if delivery:
+            cost = delivery.calculate_delivery_cost()
+        else:
+            cost = Decimal("0.00")
+        return base + cost
+
+    # def get_grand_total(self, obj):
+    #     base = Decimal(obj.total or 0)
+    #     try:
+    #         delivery = obj.deliverycouriers_set.latest("created_at").delivery_cost
+    #     except (DeliveryCouriers.DoesNotExist, AttributeError):
+    #         delivery = Decimal("0")
+    #     return base + delivery
 
 
 class WishlistCreateSerializer(serializers.ModelSerializer):

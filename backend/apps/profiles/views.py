@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -25,7 +25,7 @@ class ProfileListAPIView(generics.ListAPIView):
 
 
 class ProfileDetailAPIView(generics.RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = ProfileSerializers
     renderer_classes = [ProfileJsonRenderers]
 
@@ -56,5 +56,3 @@ class UpdateProfileAPIView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-

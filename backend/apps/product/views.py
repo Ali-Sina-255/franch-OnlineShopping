@@ -1,14 +1,21 @@
 from apps.carts.models import CartOrder
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, viewsets
+from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter
 from rest_framework.parsers import FormParser, MultiPartParser
 
 from .filters import ProductFilter
 from .models import Brand, DeliveryCouriers, Product
 from .pagination import CustomPageNumberPagination, ProductPageNumberPagination
-from .serializers import BrandSerializer, DeliveryCouriersSerializer, ProductSerializer
+from .serializers import (
+    BrandSerializer,
+    DeliveryCouriersCreateSerializer,
+    DeliveryCouriersSerializer,
+    ProductSerializer,
+)
 
 
 class BrandAPIViewSet(generics.ListCreateAPIView):
@@ -34,21 +41,31 @@ class ProductViewSet(viewsets.ModelViewSet):
     ]
 
 
-class DeliveryCouriersListCreateView(generics.ListCreateAPIView):
-    serializer_class = DeliveryCouriersSerializer
+class DeliveryCourierCreateView(generics.CreateAPIView):
+    serializer_class = DeliveryCouriersCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        order_id = self.kwargs.get("order_id")
-        # Filter DeliveryCouriers for current user and CartOrder by oid
-        return DeliveryCouriers.objects.filter(
-            user=self.request.user, order__oid=order_id
-        )
+    lookup_field = "oid"
+    lookup_url_kwarg = "order_oid"
+    queryset = CartOrder.objects.all()
 
     def perform_create(self, serializer):
-        order_id = self.kwargs.get("order_id")
-        try:
-            order = CartOrder.objects.get(oid=order_id)
-        except CartOrder.DoesNotExist:
-            raise Http404(f"Order with oid '{order_id}' not found")
+        order = get_object_or_404(
+            CartOrder, oid=self.kwargs["order_oid"], user=self.request.user
+        )
+        delivery = serializer.save(user=self.request.user, cart_order=order)
 
-        serializer.save(user=self.request.user, order=order)
+        # Calculate and update the delivery cost
+        delivery_cost = delivery.calculate_delivery_cost()
+        delivery.delivery_cost = delivery_cost
+        delivery.save(update_fields=["delivery_cost"])
+
+        # Update the CartOrder total
+        order.total += delivery_cost
+        order.save(update_fields=["total"])
+
+
+class DeliveryCourierDetailView(generics.RetrieveAPIView):
+    queryset = DeliveryCouriers.objects.all()
+    serializer_class = DeliveryCouriersSerializer
+    serializer_class = DeliveryCouriersSerializer

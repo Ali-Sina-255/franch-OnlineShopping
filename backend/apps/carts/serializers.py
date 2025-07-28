@@ -1,4 +1,6 @@
-from apps.product.models import Product
+from decimal import Decimal
+
+from apps.product.models import DeliveryCouriers, Product
 from apps.product.serializers import ProductSerializer
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
@@ -75,6 +77,7 @@ class CartOrderItemSerializer(serializers.ModelSerializer):
 class CartOrderSerializer(serializers.ModelSerializer):
     orderitem = CartOrderItemSerializer(many=True, read_only=True)
     total = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    grand_total = serializers.SerializerMethodField()
 
     class Meta:
         model = CartOrder
@@ -82,6 +85,7 @@ class CartOrderSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "total",
+            "grand_total",
             "payment_status",
             "order_status",
             "full_name",
@@ -95,6 +99,14 @@ class CartOrderSerializer(serializers.ModelSerializer):
             "date",
             "orderitem",
         ]
+
+    def get_grand_total(self, obj):
+        base = Decimal(obj.total or 0)
+        try:
+            delivery = obj.deliverycouriers_set.latest("created_at").delivery_cost
+        except (DeliveryCouriers.DoesNotExist, AttributeError):
+            delivery = Decimal("0")
+        return base + delivery
 
 
 class WishlistCreateSerializer(serializers.ModelSerializer):
@@ -113,5 +125,7 @@ class ProductSalesSummarySerializer(serializers.Serializer):
     product_name = serializers.CharField()
     total_sales = serializers.FloatField()
     total_orders = serializers.IntegerField()
+    total_customers = serializers.IntegerField()
+    total_returns = serializers.IntegerField()
     total_customers = serializers.IntegerField()
     total_returns = serializers.IntegerField()

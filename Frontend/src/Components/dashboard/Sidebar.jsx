@@ -115,13 +115,13 @@ const Sidebar = ({ setActiveComponent }) => {
       <header className="flex items-center justify-center lg:justify-start gap-5 p-5 font-bold text-xl">
         <Link
           to="/"
-          className="flex items-center justify-center p-2 bg-gray-300 md:h-10 md:w-10 rounded-full"
+          className="flex items-center justify-center p-2 bg-gray-300 h-8 w-8 md:h-10 md:w-10 rounded-full"
         >
           <FaUser className="text-[#7209b7]" size={24} />
         </Link>
         <Link
           to="/"
-          className="text-lg font-semibold text-[#7209b7] whitespace-nowrap hidden md:inline"
+          className="text-lg font-semibold text-[#7209b7] whitespace-nowrap hidden lg:inline"
         >
           CHIQ FRIP
         </Link>

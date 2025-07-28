@@ -133,7 +133,7 @@ const CategoryManagement = () => {
   };
 
   return (
-    <div className="p-6 w-full px-5">
+    <div className="p-3 md:p-6 w-full px-5">
       {/* Form Section */}
       <div className="w-full py-4 px-5 shadow-lg bg-white pb-14 rounded-md">
         <h2 className="text-xl text-center font-bold mb-4">
@@ -141,14 +141,14 @@ const CategoryManagement = () => {
         </h2>
         <form
           onSubmit={handleSubmit}
-          className=" flex max-w-4xl mx-auto  gap-x-5 justify-center items-center "
+          className=" flex flex-col md:flex-row max-w-4xl mx-auto  gap-x-5 justify-center items-center "
         >
           <div className="">
             <input
               type="text"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
-              className="w-[450px] px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
+              className="lg:w-[450px] px-3 py-2 border rounded  bg-gray-200 text-black focus:outline-none"
               placeholder="Enter category name"
               required
             />

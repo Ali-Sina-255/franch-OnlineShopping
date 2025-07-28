@@ -71,6 +71,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "tags",
             # "brand",
             "price",
+            "weight",
             "stock",
             "is_available",
             "category",
@@ -119,8 +120,32 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class DeliveryCouriersSerializer(serializers.ModelSerializer):
+    delivery_cost = serializers.SerializerMethodField()
 
     class Meta:
         model = DeliveryCouriers
-        fields = ["id", "user", "location", "created_at", "updated_at"]
-        read_only_fields = ["user"]
+        fields = [
+            "id",
+            "user",
+            "cart_order",
+            "delivery_type",
+            "delivery_cost",
+            "location",
+            "created_at",
+            "updated_at",
+        ]
+
+    def get_delivery_cost(self, obj):
+        return obj.calculate_delivery_cost()
+
+
+class DeliveryCouriersCreateSerializer(serializers.ModelSerializer):
+    delivery_cost = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DeliveryCouriers
+        fields = ["delivery_type", "location", "delivery_cost"]
+
+    def get_delivery_cost(self, obj):
+        # Calls the model’s calculate_delivery_cost
+        return obj.calculate_delivery_cost()

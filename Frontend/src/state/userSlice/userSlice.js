@@ -157,7 +157,7 @@ export const fetchUserCart = createAsyncThunk(
   "user/fetchUserCart",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/api/v1/cart/");
+      const response = await api.get("/api/v1/cart/cart/");
       const items = response.data;
       const cartId = items.length > 0 ? items[0].cart_id : null;
       return { items, cartId };
@@ -178,7 +178,7 @@ export const addItemToCart = createAsyncThunk(
   "user/addItemToCart",
   async (itemData, { dispatch, rejectWithValue }) => {
     try {
-      await api.post("/api/v1/cart/", itemData);
+      await api.post("/api/v1/cart/cart/", itemData);
       toast.success("Bag updated!");
       dispatch(fetchUserCart());
     } catch (error) {
@@ -198,7 +198,7 @@ export const removeItemFromCart = createAsyncThunk(
       return rejectWithValue("Cart ID not found.");
     }
     try {
-      await api.delete(`/api/v1/cart/${cart.cart_id}/delete/${itemId}/`);
+      await api.delete(`/api/v1/cart/cart/${cart.cart_id}/delete/${itemId}/`);
       toast.success("Item removed from bag.");
       return itemId;
     } catch (error) {

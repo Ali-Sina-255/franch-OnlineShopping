@@ -145,8 +145,8 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-12 border-t border-gray-700 pt-8">
-          <p className="text-base text-gray-400 xl:text-center">
-            © {new Date().getFullYear()} TETTEAM, Inc. All rights reserved.
+          <p className="text-base text-gray-400 text-center">
+            © {new Date().getFullYear()} ChiqFrip, Inc. All rights reserved.
           </p>
         </div>
       </div>

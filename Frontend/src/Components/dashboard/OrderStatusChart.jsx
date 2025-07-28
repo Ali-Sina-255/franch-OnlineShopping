@@ -29,10 +29,8 @@ const data = [
 
 const OrderStatusChart = ({ isLoading }) => {
   return (
-    <div>
-      <h2 className="text-lg font-semibold text-gray-700 mb-4">
-        Order Status
-      </h2>
+    <div className="bg-white rounded-lg p-5">
+      <h2 className="text-lg font-semibold text-gray-700 mb-4">Order Status</h2>
       {isLoading ? (
         <Skeleton height={300} />
       ) : (

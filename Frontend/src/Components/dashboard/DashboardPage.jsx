@@ -30,7 +30,7 @@ const Dashboard = () => {
         activeComponent={activeComponent}
       />
       <div className="flex flex-col flex-1 h-screen overflow-hidden">
-        <div className="bg-gray-100 py-2 w-full flex items-center justify-between pl-10 pr-4 shadow-sm">
+        <div className="bg-gray-100 py-2 w-full flex items-center justify-between px-4 shadow-sm">
           {/* Search Box */}
           <div className="relative flex items-center">
             <FaSearch className="absolute left-3 text-gray-600 text-base pointer-events-none" />
@@ -46,7 +46,7 @@ const Dashboard = () => {
 
           <div className="flex items-center gap-4">
             {/* Notification and Message Icons */}
-            <div className="relative">
+            {/* <div className="relative">
               <FaBell className="text-gray-600 text-xl cursor-pointer" />
               {notificationsCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
@@ -61,7 +61,7 @@ const Dashboard = () => {
                   {messagesCount}
                 </span>
               )}
-            </div>
+            </div> */}
 
             {/* User Profile Section */}
             <div className="flex items-center gap-2 cursor-pointer">

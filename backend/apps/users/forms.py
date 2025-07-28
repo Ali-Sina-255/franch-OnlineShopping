@@ -14,7 +14,7 @@ class UserCreationForm(admin_forms.UserCreationForm):
 
     class Meta(admin_forms.UserCreationForm.Meta):
         model = User
-        fields = ["first_name", "last_name", "email"]
+        fields = ["first_name", "last_name", "email", "role"]
 
     error_messages = {"duplicate_email": "A user with this email is already exists. "}
 

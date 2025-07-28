@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
+
 from .forms import UserChangeForm, UserCreationForm
 from .models import User
 
@@ -17,6 +18,7 @@ class UserAdmin(BaseUserAdmin):
         "email",
         "first_name",
         "last_name",
+        "role",
         "is_staff",
         "is_active",
     ]
@@ -36,6 +38,7 @@ class UserAdmin(BaseUserAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
+                    "role",
                     "groups",
                     "user_permissions",
                 )

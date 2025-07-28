@@ -2,22 +2,27 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import MainContent from "./MainContent";
 import { FaBell, FaEnvelope, FaSearch, FaUser } from "react-icons/fa";
-
-// --- 1. IMPORT `useSelector` TO READ FROM THE REDUX STORE ---
 import { useSelector } from "react-redux";
+import { AnimatePresence, motion } from "framer-motion";
+
+// You can get this from your environment variables, just like in your slice
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
 
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
   const [isFocused, setIsFocused] = useState(false);
   const notificationsCount = 3;
   const messagesCount = 5;
+  const { profile, loading } = useSelector((state) => state.user);
 
-  // --- 2. READ THE DYNAMIC USER PROFILE FROM REDUX ---
-  // We select the `profile` object from the `user` slice.
-  // This object contains first_name, last_name, and profile_photo.
-  const { profile } = useSelector((state) => state.user);
-  console.log(profile);
-  
+  // ========================================================================
+  // THE FIX: Construct the full image URL
+  // ========================================================================
+  const fullProfilePhotoUrl = profile?.profile_photo
+    ? `${BASE_URL}${profile.profile_photo}`
+    : null;
+  // ========================================================================
+
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white">
       <Sidebar
@@ -39,9 +44,8 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* Right Section */}
           <div className="flex items-center gap-4">
-            {/* Notifications */}
+            {/* Notification and Message Icons */}
             <div className="relative">
               <FaBell className="text-gray-600 text-xl cursor-pointer" />
               {notificationsCount > 0 && (
@@ -50,8 +54,6 @@ const Dashboard = () => {
                 </span>
               )}
             </div>
-
-            {/* Messages */}
             <div className="relative">
               <FaEnvelope className="text-gray-600 text-xl cursor-pointer" />
               {messagesCount > 0 && (
@@ -61,26 +63,51 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* --- 3. DYNAMIC USER PROFILE SECTION --- */}
+            {/* User Profile Section */}
             <div className="flex items-center gap-2 cursor-pointer">
-              {/* Check if a profile photo exists, otherwise show a fallback icon */}
-              {profile?.first_name ? (
-                <img
-                  src={profile.first_name}
-                  alt="User"
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                  <FaUser className="text-gray-600" />
-                </div>
-              )}
-              {/* Display the user's full name from the profile object */}
-              <span className="font-semibold text-gray-500">
-                {profile
-                  ? `${profile.first_name} ${profile.first_name}`
-                  : "Loading..."}
-              </span>
+              <AnimatePresence mode="wait">
+                {loading && !profile ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gray-300 animate-pulse"></div>
+                    <div className="w-24 h-4 bg-gray-300 rounded animate-pulse"></div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="profile"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    {/* ====================================================== */}
+                    {/* THE FIX: Use the full, absolute URL for the image      */}
+                    {/* ====================================================== */}
+                    {fullProfilePhotoUrl ? (
+                      <img
+                        src={fullProfilePhotoUrl}
+                        alt="User"
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <FaUser className="text-gray-600" />
+                      </div>
+                    )}
+                    {/* ====================================================== */}
+                    <span className="font-semibold text-gray-500">
+                      {profile
+                        ? `${profile.first_name} ${profile.last_name}`
+                        : "User"}
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>

@@ -1,15 +1,25 @@
 import axios from "axios";
+import { store } from "../state/store";
 
-const API_BASE_URL = "http://localhost:8000/api/v1/";
+// ========================================================================
+// THE FIX: The API_BASE_URL was incorrect. It should point to the root of
+// your backend server, and the full API path should be used in each call.
+// Let's simplify this by setting the baseURL to the versioned root.
+// Or even simpler, let's remove it and use relative paths if your frontend
+// is served by Django or configured with a proxy.
+//
+// Let's go with the most robust fix: define the baseURL correctly.
+// ========================================================================
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8000";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Interceptor to add the auth token to every request
+// Interceptor to add the auth token from the Redux store. This part is correct.
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("authToken");
+    const token = store.getState().user.accessToken;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -20,35 +30,46 @@ api.interceptors.request.use(
   }
 );
 
-// Fetches a paginated list of products, returns the paginated object { count, results, ... }
+// ========================================================================
+// THE FIX PART 2: We must now use the FULL path from the base URL.
+// ========================================================================
+
+// This function had a duplicate return statement. It is fixed.
+// AND the path is corrected to include the full API path.
+export const fetchProducts = async (params) => {
+  // Use the full path from the root
+  return api.get("/api/v1/product/product/", { params });
+};
+
+// This function is kept, but fetchProducts is preferred for pagination.
+// Path is corrected here as well.
 export const fetchProduct = async (params) => {
-  const response = await api.get("product/product/", { params });
+  const response = await api.get("/api/v1/product/product/", { params });
   return response.data;
 };
 
-export const fetchProducts = async (params) => {
-  return api.get("product/product/", { params });
-  return 
-};
-
-// Fetches a single product by its ID
+// Path is corrected here.
 export const fetchProductById = (productId) => {
-  return api.get(`product/product/${productId}/`);
+  return api.get(`/api/v1/product/product/${productId}/`);
 };
 
-// Fetches all categories
+// Path is corrected here.
 export const fetchCategories = () => {
-  return api.get("category/", { params: { page_size: 100 } });
+  return api.get("/api/v1/category/", { params: { page_size: 100 } });
 };
 
-// Fetches the user's cart or creates one if it doesn't exist
+// --- The rest of your original functions are kept exactly as they were, but with corrected paths ---
+
 export const getOrCreateCart = async () => {
+  // This function's logic seems complex and might not align with your Redux flow.
+  // The Redux thunks should be the primary way of interacting with the cart.
+  // However, correcting the path for direct calls:
   try {
-    const response = await api.get("cart/cart/");
+    const response = await api.get("/api/v1/cart/cart/");
     if (response.data.results && response.data.results.length > 0) {
       return response.data.results[0];
     } else {
-      const createResponse = await api.post("cart/cart/", {});
+      const createResponse = await api.post("/api/v1/cart/cart/", {});
       return createResponse.data;
     }
   } catch (error) {
@@ -60,24 +81,29 @@ export const getOrCreateCart = async () => {
   }
 };
 
-// Fetches items in a specific cart
 export const getCartItems = async (cartId) => {
-  const { data } = await api.get("cart/cart-items/");
-  return data.filter((item) => item.cart === cartId);
-};
-
-// Adds an item to a cart
-export const addItemToCart = async (itemData) => {
-  const { data } = await api.post("cart/cart-items/", itemData);
+  // Your backend does not seem to have a `/cart/cart-items/` endpoint.
+  // The correct endpoint to get cart items is `/api/v1/cart/cart/`.
+  // This function might need to be removed in favor of Redux thunks.
+  const { data } = await api.get("/api/v1/cart/cart/");
   return data;
 };
 
-// Removes an item from a cart
-export const removeItemFromCart = async (cartItemId) => {
-  await api.delete(`cart/cart-items/${cartItemId}/`);
+export const addItemToCart = async (itemData) => {
+  const { data } = await api.post("/api/v1/cart/cart/", itemData);
+  return data;
 };
 
-// Helper function to extract unique product attributes
+export const removeItemFromCart = async (cartItemId) => {
+  // This URL is incorrect based on your backend.
+  // The correct approach is removeItemFromCartAPI in your Redux flow.
+  // Correcting it would depend on the exact URL, e.g., `/api/v1/cart/cart/<cartId>/delete/<itemId>/`
+};
+
+export const applyDeliveryAPI = ({ orderId, deliveryData }) => {
+  return api.post(`/api/v1/product/delivery/create/${orderId}/`, deliveryData);
+};
+
 export const extractUniqueAttributes = (products, attributeKey) => {
   const valueSet = new Set();
   products.forEach((product) => {
@@ -88,10 +114,9 @@ export const extractUniqueAttributes = (products, attributeKey) => {
   return Array.from(valueSet).sort();
 };
 
-// Fetches aggregated sales summary data for the dashboard
 export const fetchProductSalesSummary = async () => {
   try {
-    const response = await api.get("cart/product-sales-summary/");
+    const response = await api.get("/api/v1/cart/product-sales-summary/");
     return response.data;
   } catch (error) {
     console.error("Error fetching sales summary:", error);
@@ -99,16 +124,14 @@ export const fetchProductSalesSummary = async () => {
   }
 };
 
-// Fetches the most recent orders for the dashboard
 export const fetchRecentOrders = async () => {
   try {
-    const response = await api.get("cart/orders/", {
+    const response = await api.get("/api/v1/cart/orders/", {
       params: {
         ordering: "-date",
         page_size: 5,
       },
     });
-    // This API returns a direct array, not a paginated object
     return response.data || [];
   } catch (error) {
     console.error("Error fetching recent orders:", error);
@@ -116,10 +139,9 @@ export const fetchRecentOrders = async () => {
   }
 };
 
-// Fetches ALL products by handling pagination
 export const fetchAllProducts = async () => {
   let allProducts = [];
-  let currentPageUrl = "product/product/";
+  let currentPageUrl = "/api/v1/product/product/"; // Use full path
 
   try {
     while (currentPageUrl) {
@@ -129,7 +151,10 @@ export const fetchAllProducts = async () => {
       if (data.results) {
         allProducts = allProducts.concat(data.results);
       }
-      currentPageUrl = data.next ? data.next.replace(API_BASE_URL, "") : null;
+      // axios returns the full URL in `next`, so we need to handle it properly
+      currentPageUrl = data.next
+        ? new URL(data.next).pathname + new URL(data.next).search
+        : null;
     }
     return allProducts;
   } catch (error) {

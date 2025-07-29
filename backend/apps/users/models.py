@@ -10,7 +10,7 @@ from .managers import CustomUserManager
 
 class User(AbstractBaseUser, PermissionsMixin):
     class ROLE_CHOICES(models.TextChoices):
-        admin = "ADMIN", "Admin"
+        admin = "admin", "Admin"
         user = "user", "User"
 
     pkid = models.BigAutoField(primary_key=True, editable=True)

@@ -1,8 +1,7 @@
-// src/state/checkoutSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-hot-toast";
 // THE FIX: Import fetchUserCart instead of clearCart
-import { fetchUserCart } from "../userSlice/userSlice";
+import { fetchUserCart } from "../userSlice/userSlice"; // Corrected Path
 import axios from "axios";
 
 // Helper to create an API client that attaches the auth token from Redux state.
@@ -35,6 +34,35 @@ export const createOrder = createAsyncThunk(
       return response.data;
     } catch (error) {
       const message = error.response?.data?.detail || "Failed to create order.";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+// ========================================================================
+// NEW THUNK: Action to apply a delivery option to an existing order.
+// This is added without removing any other logic.
+// ========================================================================
+export const applyDeliveryOption = createAsyncThunk(
+  "checkout/applyDeliveryOption",
+  async (
+    { orderId, deliveryType, location },
+    { dispatch, getState, rejectWithValue }
+  ) => {
+    const api = createApiClient(getState);
+    try {
+      const payload = { delivery_type: deliveryType, location };
+      await api.post(`/api/v1/product/delivery/create/${orderId}/`, payload);
+
+      // On success, automatically re-fetch the order to get the updated total.
+      dispatch(fetchOrderForCheckout(orderId));
+
+      toast.success("Delivery option applied! Your total has been updated.");
+      return true;
+    } catch (error) {
+      const message =
+        error.response?.data?.detail || "Could not apply delivery option.";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -88,6 +116,7 @@ export const processPaypalPayment = createAsyncThunk(
 const initialState = {
   order: null,
   loading: false,
+  deliveryLoading: false, // Added state for delivery submission
   error: null,
 };
 
@@ -99,6 +128,7 @@ const checkoutSlice = createSlice({
       state.order = null;
       state.error = null;
       state.loading = false;
+      state.deliveryLoading = false; // Also reset this state
     },
   },
   extraReducers: (builder) => {
@@ -114,6 +144,21 @@ const checkoutSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      // --- ADDED: Reducer logic for the new applyDeliveryOption thunk ---
+      .addCase(applyDeliveryOption.pending, (state) => {
+        state.deliveryLoading = true;
+        state.error = null;
+      })
+      .addCase(applyDeliveryOption.fulfilled, (state) => {
+        state.deliveryLoading = false;
+      })
+      .addCase(applyDeliveryOption.rejected, (state, action) => {
+        state.deliveryLoading = false;
+        state.error = action.payload;
+      })
+      // --- End of new logic ---
+
       .addCase(fetchOrderForCheckout.pending, (state) => {
         state.loading = true;
         state.error = null;

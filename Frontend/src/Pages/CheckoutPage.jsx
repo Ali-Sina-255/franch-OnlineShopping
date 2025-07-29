@@ -8,7 +8,7 @@ import {
   fetchOrderForCheckout,
   processPaypalPayment,
   clearOrderState,
-  applyDeliveryOption, // <-- 1. IMPORT THE THUNK
+  applyDeliveryOption,
 } from "../state/checkoutSlice/checkoutSlice";
 
 const LoadingIndicator = () => (
@@ -66,7 +66,6 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { orderId } = useParams();
 
-  // 2. GET THE NEW `deliveryLoading` STATE FROM THE SLICE
   const { order, loading, deliveryLoading } = useSelector(
     (state) => state.checkout
   );

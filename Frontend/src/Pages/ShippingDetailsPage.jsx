@@ -4,13 +4,21 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { createOrder } from "../state/checkoutSlice/checkoutSlice";
 import { fetchUserProfile } from "../state/userSlice/userSlice";
-import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  Home,
+  Box,
+  HelpCircle,
+} from "lucide-react";
 import { toast } from "react-toastify";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ShippingDetailsPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [activeQuestion, setActiveQuestion] = useState(null);
+  const [activeQuestion, setActiveQuestion] = useState(0); // Default to first question open
 
   const {
     cart,
@@ -24,8 +32,8 @@ const ShippingDetailsPage = () => {
     handleSubmit,
     reset,
     formState: { errors, isValid },
+    watch,
   } = useForm({ mode: "onChange" });
-  const { watch } = useForm();
 
   useEffect(() => {
     dispatch(fetchUserProfile());
@@ -49,31 +57,33 @@ const ShippingDetailsPage = () => {
     setActiveQuestion(activeQuestion === index ? null : index);
   };
 
+  // ========================================================================
+  // REVISED FAQ Section to match your backend logic and pricing
+  // ========================================================================
   const faqs = [
     {
-      question: "How long does delivery take?",
+      question: "What are the Home Location delivery costs?",
       answer:
-        "Standard delivery takes 3-5 business days. Express delivery is available for an additional fee and takes 1-2 business days.",
+        "Delivery costs to your home are based on the total weight of your order: up to 500g is €4.50, up to 1kg is €5.50, and up to 2kg is €6.90.",
+      icon: <Home className="h-5 w-5 mr-2 text-indigo-500" />,
     },
     {
-      question: "Do you ship internationally?",
+      question: "What are the Close Station delivery costs?",
       answer:
-        "Yes, we ship to most countries worldwide. International delivery times vary by destination.",
+        "Picking up from a close station is a flexible option. Costs are: up to 500g is €7.00, up to 1kg is €8.50, and up to 2kg is €9.90.",
+      icon: <Box className="h-5 w-5 mr-2 text-indigo-500" />,
     },
     {
-      question: "Can I change my shipping address after ordering?",
+      question: "How is the total weight calculated?",
       answer:
-        "You can change your shipping address within 1 hour of placing your order by contacting our customer service.",
+        "The total weight is the sum of the weights of all individual products in your cart. You can see each product's weight on its detail page.",
+      icon: <HelpCircle className="h-5 w-5 mr-2 text-indigo-500" />,
     },
     {
-      question: "What shipping carriers do you use?",
+      question: "Can I change my delivery choice later?",
       answer:
-        "We work with major carriers including FedEx, UPS, and DHL, depending on your location and the shipping method selected.",
-    },
-    {
-      question: "How can I track my order?",
-      answer:
-        "Once your order is shipped, you'll receive a tracking number via email that you can use to track your package.",
+        "Yes, you can select your preferred delivery method (Home or Station) and see the final cost on the next page before completing your payment.",
+      icon: <HelpCircle className="h-5 w-5 mr-2 text-indigo-500" />,
     },
   ];
 
@@ -97,82 +107,74 @@ const ShippingDetailsPage = () => {
     );
   }
 
+  // The entire return statement is updated for better UI/UX and text.
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <div className="flex flex-col lg:flex-row h-full">
-        {/* FAQ Section */}
-        <div className="lg:w-1/2 bg-gray-50 p-8 hidden lg:block">
+        {/* Information Section */}
+        <div className="lg:w-1/2 bg-white p-8 lg:p-12 hidden lg:flex flex-col justify-center">
           <div className="max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Delivery Information
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
+              Delivery Pricing & Info
             </h2>
+            <p className="text-gray-600 mb-8">
+              Your shipping cost is calculated on the next page based on your
+              delivery choice and total order weight. Here are the details:
+            </p>
             <div className="space-y-4">
               {faqs.map((faq, index) => (
-                <div key={index} className="border-b border-gray-200 pb-4">
+                <div key={index} className="border rounded-lg overflow-hidden">
                   <button
                     onClick={() => toggleQuestion(index)}
-                    className="flex items-center justify-between w-full text-left focus:outline-none"
+                    className="flex items-center justify-between w-full text-left p-4 bg-gray-50 hover:bg-gray-100 focus:outline-none"
                   >
-                    <span className="text-lg font-medium text-gray-900">
-                      {faq.question}
-                    </span>
+                    <div className="flex items-center">
+                      {faq.icon}
+                      <span className="text-md font-medium text-gray-800">
+                        {faq.question}
+                      </span>
+                    </div>
                     {activeQuestion === index ? (
-                      <ChevronUp className="h-5 w-5 text-gray-500" />
+                      <ChevronUp className="h-5 w-5 text-gray-500 transition-transform" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-500" />
+                      <ChevronDown className="h-5 w-5 text-gray-500 transition-transform" />
                     )}
                   </button>
-                  {activeQuestion === index && (
-                    <div className="mt-2 text-gray-600">
-                      <p>{faq.answer}</p>
-                    </div>
-                  )}
+                  <AnimatePresence>
+                    {activeQuestion === index && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="p-4 bg-white text-gray-600 text-sm">
+                          <p>{faq.answer}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ))}
-            </div>
-
-            <div className="mt-8 bg-indigo-50 p-6 rounded-lg">
-              <h3 className="text-lg font-medium text-indigo-800 mb-3">
-                Need help with your order?
-              </h3>
-              <p className="text-gray-700 mb-4">
-                Our customer service team is available to assist you with any
-                questions about shipping or your order.
-              </p>
-              <button className="text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center">
-                Contact Us
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 ml-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </button>
             </div>
           </div>
         </div>
 
         {/* Form Section */}
-        <div className="lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
+        <div className="lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-white lg:bg-gray-50">
           <div className="w-full max-w-md">
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                Shipping Details
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Shipping Address
               </h1>
               <p className="text-gray-600">
-                Please confirm your details to proceed to payment
+                Confirm your details to proceed to the payment page.
               </p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {/* Form fields remain unchanged */}
               <div className="relative">
                 <input
                   id="full_name"
@@ -187,12 +189,11 @@ const ShippingDetailsPage = () => {
                 />
                 <label
                   htmlFor="full_name"
-                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
-      ${
-        watch("full_name")
-          ? "-top-2 text-xs text-black"
-          : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
-      }`}
+                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none ${
+                    watch("full_name")
+                      ? "-top-2 text-xs text-black"
+                      : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+                  }`}
                 >
                   Full Name
                 </label>
@@ -202,7 +203,6 @@ const ShippingDetailsPage = () => {
                   </p>
                 )}
               </div>
-
               <div className="relative">
                 <input
                   id="email"
@@ -221,12 +221,11 @@ const ShippingDetailsPage = () => {
                 />
                 <label
                   htmlFor="email"
-                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
-      ${
-        watch("email")
-          ? "-top-2 text-xs text-black"
-          : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
-      }`}
+                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none ${
+                    watch("email")
+                      ? "-top-2 text-xs text-black"
+                      : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+                  }`}
                 >
                   Email
                 </label>
@@ -236,7 +235,6 @@ const ShippingDetailsPage = () => {
                   </p>
                 )}
               </div>
-
               <div className="relative">
                 <input
                   id="mobile"
@@ -255,12 +253,11 @@ const ShippingDetailsPage = () => {
                 />
                 <label
                   htmlFor="mobile"
-                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
-      ${
-        watch("mobile")
-          ? "-top-2 text-xs text-black"
-          : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
-      }`}
+                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none ${
+                    watch("mobile")
+                      ? "-top-2 text-xs text-black"
+                      : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+                  }`}
                 >
                   Mobile Number
                 </label>
@@ -270,27 +267,23 @@ const ShippingDetailsPage = () => {
                   </p>
                 )}
               </div>
-
               <div className="relative">
                 <input
                   id="address"
                   type="text"
                   placeholder="Address"
-                  {...register("address", {
-                    required: "Address is required",
-                  })}
+                  {...register("address", { required: "Address is required" })}
                   className={`peer w-full px-4 py-3 rounded-lg bg-white border ${
                     errors.address ? "border-red-500" : "border-gray-300"
                   } focus:outline-none focus:bg-white placeholder-transparent`}
                 />
                 <label
                   htmlFor="address"
-                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
-      ${
-        watch("address")
-          ? "-top-2 text-xs text-black"
-          : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
-      }`}
+                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none ${
+                    watch("address")
+                      ? "-top-2 text-xs text-black"
+                      : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+                  }`}
                 >
                   Address
                 </label>
@@ -300,9 +293,7 @@ const ShippingDetailsPage = () => {
                   </p>
                 )}
               </div>
-
               <div className="grid grid-cols-2 gap-4">
-                {/* City */}
                 <div className="relative">
                   <input
                     id="city"
@@ -315,12 +306,11 @@ const ShippingDetailsPage = () => {
                   />
                   <label
                     htmlFor="city"
-                    className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
-        ${
-          watch("city")
-            ? "-top-2 text-xs text-black"
-            : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
-        }`}
+                    className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none ${
+                      watch("city")
+                        ? "-top-2 text-xs text-black"
+                        : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+                    }`}
                   >
                     City
                   </label>
@@ -330,8 +320,6 @@ const ShippingDetailsPage = () => {
                     </p>
                   )}
                 </div>
-
-                {/* State */}
                 <div className="relative">
                   <input
                     id="state"
@@ -344,12 +332,11 @@ const ShippingDetailsPage = () => {
                   />
                   <label
                     htmlFor="state"
-                    className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
-        ${
-          watch("state")
-            ? "-top-2 text-xs text-black"
-            : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
-        }`}
+                    className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none ${
+                      watch("state")
+                        ? "-top-2 text-xs text-black"
+                        : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+                    }`}
                   >
                     State
                   </label>
@@ -360,7 +347,6 @@ const ShippingDetailsPage = () => {
                   )}
                 </div>
               </div>
-
               <div className="relative">
                 <input
                   id="country"
@@ -373,12 +359,11 @@ const ShippingDetailsPage = () => {
                 />
                 <label
                   htmlFor="country"
-                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
-      ${
-        watch("country")
-          ? "-top-2 text-xs text-black"
-          : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
-      }`}
+                  className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none ${
+                    watch("country")
+                      ? "-top-2 text-xs text-black"
+                      : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
+                  }`}
                 >
                   Country
                 </label>

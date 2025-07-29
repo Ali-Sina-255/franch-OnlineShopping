@@ -19,12 +19,9 @@ const SORT_OPTIONS = {
 
 const ProductListPage = forwardRef(
   ({ searchQuery, onQuickView, wishlist, onToggleWishlist }, ref) => {
-    // ========================================================================
-    // THE FIX: Initialize useLocation hook at the top level of the component.
-    // ========================================================================
+ 
     const location = useLocation();
 
-    // State management
     const [productsToShow, setProductsToShow] = useState([]);
     const [activeFilters, setActiveFilters] = useState({});
     const [sortOption, setSortOption] = useState("newest");
@@ -48,9 +45,7 @@ const ProductListPage = forwardRef(
     );
     const [priceRange, setPriceRange] = useState([minPrice, maxPrice]);
 
-    // ========================================================================
-    // THE FIX: This useEffect now correctly reads the category from the URL.
-    // ========================================================================
+  
     useEffect(() => {
       const params = new URLSearchParams(location.search);
       const categoryFromUrl = params.get("category");
@@ -58,7 +53,6 @@ const ProductListPage = forwardRef(
       setCurrentPage(1); // Reset to page 1 when category changes
     }, [location.search]);
 
-    // This useEffect fetches the data to populate the filter options
     useEffect(() => {
       const extractUniqueValues = (products, key) => {
         const valueSet = new Set();

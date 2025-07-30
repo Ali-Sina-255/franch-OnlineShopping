@@ -114,7 +114,7 @@ export const fetchRecentOrders = async () => {
 
 export const fetchAllProducts = async () => {
   let allProducts = [];
-  let currentPageUrl = "/api/v1/product/product/"; // Use full path
+  let currentPageUrl = "/api/v1/product/product/"; 
 
   try {
     while (currentPageUrl) {

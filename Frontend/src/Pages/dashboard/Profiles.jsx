@@ -7,7 +7,7 @@ import {
 } from "../../state/userSlice/userSlice";
 import { Loader2, Edit3, User, Mail, Phone, Home, Globe } from "lucide-react";
 
-// A modern, reusable Input component for the form
+
 const FormInput = ({
   control,
   name,

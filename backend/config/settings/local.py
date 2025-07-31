@@ -27,8 +27,13 @@ EMAIL_PORT = getenv("EMAIL_PORT")
 DEFAULT_FROM_EMAIL = getenv("DEFAULT_FROM_EMAIL", default="alisinasultani@gmail.com")
 MAX_UPLOAD_SIZE = 1 * 1024 * 1024
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
 
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 LOGGING = {
     "version": 1,

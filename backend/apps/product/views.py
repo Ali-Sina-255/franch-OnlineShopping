@@ -16,6 +16,7 @@ from .serializers import (
     DeliveryCouriersSerializer,
     ProductSerializer,
 )
+from .tasks import process_new_product
 
 
 class BrandAPIViewSet(generics.ListCreateAPIView):
@@ -39,6 +40,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         "condition",
         "description",
     ]
+
+    def perform_create(self, serializer):
+        product = serializer.save()
+        process_new_product.delay(product.id)
 
 
 class DeliveryCourierCreateView(generics.CreateAPIView):

@@ -59,23 +59,18 @@ const MegaMenu = ({ onClose }) => {
     }
 
     return categories.map((category) => (
-      // ========================================================================
-      // THE FIX: Use category.name.toLowerCase() instead of category.slug
-      // ========================================================================
       <Link
-        key={category.id || category.name} // Use a guaranteed unique key
+        key={category.id || category.name} 
         to={`/?category=${category.name.toLowerCase()}`}
         className="block text-gray-700 text-sm font-medium hover:text-indigo-600 hover:underline transition-colors"
         onClick={onClose}
       >
         {category.name}
       </Link>
-      // ========================================================================
-      // END OF FIX
-      // ========================================================================
+      
     ));
   };
-
+ 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -85,6 +80,7 @@ const MegaMenu = ({ onClose }) => {
       className="fixed left-0 top-[55px] w-full min-h-[200px] z-40 bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm  border-indigo-100 shadow-lg"
       onMouseLeave={onClose}
     >
+
       <div className="mx-auto max-w-7xl px-6 py-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-4">
         {renderContent()}
       </div>

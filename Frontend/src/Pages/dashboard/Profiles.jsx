@@ -11,6 +11,8 @@ import { Loader2, Edit3, User, Mail, Phone, Home, Globe } from "lucide-react";
 const FormInput = ({
   control,
   name,
+
+  
   label,
   errors,
   type = "text",

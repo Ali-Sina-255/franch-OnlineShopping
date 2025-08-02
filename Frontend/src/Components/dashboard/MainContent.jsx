@@ -8,6 +8,8 @@ import ProductManager from "./pages/ProductManager.jsx";
 import ProductList from "./pages/ProductList.jsx";
 import OrderManagement from "./pages/OrderManagement.jsx";
 
+
+
 const MainContent = ({ activeComponent, setActiveComponent }) => {
   const { profile } = useSelector((state) => state.user);
 

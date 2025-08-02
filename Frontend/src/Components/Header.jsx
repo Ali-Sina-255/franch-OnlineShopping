@@ -8,9 +8,7 @@ import { useSelector } from "react-redux";
 import MegaMenu from "./MegaMenu";
 import SearchBar from "./SearchBar";
 import MobileMenu from "./MobileMenu";
-
-// Add your logo import here (replace with your actual logo path)
-import logo from "../../public/44.png"; // Update this path to your logo file
+import logo from "../../public/44.png";
 
 const navbarItems = [
   { name: "Home", path: "/" },

@@ -1,36 +1,45 @@
-// import Customer from "./pages/ServiceManger";
-import CategoryManagement from './pages/categoryManager.jsx'
+import React from "react";
+import { useSelector } from "react-redux";
+import CategoryManagement from "./pages/categoryManager.jsx";
 import Dashboard from "./dashboard";
 import Profile from "../../Pages/dashboard/Profiles.jsx";
 import Attribute from "./pages/attribute.jsx";
 import ProductManager from "./pages/ProductManager.jsx";
-import ProductList from './pages/ProductList.jsx';
-import OrderManagement from "./pages/OrderManagement.jsx"; 
-
+import ProductList from "./pages/ProductList.jsx";
+import OrderManagement from "./pages/OrderManagement.jsx";
 
 const MainContent = ({ activeComponent, setActiveComponent }) => {
+  const { profile } = useSelector((state) => state.user);
+
+  const isAdmin = profile?.role === "admin";
+
   const renderContent = () => {
     switch (activeComponent) {
       case "dashboard":
-        return <Dashboard />;
+        // Only admins can see the main dashboard
+        return isAdmin ? <Dashboard /> : <OrderManagement userOnly={true} />;
       case "category":
-        return <CategoryManagement />;
+        return isAdmin ? <CategoryManagement /> : null;
       case "attribute":
-        return <Attribute />;
+        return isAdmin ? <Attribute /> : null;
       case "products":
-        return <ProductManager />;
+        return isAdmin ? <ProductManager /> : null;
       case "porductlist":
-        return <ProductList setActiveComponent={setActiveComponent} />;
-      case "orders": 
-        return <OrderManagement />;
-      case "proflie":
+        return isAdmin ? (
+          <ProductList setActiveComponent={setActiveComponent} />
+        ) : null;
+      case "orders":
+        // If the user is an admin, show all orders. Otherwise, show only their orders.
+        return <OrderManagement userOnly={!isAdmin} />;
+      case "profile":
         return <Profile />;
-
       default:
-        return <Dashboard />;
+        // Default for admin is dashboard, for user is their orders.
+        return isAdmin ? <Dashboard /> : <OrderManagement userOnly={true} />;
     }
   };
-  return <div className="min-h-[93.5vh] bg-gray-200">{renderContent()}</div>;
+
+  return <div className="min-h-full bg-gray-200">{renderContent()}</div>;
 };
 
 export default MainContent;

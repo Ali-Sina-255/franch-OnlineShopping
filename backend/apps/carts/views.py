@@ -199,23 +199,21 @@ class OrderDeleteAPIView(generics.DestroyAPIView):
     serializer_class = CartOrderSerializer
     permission_classes = [IsAuthenticated, IsAdminOrOwner]
 
-
 class OrderDetailAPIView(generics.GenericAPIView):
     serializer_class = CartOrderSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsAdminOrOwner]
     queryset = CartOrder.objects.all()
 
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
+        user = request.user
 
-            orders = CartOrder.objects.filter(user=request.user).order_by("-date")
+        if user.is_staff:
+            orders = CartOrder.objects.all().order_by("-date")  # Admin sees all
         else:
-            orders = CartOrder.objects.all()
+            orders = CartOrder.objects.filter(user=user).order_by("-date")  # Regular user sees only their own
 
         serializer = self.get_serializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 class CheckoutAPIView(generics.RetrieveAPIView):
     serializer_class = CartOrderSerializer
     lookup_field = "order_id"

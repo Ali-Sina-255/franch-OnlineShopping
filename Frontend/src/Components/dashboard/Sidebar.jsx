@@ -1,28 +1,19 @@
-import React, { useState } from "react";
-import {
-  FaBoxOpen,
-  FaHome,
-  FaServicestack,
-  FaSignOutAlt,
-  FaUser,
-} from "react-icons/fa";
+import React from "react";
+import { FaBoxOpen, FaSignOutAlt, FaUser, FaBuilding } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { signOutSuccess } from "../../state/userSlice/userSlice";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { FaBuilding } from "react-icons/fa6";
-import { MdDashboardCustomize } from "react-icons/md";
-import { MdLocalLaundryService } from "react-icons/md";
+import { MdDashboardCustomize, MdLocalLaundryService } from "react-icons/md";
 import { LucideUserRoundPlus } from "lucide-react";
 
-const Sidebar = ({ setActiveComponent }) => {
-  const [selectedC, setSelectedC] = useState("home");
-  const [activeC, setActiveC] = useState("home");
+const Sidebar = ({ setActiveComponent, activeComponent }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { currentUser } = useSelector((state) => state.user);
   const MySwal = withReactContent(Swal);
+  const { currentUser } = useSelector((state) => state.user);
+
   const handleSignOut = () => {
     MySwal.fire({
       title: "Are you sure?",
@@ -40,78 +31,69 @@ const Sidebar = ({ setActiveComponent }) => {
     });
   };
 
-  const AllComponents = [
+  // Define all possible menu items with an 'adminOnly' flag
+  const allMenuItems = [
     {
-      name: "Home",
-      value: "home",
+      name: "Dashboard",
+      value: "dashboard",
       icon: <MdDashboardCustomize className="text-green-500" />,
+      adminOnly: true,
     },
     {
-      name: "Category Management",
+      name: "Category",
       value: "category",
       icon: <LucideUserRoundPlus className="text-blue-500" />,
+      adminOnly: true,
     },
     {
-      name: "Attribute Management",
+      name: "Attribute",
       value: "attribute",
       icon: <FaBuilding className="text-blue-500" />,
+      adminOnly: true,
     },
     {
       name: "New Product",
       value: "products",
       icon: <MdLocalLaundryService className="text-blue-500" />,
+      adminOnly: true,
     },
     {
-      name: "Porducts",
+      name: "Product List",
       value: "porductlist",
-      icon: <FaBuilding className="text-blue-500" />,
+      icon: <FaBoxOpen className="text-purple-500" />,
+      adminOnly: true,
     },
     {
-      name: "Order Management",
+      name: "Orders",
       value: "orders",
       icon: <FaBoxOpen className="text-purple-500" />,
-    },
+      adminOnly: false,
+    }, // Will be used for both roles
     {
       name: "Profile",
-      value: "proflie",
+      value: "profile",
       icon: <FaUser className="text-blue-500" />,
+      adminOnly: false,
     },
     {
       name: "Logout",
       value: "signout",
       icon: <FaSignOutAlt className="text-rose-500" />,
+      adminOnly: false,
     },
   ];
 
-  let accessibleComponents = [];
-
-  if (currentUser?.isAdmin === true || currentUser?.role?.[0] === 1) {
-    accessibleComponents = AllComponents;
-  } else if (currentUser?.role?.[0] === 2) {
-    const allowedForRole2 = [
-      "home",
-      "ServiceManager",
-      "RentManger",
-      "Salaries",
-      "Expenses",
-      "Blockes",
-      "financial",
-      "signout",
-    ];
-
-    accessibleComponents = AllComponents.filter((item) =>
-      allowedForRole2.includes(item.value)
-    );
-  } else {
-    accessibleComponents = AllComponents.filter(
-      (item) => item.value === "signout"
-    );
-  }
+  // Filter the list based on the user's role
+  const accessibleComponents = allMenuItems.filter((item) => {
+    // If user is not an admin, hide admin-only items
+    if (currentUser?.role !== "admin" && item.adminOnly) {
+      return false;
+    }
+    return true;
+  });
 
   return (
-    <div
-      className={`h-full transition-all duration-300 ease-in-out w-[70px] md:w-[80px] lg:w-64 bg-white`}
-    >
+    <div className="h-full transition-all duration-300 ease-in-out w-[70px] md:w-[80px] lg:w-64 bg-white">
       <header className="flex items-center justify-center lg:justify-start gap-5 p-5 font-bold text-xl">
         <Link
           to="/"
@@ -127,55 +109,34 @@ const Sidebar = ({ setActiveComponent }) => {
         </Link>
       </header>
       <ul className="mx-2">
-        {AllComponents.map((component, index) => (
+        {accessibleComponents.map((component, index) => (
           <li key={index} className="relative group cursor-pointer">
-            {component.value === "signout" ? (
-              <a
-                onClick={handleSignOut}
-                onMouseEnter={() => setActiveC(component.value)}
-                onMouseLeave={() => setActiveC(selectedC)}
-                className={`relative flex items-center w-full gap-x-3  justify-center lg:justify-start px-4 rounded-md py-3 transition-all duration-300
-              ${
-                activeC === component.value
-                  ? "bg-gray-200 text-primary"
-                  : "hover:bg-gray-200 hover:bg-opacity-20 text-black"
-              }`}
-              >
-                <span className="text-xl md:text-2xl lg:text-xl">
-                  {component.icon}
-                </span>
-                <span className="text-base font-semibold whitespace-nowrap hidden lg:inline">
-                  {component.name}
-                </span>
-              </a>
-            ) : (
-              <a
-                onClick={() => {
+            <a
+              onClick={() => {
+                if (component.value === "signout") {
+                  handleSignOut();
+                } else {
                   setActiveComponent(component.value);
-                  setSelectedC(component.value);
-                  setActiveC(component.value);
-                }}
-                onMouseEnter={() => setActiveC(component.value)}
-                onMouseLeave={() => setActiveC(selectedC)}
-                className={`relative flex items-center justify-center lg:justify-start gap-x-3 w-full px-4 rounded-md py-3 transition-all duration-300
+                }
+              }}
+              className={`relative flex items-center justify-center lg:justify-start gap-x-3 w-full px-4 rounded-md py-3 transition-all duration-300
               ${
-                activeC === component.value
-                  ? "bg-gray-200 text-primary "
-                  : "hover:bg-gray-200 hover:bg-opacity-20 text-black"
+                activeComponent === component.value
+                  ? "bg-gray-200 text-primary"
+                  : "hover:bg-gray-200 text-black"
               }`}
-              >
-                <span className="text-xl md:text-2xl lg:text-xl">
-                  {component.icon}
-                </span>
-                <span className="text-base font-semibold whitespace-nowrap hidden lg:inline">
-                  {component.name}
-                </span>
-              </a>
-            )}
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-4 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg z-50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-              {component.name}
-              <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-r-4 border-r-gray-800"></div>
-            </div>
+            >
+              <span className="text-xl md:text-2xl lg:text-xl">
+                {component.icon}
+              </span>
+              <span className="text-base font-semibold whitespace-nowrap hidden lg:inline">
+                {/* For regular users, change "Orders" to "My Orders" */}
+                {component.value === "orders" && currentUser?.role !== "admin"
+                  ? "My Orders"
+                  : component.name}
+              </span>
+            </a>
+            {/* ... (Your tooltip JSX) ... */}
           </li>
         ))}
       </ul>

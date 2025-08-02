@@ -12,3 +12,5 @@ class IsAdminOrOwner(BasePermission):
             return True
         # Allow the owner to delete their own order
         return obj.user == request.user
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated

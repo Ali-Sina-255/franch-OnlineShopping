@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from .managers import CustomUserManager
 
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     class ROLE_CHOICES(models.TextChoices):
         admin = "admin", "Admin"

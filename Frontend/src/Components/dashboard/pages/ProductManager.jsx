@@ -6,10 +6,12 @@ import AttributeInput from "./AttributeInput";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+// The component now accepts props to receive the product data and a callback function.
 export default function ProductManager({ productToEdit, onFormSubmit }) {
   const token = useSelector((state) => state.user.accessToken);
   const [categories, setCategories] = useState([]);
 
+  // Define the initial blank state for the form for easy resetting.
   const initialFormState = {
     product_name: "",
     description: "",
@@ -32,13 +34,19 @@ export default function ProductManager({ productToEdit, onFormSubmit }) {
 
   const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
+
+  // --- This useEffect is the core of the solution ---
+  // It runs whenever the 'productToEdit' prop changes.
   useEffect(() => {
     if (productToEdit && productToEdit.id) {
+      // If we receive a product, we are in "Edit Mode".
       setEditingId(productToEdit.id);
 
+      // Populate the form with the product's data.
       setFormData({
         product_name: productToEdit.product_name || "",
         description: productToEdit.description || "",
+        // Convert array from API back to a comma-separated string for the input.
         details: Array.isArray(productToEdit.details)
           ? productToEdit.details.join(", ")
           : "",
@@ -64,11 +72,13 @@ export default function ProductManager({ productToEdit, onFormSubmit }) {
         multi_images: [],
       });
     } else {
+      // If 'productToEdit' is null, we are in "Add Mode".
       setEditingId(null);
-      setFormData(initialFormState); 
+      setFormData(initialFormState); // Reset the form to its initial blank state.
     }
-  }, [productToEdit]); 
+  }, [productToEdit]); // The hook depends on this prop.
 
+  // Fetch categories (no change here)
   useEffect(() => {
     if (token) {
       fetchCategories();
@@ -117,6 +127,7 @@ export default function ProductManager({ productToEdit, onFormSubmit }) {
       if (key === "multi_images" && Array.isArray(value)) {
         value.forEach((file) => data.append("uploaded_images", file));
       } else if (key === "details") {
+        // Correctly format list for DRF ListField by appending multiple times.
         const detailList = value
           .split(",")
           .map((item) => item.trim())
@@ -130,6 +141,7 @@ export default function ProductManager({ productToEdit, onFormSubmit }) {
     const url = editingId
       ? `${BASE_URL}/api/v1/product/product/${editingId}/`
       : `${BASE_URL}/api/v1/product/product/`;
+    // Use 'PUT' for update as it replaces the entire resource, which matches this form's behavior.
     const method = editingId ? "put" : "post";
 
     try {
@@ -145,6 +157,7 @@ export default function ProductManager({ productToEdit, onFormSubmit }) {
         "success"
       );
 
+      // After success, call the callback function to notify the parent component.
       if (onFormSubmit) {
         onFormSubmit();
       }
@@ -152,6 +165,7 @@ export default function ProductManager({ productToEdit, onFormSubmit }) {
       const errorData = error.response?.data;
       let errorMessage = "Submission failed. Please check the form fields.";
       if (errorData) {
+        // Create a more detailed error message from the backend response
         errorMessage +=
           "<br/><br/><pre style='text-align:left;'>" +
           JSON.stringify(errorData, null, 2) +
@@ -310,6 +324,7 @@ export default function ProductManager({ productToEdit, onFormSubmit }) {
               required
             />
           </div>
+
           <div className="col-span-2 mt-4">
             <label className="block mb-1 font-medium">
               Details (comma-separated list)
@@ -323,8 +338,9 @@ export default function ProductManager({ productToEdit, onFormSubmit }) {
               placeholder="e.g. 100% Cotton, Machine Washable"
             />
           </div>
+
           <div className="col-span-2 mt-4">
-            <label className="block mb-1 font-medium"> Seller Notes </label>
+            <label className="block mb-1 font-medium">Seller Notes</label>
             <textarea
               name="seller_notes"
               value={formData.seller_notes}
@@ -340,6 +356,7 @@ export default function ProductManager({ productToEdit, onFormSubmit }) {
             onAttributeChange={handleAttributeChange}
             initialAttributes={productToEdit?.attributes}
           />
+
           <div className="col-span-2 mt-6 p-4 border rounded-md space-y-4">
             <h3 className="font-medium text-lg">Product Images</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

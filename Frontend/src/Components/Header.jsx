@@ -8,6 +8,10 @@ import { useSelector } from "react-redux";
 import MegaMenu from "./MegaMenu";
 import SearchBar from "./SearchBar";
 import MobileMenu from "./MobileMenu";
+
+// Add your logo import here (replace with your actual logo path)
+import logo from "../../public/44.png"; // Update this path to your logo file
+
 const navbarItems = [
   { name: "Home", path: "/" },
   { name: "Category", path: "/category" },
@@ -70,7 +74,6 @@ const Header = ({
             : "bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm border-indigo-100"
         }`}
       >
-        
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center lg:hidden">
@@ -83,11 +86,13 @@ const Header = ({
             </div>
 
             <div className="flex items-center">
-              <Link
-                to="/"
-                className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent"
-              >
-                Chiq Frip
+              <Link to="/" className="flex items-center">
+                {/* Replaced text with logo */}
+                <img
+                  src={logo}
+                  alt="Website Logo"
+                  className="h-16  w-auto" // Adjust height as needed
+                />
               </Link>
             </div>
 

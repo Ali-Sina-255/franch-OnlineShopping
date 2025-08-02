@@ -1,8 +1,7 @@
-// src/components/Footer.jsx
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Twitter } from "lucide-react";
+import logo from "../../public/44.png"; // Make sure this path matches your logo import
 
 const Footer = () => {
   return (
@@ -13,7 +12,14 @@ const Footer = () => {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
-            <h1 className="text-3xl font-bold tracking-tighter">CoolThrift</h1>
+            {/* Replaced text with logo */}
+            <Link to="/" className="flex items-center">
+              <img
+                src={logo}
+                alt="Website Logo"
+                className="h-28 w-auto" // Adjust height to match your header logo
+              />
+            </Link>
             <p className="text-base text-gray-400">
               Sustainable fashion, one piece at a time. Discover unique
               pre-loved items and give them a second life.

@@ -85,9 +85,6 @@ export const updateUserProfile = createAsyncThunk(
     }
   }
 );
-
-// --- AUTH THUNKS ---
-
 export const createUser = createAsyncThunk(
   "user/createUser",
   async (userData, { rejectWithValue }) => {
@@ -141,7 +138,6 @@ export const signIn = createAsyncThunk(
 );
 
 // --- CART THUNKS ---
-
 export const fetchUserCart = createAsyncThunk(
   "user/fetchUserCart",
   async (_, { rejectWithValue }) => {
@@ -342,3 +338,5 @@ export default userSlice.reducer;
 export const injectStore = (_store) => {
   store = _store;
 };
+
+

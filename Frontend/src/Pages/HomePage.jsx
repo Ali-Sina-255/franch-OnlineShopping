@@ -10,9 +10,7 @@ const HomePage = (props) => {
 
   const productListRef = useRef(null);
 
-
   useEffect(() => {
-  
     if (props.searchQuery && productListRef.current) {
       const headerOffset = 80; // Adjust this value to match your sticky header's height
       const elementPosition =
@@ -72,7 +70,6 @@ const HomePage = (props) => {
 
   return (
     <div className="relative">
-     
       <div className="relative h-screen max-h-[600px] w-full overflow-hidden">
         <AnimatePresence initial={false}>
           <motion.div
@@ -119,7 +116,7 @@ const HomePage = (props) => {
             >
               <a
                 href="#product-grid"
-                className="inline-flex items-center px-8 py-4 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 transition-all duration-300 group"
+                className="inline-flex items-center px-8 py-4 bg-[#3caca8] text-gray-900 font-medium rounded-full hover:bg-gray-100 transition-all duration-300 group"
               >
                 Shop New Arrivals
                 <svg

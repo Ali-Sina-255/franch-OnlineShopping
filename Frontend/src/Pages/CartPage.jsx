@@ -143,7 +143,7 @@ const OrderSummary = ({ subtotal, shippingFee, total, onCheckout }) => (
       <button
         type="button"
         onClick={onCheckout}
-        className="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+        className="rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-white hover:border hover:border-primary hover:text-primary focus:outline-none  transition-colors duration-500 w-full"
       >
         Proceed to Checkout
       </button>

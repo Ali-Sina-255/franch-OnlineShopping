@@ -65,25 +65,25 @@ const ShippingDetailsPage = () => {
       question: "What are the Home Location delivery costs?",
       answer:
         "Delivery costs to your home are based on the total weight of your order: up to 500g is €4.50, up to 1kg is €5.50, and up to 2kg is €6.90.",
-      icon: <Home className="h-5 w-5 mr-2 text-indigo-500" />,
+      icon: <Home className="h-5 w-5 mr-2 text-primary" />,
     },
     {
       question: "What are the Close Station delivery costs?",
       answer:
         "Picking up from a close station is a flexible option. Costs are: up to 500g is €7.00, up to 1kg is €8.50, and up to 2kg is €9.90.",
-      icon: <Box className="h-5 w-5 mr-2 text-indigo-500" />,
+      icon: <Box className="h-5 w-5 mr-2 text-primary" />,
     },
     {
       question: "How is the total weight calculated?",
       answer:
         "The total weight is the sum of the weights of all individual products in your cart. You can see each product's weight on its detail page.",
-      icon: <HelpCircle className="h-5 w-5 mr-2 text-indigo-500" />,
+      icon: <HelpCircle className="h-5 w-5 mr-2 text-primary" />,
     },
     {
       question: "Can I change my delivery choice later?",
       answer:
         "Yes, you can select your preferred delivery method (Home or Station) and see the final cost on the next page before completing your payment.",
-      icon: <HelpCircle className="h-5 w-5 mr-2 text-indigo-500" />,
+      icon: <HelpCircle className="h-5 w-5 mr-2 text-primary" />,
     },
   ];
 
@@ -377,10 +377,10 @@ const ShippingDetailsPage = () => {
               <button
                 type="submit"
                 disabled={orderLoading || !isValid}
-                className={`w-full mt-6 py-3 px-4 rounded-lg font-medium text-white transition-all ${
+                className={`primary-btn ${
                   orderLoading || !isValid
-                    ? "bg-indigo-400 cursor-not-allowed"
-                    : "bg-indigo-600 hover:bg-indigo-700"
+                    ? ""
+                    : ""
                 }`}
               >
                 {orderLoading ? (

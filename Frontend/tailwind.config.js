@@ -7,15 +7,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#050816",
+        primary: "#3caca8",
         secondary: "#aaa6c3",
-        tertiary: "#151030",
-        "black-100": "#100d25",
-        "black-200": "#090325",
-        "white-100": "#f3f3f3",
-        // green: "#00513a",
-        // orange: "#FFDB00",
-        "update": "#ED8D1D",
+        update: "#ED8D1D",
       },
       fontFamily: {
         vazirmatn: ["Vazirmatn", "Arial", "sans-serif"],

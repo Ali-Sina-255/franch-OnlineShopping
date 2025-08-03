@@ -3,24 +3,24 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 
 const faqItems = [
   {
-    question: "How long does shipping take?",
+    question: "Combien de temps prend la livraison ?",
     answer:
-      "Standard shipping takes 3-5 business days. Express options are available at checkout.",
+      "La livraison standard prend de 3 à 5 jours ouvrables. Des options express sont disponibles lors du paiement.",
   },
   {
-    question: "What is your return policy?",
+    question: "Quelle est votre politique de retour ?",
     answer:
-      "We offer 30-day returns for unused items with original tags. Final sale items are non-returnable.",
+      "Nous offrons un retour sous 30 jours pour les articles non utilisés avec les étiquettes d'origine. Les articles en vente finale ne peuvent pas être retournés.",
   },
   {
-    question: "How do I track my order?",
+    question: "Comment suivre ma commande ?",
     answer:
-      "You'll receive a tracking number via email once your order ships. You can also check in your account dashboard.",
+      "Vous recevrez un numéro de suivi par e-mail une fois votre commande expédiée. Vous pouvez également vérifier dans le tableau de bord de votre compte.",
   },
   {
-    question: "Do you offer international shipping?",
+    question: "Proposez-vous la livraison internationale ?",
     answer:
-      "Yes! We ship to over 50 countries worldwide. Shipping costs vary by destination.",
+      "Oui ! Nous livrons dans plus de 50 pays dans le monde. Les frais de livraison varient selon la destination.",
   },
 ];
 
@@ -47,7 +47,7 @@ const FAQSection = () => {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold text-indigo-900 mb-4">
-        Frequently Asked Questions
+        Questions fréquemment posées
       </h2>
       {faqItems.map((item, index) => (
         <div key={index} className="border-b border-gray-200 pb-4">

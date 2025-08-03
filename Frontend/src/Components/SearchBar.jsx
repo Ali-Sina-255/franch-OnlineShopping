@@ -99,7 +99,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
       >
         <FiSearch size={24} className="text-gray-500" />
         <span className="hidden md:block bg-transparent outline-none w-32 text-gray-500 text-sm truncate">
-          {searchQuery || "Search..."}
+          {searchQuery || "Rechercher..."}
         </span>
       </div>
 
@@ -131,7 +131,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
                     onClick={handleCancelClick}
                     className="md:hidden py-2 text-gray-800 font-semibold hover:text-gray-500 text-lg transition"
                   >
-                    Cancel
+                    Annuler
                   </button>
                 </div>
                 <form
@@ -147,7 +147,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Search for products, brands, and tags..."
+                    placeholder="Rechercher des produits, des marques et des tags..."
                     className="flex bg-transparent w-[800px] outline-none text-gray-800"
                     autoFocus
                   />
@@ -166,13 +166,13 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
                   onClick={handleCancelClick}
                   className="hidden md:block py-2 text-gray-800 font-semibold hover:text-gray-500 text-lg transition"
                 >
-                  Cancel
+                  Annuler
                 </button>
               </div>
               {/* This is your original suggestions layout - unchanged */}
               <div className="md:w-[850px] mx-auto mt-6">
                 <h4 className="text-gray-500 text-md font-semibold p-4">
-                  Popular Search Terms
+                  Termes de recherche populaires
                 </h4>
                 <ul className="flex items-center flex-wrap gap-4 mb-4 px-4">
                   {constantItems.map((item, index) => (
@@ -189,7 +189,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
                 {recentSearches.length > 0 && (
                   <>
                     <h4 className="text-gray-500 text-md font-semibold p-4">
-                      Recent Searches
+                      Recherches récentes
                     </h4>
                     <ul className="flex items-center flex-wrap gap-4 mb-4 px-4">
                       {recentSearches.map((item, index) => (

@@ -91,15 +91,15 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
   if (!product) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-gray-900">Product Not Found</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Produit non trouvé</h2>
         <p className="text-gray-600 mt-2">
-          The item you are looking for may have been sold or removed.
+          L’article que vous recherchez a peut-être été vendu ou retiré.
         </p>
         <Link
           to="/"
           className="mt-6 inline-block bg-gray-900 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition-colors font-semibold"
         >
-          Back to Shop
+          Retour à la boutique
         </Link>
       </div>
     );
@@ -168,7 +168,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
               <div className="flex items-center">
                 <ShieldCheck className="h-6 w-6 text-green-600 mr-2" />
                 <p className="font-medium text-gray-800">
-                  Condition: {product.condition}
+                  État: {product.condition}
                 </p>
               </div>
               {product.sellerNotes && (
@@ -177,7 +177,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
                     <AlertTriangle className="h-5 w-5 text-yellow-400 flex-shrink-0" />
                     <div className="ml-3">
                       <h3 className="text-sm font-medium text-yellow-800">
-                        Seller's Note
+                        Note du vendeur
                       </h3>
                       <p className="mt-2 text-sm text-yellow-700">
                         {product.sellerNotes}
@@ -195,7 +195,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
                 </p>
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900">Details</h3>
+                <h3 className="text-lg font-medium text-gray-900">Détails</h3>
                 <ul className="list-disc space-y-2 pl-4 mt-4 text-gray-600">
                   {(product.details || []).map((detail) => (
                     <li key={detail}>{detail}</li>
@@ -204,15 +204,15 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
               </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <div>
-                  <span className="font-medium text-gray-900">Color:</span>{" "}
+                  <span className="font-medium text-gray-900">Couleur:</span>{" "}
                   {product.color}
                 </div>
                 <div>
-                  <span className="font-medium text-gray-900">Material:</span>{" "}
+                  <span className="font-medium text-gray-900">Matière:</span>{" "}
                   {product.material}
                 </div>
                 <div>
-                  <span className="font-medium text-gray-900">Size:</span>{" "}
+                  <span className="font-medium text-gray-900">Taille:</span>{" "}
                   {product.size}
                 </div>
               </div>
@@ -226,7 +226,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
                 {cartLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  "Add to bag"
+                  "Ajouter au sac"
                 )}
               </button>
               <button

@@ -11,16 +11,16 @@ import {
 const EmptyCart = () => (
   <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8 text-center">
     <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-      Your Bag is Empty
+      Votre sac est vide
     </h1>
     <p className="mt-4 text-lg text-gray-500">
-      Looks like you haven't added anything to your bag yet.
+      On dirait que vous n’avez encore rien ajouté à votre sac.
     </p>
     <Link
       to="/"
       className="mt-8 inline-block rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
     >
-      Continue Shopping
+      Continuer vos achats
     </Link>
   </div>
 );
@@ -28,7 +28,7 @@ const EmptyCart = () => (
 const LoadingCart = () => (
   <div className="text-center py-20 flex flex-col items-center justify-center">
     <Loader2 className="h-12 w-12 animate-spin text-gray-500" />
-    <h1 className="text-2xl font-bold mt-4">Loading Your Bag...</h1>
+    <h1 className="text-2xl font-bold mt-4">Chargement de votre sac...</h1>
   </div>
 );
 
@@ -68,7 +68,7 @@ const CartItem = ({
             </p>
 
             <div className="mt-2 flex items-center">
-              <p className="text-sm text-gray-500 mr-4">Qty:</p>
+              <p className="text-sm text-gray-500 mr-4">Qté:</p>
               <div className="flex items-center border rounded">
                 <button
                   onClick={() => handleQuantityChange(product.id, -1)}
@@ -106,7 +106,7 @@ const CartItem = ({
             className="flex items-center font-medium text-red-600 hover:text-red-500 disabled:opacity-50 transition-colors"
           >
             <Trash2 className="h-4 w-4 mr-1.5" />
-            <span>Remove</span>
+            <span> Supprimer</span>
           </button>
         </div>
       </div>
@@ -116,24 +116,27 @@ const CartItem = ({
 
 const OrderSummary = ({ subtotal, shippingFee, total, onCheckout }) => (
   <section className="mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8">
-    <h2 className="text-lg font-medium text-gray-900">Order Summary</h2>
+    <h2 className="text-lg font-medium text-gray-900">Résumé de la commande</h2>
     <dl className="mt-6 space-y-4">
       <div className="flex items-center justify-between">
-        <dt className="text-sm text-gray-600">Subtotal</dt>
+        <dt className="text-sm text-gray-600"> Sous-total</dt>
         <dd className="text-sm font-medium text-gray-900">
           €{subtotal.toFixed(2)}
         </dd>
       </div>
       <div className="flex items-center justify-between border-t border-gray-200 pt-4">
         <dt className="flex items-center text-sm text-gray-600">
-          <span>Shipping estimate</span>
+          <span>Frais de livraison estimés</span>
         </dt>
         <dd className="text-sm font-medium text-gray-900">
           €{shippingFee.toFixed(2)}
         </dd>
       </div>
       <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-        <dt className="text-base font-medium text-gray-900">Order total</dt>
+        <dt className="text-base font-medium text-gray-900">
+          {" "}
+          Total de la commandel
+        </dt>
         <dd className="text-base font-medium text-gray-900">
           €{total.toFixed(2)}
         </dd>
@@ -145,7 +148,7 @@ const OrderSummary = ({ subtotal, shippingFee, total, onCheckout }) => (
         onClick={onCheckout}
         className="rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-white hover:border hover:border-primary hover:text-primary focus:outline-none  transition-colors duration-500 w-full"
       >
-        Proceed to Checkout
+        Passer à la caisse
       </button>
     </div>
   </section>
@@ -188,12 +191,12 @@ const CartPage = () => {
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 pt-16 pb-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          Shopping Bag
+          Sac de courses
         </h1>
         <div className="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
           <section aria-labelledby="cart-heading" className="lg:col-span-7">
             <h2 id="cart-heading" className="sr-only">
-              Items in your shopping cart
+              Articles dans votre panier
             </h2>
             <ul
               role="list"

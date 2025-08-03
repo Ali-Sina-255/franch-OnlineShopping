@@ -10,7 +10,7 @@ const PriceSlider = ({ min, max, values, onChange }) => {
     
   return (
     <div className="py-6">
-      <h3 className="font-medium text-gray-900 mb-4">Price</h3>
+      <h3 className="font-medium text-gray-900 mb-4">Prix</h3>
       <Slider
         range
         min={min}

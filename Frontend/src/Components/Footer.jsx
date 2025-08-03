@@ -18,8 +18,8 @@ const Footer = () => {
               />
             </Link>
             <p className="text-base text-black">
-              Sustainable fashion, one piece at a time. Discover unique
-              pre-loved items and give them a second life.
+              La mode durable, un article à la fois. Découvrez des pièces
+              uniques d'occasion et offrez-leur une seconde vie.
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-black hover:text-white">
@@ -43,7 +43,7 @@ const Footer = () => {
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
                 <h3 className="text-sm font-semibold text-black tracking-wider uppercase">
-                  Shop
+                  Boutique
                 </h3>
                 <ul role="list" className="mt-4 space-y-4">
                   <li>
@@ -51,7 +51,7 @@ const Footer = () => {
                       to="/"
                       className="text-base text-black hover:text-black/50"
                     >
-                      All Products
+                      Tous les produits
                     </Link>
                   </li>
                   <li>
@@ -59,7 +59,7 @@ const Footer = () => {
                       href="#"
                       className="text-base text-black hover:text-black/50"
                     >
-                      New Arrivals
+                      Nouveautés
                     </a>
                   </li>
                   <li>
@@ -67,7 +67,7 @@ const Footer = () => {
                       href="#"
                       className="text-base text-black hover:text-black/50"
                     >
-                      Women
+                      Femmes
                     </a>
                   </li>
                   <li>
@@ -75,7 +75,7 @@ const Footer = () => {
                       href="#"
                       className="text-base text-black hover:text-black/50"
                     >
-                      Men
+                      Hommes
                     </a>
                   </li>
                 </ul>
@@ -106,7 +106,7 @@ const Footer = () => {
                       href="#"
                       className="text-base text-black hover:text-black/50"
                     >
-                      Shipping & Returns
+                      Livraison et Retours
                     </a>
                   </li>
                 </ul>
@@ -115,15 +115,15 @@ const Footer = () => {
             <div className="md:grid md:grid-cols-1 md:gap-8">
               <div>
                 <h3 className="text-sm text-black font-semibold tracking-wider uppercase">
-                  Join our newsletter
+                  Abonnez-vous à notre newsletter
                 </h3>
                 <p className="mt-4 text-base text-black">
-                  Get the latest arrivals and special offers directly to your
-                  inbox.
+                  Recevez les dernières nouveautés et offres spéciales
+                  directement dans votre boîte de réception.
                 </p>
                 <form className="mt-4 sm:flex sm:max-w-md">
                   <label htmlFor="email-address" className="sr-only">
-                    Email address
+                    Adresse e-mail
                   </label>
                   <input
                     type="email"
@@ -133,14 +133,14 @@ const Footer = () => {
                     required
                     className="w-full min-w-0 appearance-none rounded-md border-0 bg-white px-3 py-2 text-white foc 
                     outline-none  sm:text-sm"
-                    placeholder="Enter your email"
+                    placeholder="Entrez votre e-mail"
                   />
                   <div className="mt-3 sm:mt-0 sm:ml-4 sm:flex-shrink-0">
                     <button
                       type="submit"
                       className="flex w-full items-center justify-center rounded-md bg-white text-black px-3 py-2 text-sm font-semibold  shadow-sm   focus-visible:outline-2 focus-visible:outline-offset-2 "
                     >
-                      Subscribe
+                      S’abonner
                     </button>
                   </div>
                 </form>
@@ -150,7 +150,7 @@ const Footer = () => {
         </div>
         <div className="mt-12 border-t border-gray-700 pt-8">
           <p className="text-base text-black text-center">
-            © {new Date().getFullYear()} ChiqFrip, Inc. All rights reserved.
+            © {new Date().getFullYear()} ChiqFrip, Inc. Tous droits réservés.
           </p>
         </div>
       </div>

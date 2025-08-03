@@ -45,7 +45,7 @@ const About = () => {
             variants={textVariants}
             className="text-4xl md:text-5xl font-bold mb-6"
           >
-            About ChigFrip
+            À propos de ChiqFrip
           </motion.h1>
 
           <motion.p
@@ -56,8 +56,8 @@ const About = () => {
             transition={{ delay: 0.2 }} // Slight delay for staggered effect
             className="text-xl md:text-2xl max-w-3xl mx-auto"
           >
-            Your trusted destination for premium secondhand fashion at
-            unbeatable prices
+            Votre destination de confiance pour la mode d'occasion premium à des
+            prix imbattables.
           </motion.p>
         </div>
       </section>
@@ -71,26 +71,27 @@ const About = () => {
               <div className="flex items-center gap-x-3 mb-5">
                 <IoReaderOutline className="text-3xl text-indigo-900" />
                 <h2 className="text-3xl font-bold text-indigo-900">
-                  Our Story
+                  Notre Histoire
                 </h2>
               </div>
 
               <p className="text-gray-700 mb-4 text-lg text-justify">
-                Founded in 2023, ChigFrip began as a small passion project to
-                make sustainable fashion accessible to everyone. What started as
-                a local initiative has now grown into a thriving online
-                community of fashion enthusiasts.
+                Fondée en 2023, ChigFrip a débuté comme un petit projet passion
+                visant à rendre la mode durable accessible à tous. Ce qui était
+                à l'origine une initiative locale est désormais une communauté
+                en ligne florissante d'amateurs de mode engagés.
               </p>
 
               <p className="text-gray-700 mb-4 text-lg text-justify">
-                We believe in the circular economy - giving pre-loved items a
-                second life while helping our customers discover unique pieces
-                at a fraction of retail prices.
+                Nous croyons en l'économie circulaire - donner une seconde vie à
+                des pièces pré-aimées tout en permettant à nos clients de
+                découvrir des articles uniques à une fraction de leur prix
+                d'origine.
               </p>
 
               <p className="text-gray-700 mb-8 text-lg text-justify">
-                Every item in our collection is carefully curated and
-                authenticated by our team of fashion experts.
+                Chaque article de notre collection est soigneusement sélectionné
+                et authentifié par notre équipe d'experts en mode.
               </p>
 
               {/* Contact Information */}
@@ -129,29 +130,29 @@ const About = () => {
         {/* Our Values */}
         <section className="mb-20">
           <h2 className="text-3xl font-bold text-indigo-900 mb-12 text-center">
-            Our Values
+            Nos Valeurs
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
                 icon: <ShieldCheck size={40} className="text-indigo-600" />,
-                title: "Authenticity",
-                desc: "Every item is thoroughly verified for authenticity before listing.",
+                title: "Authenticité",
+                desc: "Chaque article est rigoureusement vérifié pour garantir son authenticité avant mise en vente.",
               },
               {
                 icon: <Truck size={40} className="text-indigo-600" />,
-                title: "Fast Shipping",
-                desc: "Items ship within 1-2 business days with tracking provided.",
+                title: "Livraison Rapide",
+                desc: "Expédition sous 1-2 jours ouvrés avec suivi de colis fourni.",
               },
               {
                 icon: <CreditCard size={40} className="text-indigo-600" />,
-                title: "Secure Payments",
-                desc: "Your payment information is always protected.",
+                title: "Paiements Sécurisés",
+                desc: "Vos informations de paiement sont toujours protégées.",
               },
               {
                 icon: <Headphones size={40} className="text-indigo-600" />,
-                title: "24/7 Support",
-                desc: "Our customer service team is always ready to help.",
+                title: "Support 24/7",
+                desc: "Notre service client est disponible à tout moment pour vous aider.",
               },
             ].map((item, index) => (
               <div
@@ -173,7 +174,7 @@ const About = () => {
         {/* Payment Methods - Focus on PayPal */}
         <section className="mb-20 bg-white  p-8 lg:p-12  border-gray-100">
           <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 mb-10 text-center">
-            Secure Payment Options
+            Options de Paiement Sécurisées
           </h2>
 
           <div className="flex flex-col-reverse lg:flex-row gap-12 items-center">
@@ -181,19 +182,19 @@ const About = () => {
             <div className="lg:w-1/2">
               <h3 className="text-2xl font-semibold mb-5 text-gray-900 flex items-center">
                 <FaPaypal size={36} className="text-blue-500 mr-3" />
-                PayPal Payments
+                Paiements PayPal
               </h3>
               <p className="text-gray-700 text-lg mb-6 leading-relaxed">
-                We've integrated PayPal to offer you the most secure, flexible,
-                and convenient checkout experience.
+                Nous avons intégré PayPal pour vous offrir une expérience de
+                paiement sécurisée, flexible et pratique..
               </p>
 
               <ul className="space-y-4 text-gray-700 text-base">
                 {[
-                  "Secure encryption for all transactions",
-                  "Buyer protection on all purchases",
-                  "Pay with credit card or PayPal balance",
-                  "Instant payment confirmation",
+                  "Chiffrement sécurisé pour toutes les transactions",
+                  "Protection des acheteurs sur tous les achats",
+                  "Paiement par carte bancaire ou solde PayPal",
+                  "Confirmation de paiement instantanée",
                 ].map((item, index) => (
                   <li key={index} className="flex items-start">
                     <span className="text-green-600 font-bold mr-3 text-lg">
@@ -205,8 +206,9 @@ const About = () => {
               </ul>
 
               <p className="text-gray-700 mt-6 text-lg leading-relaxed">
-                No PayPal account? No problem. You can still pay as a guest
-                using your credit or debit card — fast and secure.
+                Pas de compte PayPal ? Aucun problème. Vous pouvez payer en tant
+                qu'invité avec votre carte de crédit ou de débit — rapide et
+                sécurisé." Key Notes:
               </p>
             </div>
 

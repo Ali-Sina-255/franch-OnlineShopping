@@ -12,9 +12,9 @@ import Pagination from "../Components/Pagination";
 
 const ITEMS_PER_PAGE = 12;
 const SORT_OPTIONS = {
-  newest: "Newest",
-  "price-asc": "Price: Low to High",
-  "price-desc": "Price: High to Low",
+  newest: " Les plus récents",
+  "price-asc": "Prix : du moins cher au plus cher",
+  "price-desc": "Prix : du plus élevé au plus bas",
 };
 
 const ProductListPage = forwardRef(
@@ -211,7 +211,7 @@ const ProductListPage = forwardRef(
             <h1 className=" text-xl md:text-2xl lg:text-4xl font-bold tracking-tight text-indigo-900 capitalize">
               {activeCategory
                 ? activeCategory.replace("-", " ")
-                : "Premium Secondhand Fashion"}
+                : "Mode d'occasion haut de gamme"}
             </h1>
             <div className="flex items-center" ref={sortRef}>
               <div className="relative inline-block text-left">
@@ -233,7 +233,7 @@ const ProductListPage = forwardRef(
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                      className="absolute right-0 z-20 mt-2 w-60 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                     >
                       <div className="py-1">
                         {Object.keys(SORT_OPTIONS).map((option) => (

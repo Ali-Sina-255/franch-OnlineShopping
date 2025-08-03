@@ -1,13 +1,19 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { MapPin, Mail, Phone, Clock, MessageSquare } from "lucide-react";
+import { MapPin, Mail, Phone, Clock } from "lucide-react";
 import FAQSection from "../Components/FAQSection";
+import axios from "axios"; // Import axios
 
 const ContactUs = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [formStatus, setFormStatus] = useState(null); // To display success/error messages
+  const [loading, setLoading] = useState(false); // To handle button loading state
+
   const textVariants = {
     hidden: { y: -50, opacity: 0 },
     visible: {
@@ -22,14 +28,55 @@ const ContactUs = () => {
 
   // For scroll-triggered animations
   const [headingRef, headingInView] = useInView({
-    triggerOnce: false, // Set to true if you only want animation once
+    triggerOnce: true,
     threshold: 0.5,
   });
 
   const [paragraphRef, paragraphInView] = useInView({
-    triggerOnce: false,
+    triggerOnce: true,
     threshold: 0.3,
   });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormStatus(null);
+    setLoading(true);
+
+    // --- THIS IS THE UPDATED PART ---
+    // Construct the full API URL from the environment variable and the specific endpoint
+    const apiUrl = `${
+      import.meta.env.VITE_BASE_URL
+    }/api/v1/notification/contacts/`;
+
+    try {
+      const response = await axios.post(apiUrl, formData);
+      console.log("Form submitted successfully:", response.data);
+      setFormStatus({
+        type: "success",
+        message: "Your message has been sent successfully!",
+      });
+      // Clear form fields
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      let errorMessage = "An error occurred. Please try again later.";
+      if (error.response && error.response.data && error.response.data.email) {
+        // Example of handling a specific backend validation error
+        errorMessage = `Error: ${error.response.data.email[0]}`;
+      }
+      setFormStatus({
+        type: "error",
+        message: errorMessage,
+      });
+    } finally {
+      setLoading(false); // Stop loading regardless of outcome
+    }
+  };
+
   return (
     <div className="bg-gradient-to-b from-indigo-50/20 to-white min-h-screen">
       {/* Hero Section */}
@@ -161,7 +208,7 @@ const ContactUs = () => {
               <h2 className="text-2xl font-bold text-indigo-900 mb-8">
                 Send Us a Message
               </h2>
-              <form className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1  gap-6">
                   <div className="space-y-6">
                     {/* Full Name Input */}
@@ -170,8 +217,8 @@ const ContactUs = () => {
                         type="text"
                         id="name"
                         name="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={formData.name}
+                        onChange={handleChange}
                         className="peer w-full px-4 py-3 border border-black rounded-lg bg-white focus:outline-none focus:bg-white placeholder-transparent"
                         placeholder="Full Name"
                         required
@@ -180,7 +227,7 @@ const ContactUs = () => {
                         htmlFor="name"
                         className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
             ${
-              name
+              formData.name
                 ? "-top-2 text-xs text-black"
                 : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
             }`}
@@ -195,8 +242,8 @@ const ContactUs = () => {
                         type="email"
                         id="email"
                         name="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={formData.email}
+                        onChange={handleChange}
                         className="peer w-full px-4 py-3 border border-black rounded-lg bg-white focus:outline-none focus:bg-white placeholder-transparent"
                         placeholder="Email"
                         required
@@ -205,7 +252,7 @@ const ContactUs = () => {
                         htmlFor="email"
                         className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
             ${
-              email
+              formData.email
                 ? "-top-2 text-xs text-black"
                 : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
             }`}
@@ -221,8 +268,8 @@ const ContactUs = () => {
                     id="message"
                     name="message"
                     rows="5"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    value={formData.message}
+                    onChange={handleChange}
                     placeholder="Your message"
                     className="peer w-full px-4 pt-6 pb-2 border border-black rounded-lg focus:outline-none  placeholder-transparent resize-none"
                     required
@@ -231,7 +278,7 @@ const ContactUs = () => {
                     htmlFor="message"
                     className={`absolute left-4 bg-white px-1 transition-all duration-200 pointer-events-none
           ${
-            message
+            formData.message
               ? "-top-2 text-xs text-black"
               : "top-4 text-gray-400 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-black"
           }`}
@@ -239,14 +286,27 @@ const ContactUs = () => {
                     Your Message
                   </label>
                 </div>
-
+                {formStatus && (
+                  <div
+                    className={`p-4 rounded-md ${
+                      formStatus.type === "success"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {formStatus.message}
+                  </div>
+                )}
                 <div className="flex justify-center items-center">
-                  {/* <button class="text-xl w-40 h-12 rounded bg-emerald-500 text-white relative overflow-hidden group z-10 hover:text-white duration-1000">
-                    <span class="absolute bg-emerald-600 w-44 h-36 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
-                    <span class="absolute bg-emerald-800 w-44 h-36 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
-                    Send
-                  </button> */}
-                  <button className="primary-btn">Send</button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="text-xl w-40 h-12 rounded bg-emerald-500 text-white relative overflow-hidden group z-10 hover:text-white duration-1000 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    <span className="absolute bg-emerald-600 w-44 h-36 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
+                    <span className="absolute bg-emerald-800 w-44 h-36 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
+                    {loading ? "Sending..." : "Send"}
+                  </button>
                 </div>
               </form>
             </div>

@@ -6,13 +6,12 @@ import { useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
-const Dashboard = () => {
+
+// Note: I've renamed this to DashboardPage to avoid confusion with the inner Dashboard component.
+const DashboardPage = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
   const [isFocused, setIsFocused] = useState(false);
-  const notificationsCount = 3;
-  const messagesCount = 5;
   const { profile, loading } = useSelector((state) => state.user);
-
 
   const fullProfilePhotoUrl = profile?.profile_photo
     ? `${BASE_URL}${profile.profile_photo}`
@@ -37,11 +36,7 @@ const Dashboard = () => {
           ${isFocused ? "w-52" : "w-10"} bg-white`}
             />
           </div>
-
           <div className="flex items-center gap-4">
-            
-          
-
             <div className="flex items-center gap-2 cursor-pointer">
               <AnimatePresence mode="wait">
                 {loading && !profile ? (
@@ -55,7 +50,7 @@ const Dashboard = () => {
                     <div className="w-8 h-8 rounded-full bg-gray-300 animate-pulse"></div>
                     <div className="w-24 h-4 bg-gray-300 rounded animate-pulse"></div>
                   </motion.div>
-                ) :  (
+                ) : (
                   <motion.div
                     key="profile"
                     initial={{ opacity: 0 }}
@@ -63,7 +58,6 @@ const Dashboard = () => {
                     exit={{ opacity: 0 }}
                     className="flex items-center gap-2"
                   >
-                 
                     {fullProfilePhotoUrl ? (
                       <img
                         src={fullProfilePhotoUrl}
@@ -87,6 +81,7 @@ const Dashboard = () => {
           </div>
         </div>
         <main className="flex-1 overflow-y-auto custom-scrollbar">
+          {/* This is the only change in this file */}
           <MainContent
             activeComponent={activeComponent}
             setActiveComponent={setActiveComponent}
@@ -96,4 +91,5 @@ const Dashboard = () => {
     </div>
   );
 };
-export default Dashboard;
+
+export default DashboardPage; // Renamed export

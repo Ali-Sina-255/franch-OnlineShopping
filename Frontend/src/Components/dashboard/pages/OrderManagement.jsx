@@ -88,14 +88,10 @@ const OrderManagement = ({ userOnly = false }) => {
       try {
         const api = createApiClient();
         const endpoint = userOnly
-          ? "/api/v1/cart/my-orders/"
+          ? "/api/v1/cart/orders/"
           : "/api/v1/cart/orders/";
         const response = await api.get(endpoint);
 
-        // ========================================================================
-        // THE FIX: Check if the response data is paginated.
-        // If it has a 'results' key, use that. Otherwise, use the data directly.
-        // ========================================================================
         const ordersData = response.data.results
           ? response.data.results
           : response.data;
@@ -106,8 +102,9 @@ const OrderManagement = ({ userOnly = false }) => {
             "API did not return an array of orders:",
             response.data
           );
-          setAllOrders([]); // Default to empty array on invalid data
+          setAllOrders([]);
         }
+      
       } catch (err) {
         const errorMessage =
           err.response?.data?.detail || "Failed to fetch your orders.";
@@ -121,7 +118,6 @@ const OrderManagement = ({ userOnly = false }) => {
   }, [userOnly]);
 
   const filteredOrders = useMemo(() => {
-    // Safety check to ensure allOrders is always an array
     if (!Array.isArray(allOrders)) return [];
     return allOrders
       .filter((order) => {
@@ -441,5 +437,4 @@ const OrderManagement = ({ userOnly = false }) => {
     </div>
   );
 };
-
 export default OrderManagement;

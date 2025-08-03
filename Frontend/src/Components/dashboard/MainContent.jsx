@@ -8,15 +8,21 @@ import ProductManager from "./pages/ProductManager.jsx";
 import ProductList from "./pages/ProductList.jsx";
 import OrderManagement from "./pages/OrderManagement.jsx";
 
-
-
 const MainContent = ({ activeComponent, setActiveComponent }) => {
   const { profile } = useSelector((state) => state.user);
+  // Using `currentUser` is safer as `profile` might not be loaded initially
+  // const { currentUser } = useSelector((state) => state.user);
   const isAdmin = profile?.role === "admin";
+
   const renderContent = () => {
     switch (activeComponent) {
       case "dashboard":
-        return isAdmin ? <Dashboard /> : <OrderManagement userOnly={true} />;
+        // Pass setActiveComponent to Dashboard for admins
+        return isAdmin ? (
+          <Dashboard setActiveComponent={setActiveComponent} />
+        ) : (
+          <OrderManagement userOnly={true} />
+        );
       case "category":
         return isAdmin ? <CategoryManagement /> : null;
       case "attribute":
@@ -32,7 +38,12 @@ const MainContent = ({ activeComponent, setActiveComponent }) => {
       case "profile":
         return <Profile />;
       default:
-        return isAdmin ? <Dashboard /> : <OrderManagement userOnly={true} />;
+        // Pass setActiveComponent to Dashboard for admins
+        return isAdmin ? (
+          <Dashboard setActiveComponent={setActiveComponent} />
+        ) : (
+          <OrderManagement userOnly={true} />
+        );
     }
   };
 

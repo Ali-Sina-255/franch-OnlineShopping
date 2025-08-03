@@ -9,12 +9,11 @@ import MegaMenu from "./MegaMenu";
 import SearchBar from "./SearchBar";
 import MobileMenu from "./MobileMenu";
 import logo from "../../public/44.png";
-
 const navbarItems = [
-  { name: "Home", path: "/" },
-  { name: "Category", path: "/category" },
-  { name: "Contact Us", path: "/contact" },
-  { name: "About Us", path: "/about" },
+  { name: "Accueil", path: "/" }, // Home
+  { name: "Catégorie", path: "" }, // Category
+  { name: "Contactez-nous", path: "/contact" }, // Contact Us
+  { name: "À propos de nous", path: "/about" }, // About Us
 ];
 
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
@@ -83,7 +82,7 @@ const Header = ({
               </button>
             </div>
 
-            <div className=" items-center hidden md:flex">
+            <div className="items-center hidden md:flex">
               <Link to="/" className="flex items-center">
                 {/* Replaced text with logo */}
                 <img
@@ -96,7 +95,7 @@ const Header = ({
 
             <div className="hidden lg:flex lg:items-center lg:space-x-8 relative">
               {navbarItems.map((item, index) => {
-                const isCategory = item.name === "Category";
+                const isCategory = item.name === "Catégorie";
                 return (
                   <div
                     key={index}
@@ -108,7 +107,7 @@ const Header = ({
                       to={item.path}
                       className={`text-sm font-medium ${
                         isScrolled ? "text-indigo-800" : "text-indigo-900"
-                      } hover:text-indigo-600 transition-colors duration-200`}
+                      } hover:text-primary transition-colors duration-200`}
                     >
                       {item.name}
                     </Link>
@@ -136,13 +135,13 @@ const Header = ({
               />
               <Link
                 to="/account"
-                className="p-2 text-indigo-700 hover:text-indigo-900 hidden lg:block transition-colors duration-200"
+                className="p-2 text-primary hidden lg:block transition-colors duration-200"
               >
                 <User size={24} />
               </Link>
               <Link
                 to="/wishlist"
-                className="flex items-center p-2 text-indigo-700 hover:text-indigo-900 transition-colors duration-200"
+                className="flex items-center p-2 text-primary transition-colors duration-200"
               >
                 <Heart size={24} />
                 {wishlistCount > 0 && (
@@ -155,7 +154,7 @@ const Header = ({
                 ref={cartRef}
                 type="button"
                 onClick={onCartClick}
-                className="flex items-center p-2 text-indigo-700 hover:text-indigo-900 transition-colors duration-200"
+                className="flex items-center p-2 text-primary transition-colors duration-200"
               >
                 <ShoppingBag size={24} />
                 {cartCount > 0 && (

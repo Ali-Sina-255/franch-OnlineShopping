@@ -76,7 +76,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
               <div className="flex items-center gap-x-2">
                 <HiOutlineShoppingBag className="h-6 w-6 text-gray-700" />
                 <h2 className="text-lg font-medium text-gray-900">
-                  Shopping Bag
+                  Sac de courses
                 </h2>
               </div>
               <button
@@ -139,7 +139,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                               disabled={cartLoading}
                               className="font-medium text-red-600 hover:text-red-500 flex items-center disabled:opacity-50"
                             >
-                              <Trash2 className="h-4 w-4 mr-1" /> Remove
+                              <Trash2 className="h-4 w-4 mr-1" /> Supprimer
                             </button>
                           </div>
                         </div>
@@ -149,7 +149,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 </ul>
               ) : (
                 <div className="text-center h-full flex flex-col justify-center">
-                  <p className="text-gray-500">Your bag is empty.</p>
+                  <p className="text-gray-500">Votre sac est vide.</p>
                 </div>
               )}
             </div>
@@ -158,30 +158,35 @@ const CartDrawer = ({ isOpen, onClose }) => {
             {cartItems.length > 0 && (
               <div className="border-t border-gray-200 py-6 px-6">
                 <div className="flex justify-between text-base font-medium text-gray-900">
-                  <p>Subtotal</p>
+                  <p>Sous-total</p>
                   <p>€{subtotal.toFixed(2)}</p>
                 </div>
                 <p className="mt-0.5 text-sm text-gray-500">
-                  Shipping and taxes calculated at checkout.
+                  Les frais de livraison et les taxes seront calculés lors du
+                  paiement.
                 </p>
+
                 <div className="mt-6">
                   <Link
                     to="/cart"
-                    onClick={onClose}
+                    onClick={() => {
+                      onClose(); // Close modal/drawer/etc.
+                      scrollTo(0, 0); // Scroll to top
+                    }}
                     className="flex items-center justify-center rounded-md border border-transparent bg-gray-900 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-gray-700"
                   >
-                    Go to Cart & Checkout
+                    Aller au panier et passer à la caisse
                   </Link>
                 </div>
                 <div className="mt-4 flex justify-center text-center text-sm text-gray-500">
                   <p>
-                    or{" "}
+                    ou{" "}
                     <button
                       type="button"
                       className="font-medium text-indigo-600 hover:text-indigo-500"
                       onClick={onClose}
                     >
-                      Continue Shopping
+                      Continuer vos achats
                       <span aria-hidden="true"> →</span>
                     </button>
                   </p>

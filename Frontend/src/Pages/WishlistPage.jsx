@@ -17,10 +17,11 @@ const WishlistPage = ({ wishlist, onToggleWishlist, onQuickView }) => {
       <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="border-b border-gray-200 pb-6">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-            My Wishlist
+            Ma liste de souhaits
           </h1>
           <p className="mt-4 text-base text-gray-500">
-            You have {wishlistedProducts.length} item(s) in your wishlist.
+            Vous avez {wishlistedProducts.length} article(s) dans votre liste de
+            souhaits.
           </p>
         </div>
 
@@ -42,17 +43,20 @@ const WishlistPage = ({ wishlist, onToggleWishlist, onQuickView }) => {
             <div className="text-center py-20">
               <Heart className="mx-auto h-12 w-12 text-gray-400" />
               <h2 className="mt-2 text-lg font-medium text-gray-900">
-                Your wishlist is empty
+                Votre liste de souhaits est vide
               </h2>
               <p className="mt-1 text-sm text-gray-500">
-                Tap the heart on any product to save it here for later.
+                Touchez le cœur sur un produit pour l'enregistrer ici pour plus
+                tard.
               </p>
+
               <div className="mt-6">
                 <Link
                   to="/"
-                  className="inline-flex items-center rounded-md border border-transparent bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700"
+                  onClick={() => scrollTo(0, 0)}
+                  className="primary-btn"
                 >
-                  Start Shopping
+                  Commencer à acheter
                 </Link>
               </div>
             </div>

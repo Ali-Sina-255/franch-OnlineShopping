@@ -24,7 +24,7 @@ const Filters = ({
     // ========================================================================
     {
       key: "sizes",
-      title: "Sizes",
+      title: "Tailles",
       searchable: false,
       // We add a safety check: `filterOptions.sizes && ...`
       // This ensures the code doesn't crash if the data hasn't loaded yet.
@@ -33,7 +33,7 @@ const Filters = ({
     },
     {
       key: "conditions",
-      title: "Conditions",
+      title: "État",
       searchable: false,
       condition:
         filterOptions.conditions && filterOptions.conditions.length > 0,
@@ -41,7 +41,7 @@ const Filters = ({
     },
     {
       key: "colors",
-      title: "Colors",
+      title: "Couleurs",
       searchable: true,
       condition: filterOptions.colors && filterOptions.colors.length > 0,
       defaultOpen: false,
@@ -51,7 +51,7 @@ const Filters = ({
   return (
     <aside className="lg:col-span-1 bg-white p-6 rounded-xl border border-gray-200 self-start shadow-sm lg:sticky top-4">
       <div className="space-y-6">
-        <h2 className="text-lg font-medium text-gray-900">Filters</h2>
+        <h2 className="text-lg font-medium text-gray-900">Filtres</h2>
 
         {hasActiveFilters && (
           <button
@@ -59,7 +59,7 @@ const Filters = ({
             onClick={resetFilters}
             className="w-full text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-150 flex items-center justify-center"
           >
-            Reset All Filters
+            Réinitialiser tous les filtres
           </button>
         )}
 

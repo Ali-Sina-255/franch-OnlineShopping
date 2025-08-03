@@ -60,32 +60,33 @@ const ShippingDetailsPage = () => {
   // ========================================================================
   // REVISED FAQ Section to match your backend logic and pricing
   // ========================================================================
-  const faqs = [
-    {
-      question: "What are the Home Location delivery costs?",
-      answer:
-        "Delivery costs to your home are based on the total weight of your order: up to 500g is €4.50, up to 1kg is €5.50, and up to 2kg is €6.90.",
-      icon: <Home className="h-5 w-5 mr-2 text-primary" />,
-    },
-    {
-      question: "What are the Close Station delivery costs?",
-      answer:
-        "Picking up from a close station is a flexible option. Costs are: up to 500g is €7.00, up to 1kg is €8.50, and up to 2kg is €9.90.",
-      icon: <Box className="h-5 w-5 mr-2 text-primary" />,
-    },
-    {
-      question: "How is the total weight calculated?",
-      answer:
-        "The total weight is the sum of the weights of all individual products in your cart. You can see each product's weight on its detail page.",
-      icon: <HelpCircle className="h-5 w-5 mr-2 text-primary" />,
-    },
-    {
-      question: "Can I change my delivery choice later?",
-      answer:
-        "Yes, you can select your preferred delivery method (Home or Station) and see the final cost on the next page before completing your payment.",
-      icon: <HelpCircle className="h-5 w-5 mr-2 text-primary" />,
-    },
-  ];
+const faqs = [
+  {
+    question: "Quels sont les frais de livraison à domicile ?",
+    answer:
+      "Les frais de livraison à domicile sont basés sur le poids total de votre commande : jusqu'à 500 g, c'est 4,50 € ; jusqu'à 1 kg, c'est 5,50 € ; et jusqu'à 2 kg, c'est 6,90 €.",
+    icon: <Home className="h-5 w-5 mr-2 text-primary" />,
+  },
+  {
+    question: "Quels sont les frais de livraison en point relais proche ?",
+    answer:
+      "Le retrait en point relais proche est une option flexible. Les coûts sont : jusqu'à 500 g, 7,00 € ; jusqu'à 1 kg, 8,50 € ; et jusqu'à 2 kg, 9,90 €.",
+    icon: <Box className="h-5 w-5 mr-2 text-primary" />,
+  },
+  {
+    question: "Comment le poids total est-il calculé ?",
+    answer:
+      "Le poids total est la somme des poids de tous les produits individuels dans votre panier. Vous pouvez voir le poids de chaque produit sur sa page de détail.",
+    icon: <HelpCircle className="h-5 w-5 mr-2 text-primary" />,
+  },
+  {
+    question: "Puis-je changer mon mode de livraison plus tard ?",
+    answer:
+      "Oui, vous pouvez sélectionner votre mode de livraison préféré (Domicile ou Point relais) et voir le coût final sur la page suivante avant de finaliser votre paiement.",
+    icon: <HelpCircle className="h-5 w-5 mr-2 text-primary" />,
+  },
+];
+
 
   const onSubmit = (data) => {
     if (!cart?.cart_id) {
@@ -115,11 +116,12 @@ const ShippingDetailsPage = () => {
         <div className="lg:w-1/2 bg-white p-8 lg:p-12 hidden lg:flex flex-col justify-center">
           <div className="max-w-md mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">
-              Delivery Pricing & Info
+              Tarifs et informations de livraison
             </h2>
             <p className="text-gray-600 mb-8">
-              Your shipping cost is calculated on the next page based on your
-              delivery choice and total order weight. Here are the details:
+              Le coût de livraison sera calculé à la page suivante en fonction
+              de votre choix de livraison et du poids total de la commande.
+              Voici les détails :
             </p>
             <div className="space-y-4">
               {faqs.map((faq, index) => (
@@ -166,10 +168,10 @@ const ShippingDetailsPage = () => {
           <div className="w-full max-w-md">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Shipping Address
+                Adresse de livraison
               </h1>
               <p className="text-gray-600">
-                Confirm your details to proceed to the payment page.
+                Confirmez vos informations pour passer à la page de paiement.
               </p>
             </div>
 
@@ -195,7 +197,7 @@ const ShippingDetailsPage = () => {
                       : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
                   }`}
                 >
-                  Full Name
+                  Nom complet
                 </label>
                 {errors.full_name && (
                   <p className="mt-1 text-sm text-red-600">
@@ -212,7 +214,7 @@ const ShippingDetailsPage = () => {
                     required: "Email is required",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
+                      message: "Adresse e-mail invalide",
                     },
                   })}
                   className={`peer w-full px-4 py-3 rounded-lg bg-white border ${
@@ -227,7 +229,7 @@ const ShippingDetailsPage = () => {
                       : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
                   }`}
                 >
-                  Email
+                  E-mail
                 </label>
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">
@@ -244,7 +246,7 @@ const ShippingDetailsPage = () => {
                     required: "Mobile number is required",
                     pattern: {
                       value: /^[0-9\-\+]{9,15}$/,
-                      message: "Invalid phone number",
+                      message: " Numéro de téléphone invalide",
                     },
                   })}
                   className={`peer w-full px-4 py-3 rounded-lg bg-white border ${
@@ -259,7 +261,7 @@ const ShippingDetailsPage = () => {
                       : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
                   }`}
                 >
-                  Mobile Number
+                  Numéro de portable
                 </label>
                 {errors.mobile && (
                   <p className="mt-1 text-sm text-red-600">
@@ -285,7 +287,7 @@ const ShippingDetailsPage = () => {
                       : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
                   }`}
                 >
-                  Address
+                  Adresse
                 </label>
                 {errors.address && (
                   <p className="mt-1 text-sm text-red-600">
@@ -312,7 +314,7 @@ const ShippingDetailsPage = () => {
                         : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
                     }`}
                   >
-                    City
+                    Ville
                   </label>
                   {errors.city && (
                     <p className="mt-1 text-sm text-red-600">
@@ -338,7 +340,7 @@ const ShippingDetailsPage = () => {
                         : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
                     }`}
                   >
-                    State
+                    État
                   </label>
                   {errors.state && (
                     <p className="mt-1 text-sm text-red-600">
@@ -365,7 +367,7 @@ const ShippingDetailsPage = () => {
                       : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
                   }`}
                 >
-                  Country
+                  Pays
                 </label>
                 {errors.country && (
                   <p className="mt-1 text-sm text-red-600">
@@ -377,19 +379,15 @@ const ShippingDetailsPage = () => {
               <button
                 type="submit"
                 disabled={orderLoading || !isValid}
-                className={`primary-btn ${
-                  orderLoading || !isValid
-                    ? ""
-                    : ""
-                }`}
+                className={`primary-btn ${orderLoading || !isValid ? "" : ""}`}
               >
                 {orderLoading ? (
                   <span className="flex items-center justify-center">
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    Processing...
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />✅
+                    Traitement ...
                   </span>
                 ) : (
-                  "Continue to Payment"
+                  "Continuer vers le paiement"
                 )}
               </button>
             </form>
@@ -413,7 +411,7 @@ const ShippingDetailsPage = () => {
                     d="M10 19l-7-7m0 0l7-7m-7 7h18"
                   />
                 </svg>
-                Return to cart
+                Retour au panier
               </Link>
             </div>
           </div>

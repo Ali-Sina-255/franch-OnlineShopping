@@ -91,7 +91,7 @@ const ContactUs = () => {
             variants={textVariants}
             className="text-4xl md:text-5xl font-bold mb-6"
           >
-            Contact Us
+            Contactez-nous
           </motion.h1>
 
           <motion.p
@@ -102,8 +102,8 @@ const ContactUs = () => {
             transition={{ delay: 0.2 }} // Slight delay for staggered effect
             className="text-xl md:text-2xl max-w-3xl mx-auto"
           >
-            We're here to help! Reach out to our team for any questions or
-            concerns.
+            Nous sommes là pour vous aider ! Contactez notre équipe pour toute
+            question ou préoccupation.
           </motion.p>
         </div>
       </section>
@@ -114,7 +114,7 @@ const ContactUs = () => {
           {/* Contact Information */}
           <div className="bg-white">
             <h2 className="text-2xl font-bold text-center text-indigo-900 mb-8">
-              Get in Touch
+              Entrer en contact
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-x-10 gap-y-10 mb-8 pt-5">
@@ -122,12 +122,12 @@ const ContactUs = () => {
                 <div className="flex items-center gap-x-2  justify-center bg-indigo-100 p-3 rounded-full">
                   <MapPin className="text-indigo-600" size={30} />
                   <h3 className="font-semibold text-lg text-gray-900">
-                    Our Location
+                    Notre adresse
                   </h3>
                 </div>
                 <div className="mt-3">
                   <p className="text-gray-600">
-                    123 Fashion Avenue, Suite 456
+                    123 Avenue de la Mode, Suite 456
                     <br />
                     New York, NY 10001
                   </p>
@@ -138,7 +138,7 @@ const ContactUs = () => {
                 <div className="flex items-center gap-x-2 justify-center bg-indigo-100 p-3 rounded-full">
                   <Mail className="text-indigo-600" size={30} />
                   <h3 className="font-semibold text-lg text-gray-900">
-                    Email Us
+                    Nous écrire
                   </h3>
                 </div>
                 <div className="text-center mt-3">
@@ -164,7 +164,7 @@ const ContactUs = () => {
                 <div className="flex items-center gap-x-2 justify-center bg-indigo-100 p-3 rounded-full">
                   <Phone className="text-indigo-600" size={30} />
                   <h3 className="font-semibold text-lg text-gray-900">
-                    Call Us
+                    Appelez-nous
                   </h3>
                 </div>
                 <div className="text-center mt-3">
@@ -185,7 +185,7 @@ const ContactUs = () => {
                 <div className="flex items-center gap-x-2 justify-center bg-indigo-100 p-3 rounded-full">
                   <Clock className="text-indigo-600" size={30} />
                   <h3 className="font-semibold text-lg text-gray-900">
-                    Business Hours
+                    Heures d’ouverture
                   </h3>
                 </div>
                 <div className="text-center mt-3">
@@ -206,7 +206,7 @@ const ContactUs = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
             <div className="col-span-1 md:px-20">
               <h2 className="text-2xl font-bold text-indigo-900 mb-8">
-                Send Us a Message
+                Envoyez-nous un message
               </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1  gap-6">
@@ -220,7 +220,7 @@ const ContactUs = () => {
                         value={formData.name}
                         onChange={handleChange}
                         className="peer w-full px-4 py-3 border border-black rounded-lg bg-white focus:outline-none focus:bg-white placeholder-transparent"
-                        placeholder="Full Name"
+                        placeholder="Nom complet"
                         required
                       />
                       <label
@@ -232,7 +232,7 @@ const ContactUs = () => {
                 : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
             }`}
                       >
-                        Your Name
+                        Votre nom
                       </label>
                     </div>
 
@@ -257,7 +257,7 @@ const ContactUs = () => {
                 : "top-1/2 -translate-y-1/2 text-gray-400 peer-focus:-top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-black"
             }`}
                       >
-                        Your Email
+                        Votre e-mail
                       </label>
                     </div>
                   </div>
@@ -283,7 +283,7 @@ const ContactUs = () => {
               : "top-4 text-gray-400 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-black"
           }`}
                   >
-                    Your Message
+                    Votre message
                   </label>
                 </div>
                 {formStatus && (
@@ -298,15 +298,12 @@ const ContactUs = () => {
                   </div>
                 )}
                 <div className="flex justify-center items-center">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="text-xl w-40 h-12 rounded bg-emerald-500 text-white relative overflow-hidden group z-10 hover:text-white duration-1000 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  >
-                    <span className="absolute bg-emerald-600 w-44 h-36 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
-                    <span className="absolute bg-emerald-800 w-44 h-36 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
-                    {loading ? "Sending..." : "Send"}
-                  </button>
+                  {/* <button class="text-xl w-40 h-12 rounded bg-emerald-500 text-white relative overflow-hidden group z-10 hover:text-white duration-1000">
+                    <span class="absolute bg-emerald-600 w-44 h-36 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
+                    <span class="absolute bg-emerald-800 w-44 h-36 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
+                    Send
+                  </button> */}
+                  <button className="primary-btn">Envoyer</button>
                 </div>
               </form>
             </div>

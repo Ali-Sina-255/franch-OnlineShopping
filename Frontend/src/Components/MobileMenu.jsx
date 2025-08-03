@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion"; // ✅ make sure AnimatePresence is imported
-import { X, Plus, Minus } from "lucide-react";
+import { X, Plus, Minus, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const mobileMenuVariants = {
@@ -65,13 +65,21 @@ const MobileMenu = ({
         className="fixed top-0 left-0 h-full w-4/5 max-w-sm bg-gradient-to-b from-indigo-50 to-white z-50 p-6 border-r border-indigo-100"
       >
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold text-indigo-900">Menu</h2>
-          <button
-            onClick={() => setMobileMenuOpen(false)}
-            className="p-1 text-indigo-700 hover:text-indigo-900"
-          >
-            <X size={24} />
-          </button>
+          <img src="44.png" alt="" className="h-10" />
+          <div className="flex items-center gap-x-2 ">
+            <Link
+              to="/account"
+              className="p-2 text-indigo-700 hover:text-indigo-900  transition-colors duration-200"
+            >
+              <User size={24} />
+            </Link>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-1 text-indigo-700 hover:text-indigo-900"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
         <nav className="flex flex-col space-y-2">
           {navbarItems.map((item, index) => {
@@ -80,7 +88,7 @@ const MobileMenu = ({
             return (
               <div key={index}>
                 <div
-                  className="flex items-center justify-between text-gray-700 hover:text-indigo-700 pl-4 py-2.5 bg-gray-200 hover:bg-indigo-100 rounded-lg transition-colors duration-150 cursor-pointer"
+                  className="flex items-center justify-between text-gray-700  pl-4 py-2.5 bg-gray-200 hover:bg-primary hover:text-white rounded-lg transition-colors duration-150 cursor-pointer"
                   onClick={() => {
                     if (isCategory) {
                       setIsMobileCategoryOpen((prev) => !prev);
@@ -88,6 +96,7 @@ const MobileMenu = ({
                       navigate(item.path);
                       setMobileMenuOpen(false);
                     }
+                    scrollTo(0, 0); // Always scroll to top after navigation
                   }}
                 >
                   <span>{item.name}</span>
@@ -127,7 +136,7 @@ const MobileMenu = ({
                               setMobileMenuOpen(false);
                               setIsMobileCategoryOpen(false);
                             }}
-                            className="block text-base border-b py-2 text-gray-600 hover:text-indigo-600 transition-colors duration-150"
+                            className="block text-base border-b py-2 text-gray-600 hover:text-primary transition-colors duration-150"
                           >
                             {cat.name}
                           </Link>

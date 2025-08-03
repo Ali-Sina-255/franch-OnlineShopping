@@ -95,8 +95,8 @@ const HomePage = (props) => {
               transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
               className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight"
             >
-              Second-Hand, <span className="text-amber-400">First-Class</span>{" "}
-              Style
+              Seconde main,{" "}
+              <span className="text-amber-400">première classe</span> style
             </motion.h1>
 
             <motion.p
@@ -105,8 +105,9 @@ const HomePage = (props) => {
               transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
               className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-10"
             >
-              Discover curated vintage and pre-loved pieces to build a wardrobe
-              that's uniquely you and kind to the planet.
+              Découvrez une sélection de pièces vintage et d'occasion choisies
+              avec soin pour créer une garde-robe qui vous ressemble et respecte
+              la planète.
             </motion.p>
 
             <motion.div
@@ -118,7 +119,7 @@ const HomePage = (props) => {
                 href="#product-grid"
                 className="inline-flex items-center px-8 py-4 bg-[#3caca8] text-gray-900 font-medium rounded-full hover:bg-gray-100 transition-all duration-300 group"
               >
-                Shop New Arrivals
+                Acheter les nouveautés
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"

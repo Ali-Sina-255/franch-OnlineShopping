@@ -16,10 +16,11 @@ import {
   fetchProduct,
 } from "../../services/api";
 
-const Dashboard = () => {
+// THE FIX: The component now accepts `setActiveComponent` as a prop from its parent
+const Dashboard = ({ setActiveComponent }) => {
   const queryClient = useQueryClient();
 
-  // Data fetching for dashboard cards
+  // Data fetching for dashboard cards (no changes to this section)
   const {
     data: salesSummary = [],
     isLoading: summaryLoading,
@@ -30,7 +31,7 @@ const Dashboard = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Data fetching for total product count
+  // Data fetching for total product count (no changes to this section)
   const {
     data: productsData,
     isLoading: productsLoading,
@@ -40,7 +41,7 @@ const Dashboard = () => {
     queryFn: () => fetchProduct({ page_size: 1 }),
   });
 
-  // Data fetching for the recent orders table
+  // Data fetching for the recent orders table (no changes to this section)
   const {
     data: recentOrders = [],
     isLoading: ordersLoading,
@@ -50,11 +51,11 @@ const Dashboard = () => {
     queryFn: fetchRecentOrders,
   });
 
-  // Derived state for overall loading and error status
+  // Derived state for overall loading and error status (no changes to this section)
   const isLoading = summaryLoading || productsLoading;
   const hasError = summaryError || productsError || ordersError;
 
-  // Calculate stats for display cards
+  // Calculate stats for display cards (no changes to this section)
   const stats = {
     sales: salesSummary.reduce(
       (sum, item) => sum + (item?.total_sales || 0),
@@ -75,13 +76,14 @@ const Dashboard = () => {
     ),
   };
 
-  // Function to manually refresh all dashboard data
+  // Function to manually refresh all dashboard data (no changes to this section)
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ["productSalesSummary"] });
     queryClient.invalidateQueries({ queryKey: ["productsCount"] });
     queryClient.invalidateQueries({ queryKey: ["recentOrders"] });
   };
 
+  // Error handling JSX (no changes to this section)
   if (hasError) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
@@ -105,7 +107,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-6  min-h-screen">
-      {/* Header */}
+      {/* Header (no changes to this section) */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
         <button
@@ -118,7 +120,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* Stats Cards Grid */}
+      {/* Stats Cards Grid (no changes to this section) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
         <StatCard
           icon={<PiChartLineUp className="text-green-600 text-2xl" />}
@@ -157,14 +159,19 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Charts Section */}
+      {/* Charts Section (no changes to this section) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <OrderStatusChart isLoading={isLoading} />
         <TopSaleProducts isLoading={isLoading} />
       </div>
 
       {/* Recent Orders Table */}
-      <RecentOrdersTable orders={recentOrders} loading={ordersLoading} />
+      {/* THE FIX: Pass the setActiveComponent prop down to the table component */}
+      <RecentOrdersTable
+        orders={recentOrders}
+        loading={ordersLoading}
+        setActiveComponent={setActiveComponent}
+      />
     </div>
   );
 };
@@ -185,11 +192,16 @@ const StatCard = ({ icon, title, value, loading, bgColor }) => (
   </div>
 );
 
-const RecentOrdersTable = ({ orders, loading }) => (
+// THE FIX: The table component now accepts and uses the setActiveComponent prop
+const RecentOrdersTable = ({ orders, loading, setActiveComponent }) => (
   <div className="bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-x-auto">
     <div className="flex justify-between items-center mb-4">
       <h2 className="text-lg font-semibold text-gray-700">Recent Orders</h2>
-      <button className="text-sm text-blue-600 hover:text-blue-800">
+      {/* THE FIX: This button now correctly navigates to the 'orders' component */}
+      <button
+        onClick={() => setActiveComponent("orders")}
+        className="text-sm text-blue-600 hover:text-blue-800"
+      >
         View All
       </button>
     </div>
@@ -213,7 +225,12 @@ const RecentOrdersTable = ({ orders, loading }) => (
           </thead>
           <tbody>
             {orders.map((order) => (
-              <OrderRow key={order.id} order={order} />
+              // THE FIX: Pass setActiveComponent down to each individual row
+              <OrderRow
+                key={order.id}
+                order={order}
+                setActiveComponent={setActiveComponent}
+              />
             ))}
           </tbody>
         </table>
@@ -222,7 +239,8 @@ const RecentOrdersTable = ({ orders, loading }) => (
   </div>
 );
 
-const OrderRow = ({ order }) => {
+// THE FIX: The row component now accepts and uses the setActiveComponent prop
+const OrderRow = ({ order, setActiveComponent }) => {
   const firstItem = order.orderitem?.[0];
   const product = firstItem?.product || {};
 
@@ -277,7 +295,11 @@ const OrderRow = ({ order }) => {
       </td>
       <td className="p-3">${(order.shippingCost || 0.0).toFixed(2)}</td>
       <td className="p-3 text-center">
-        <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors">
+        {/* THE FIX: This button now correctly navigates to the 'orders' component */}
+        <button
+          onClick={() => setActiveComponent("orders")}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors"
+        >
           View
         </button>
       </td>

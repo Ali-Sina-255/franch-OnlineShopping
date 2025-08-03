@@ -1,18 +1,19 @@
-// src/Components/dashboard/pages/UserOrderManagement.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
 import {
   Loader2,
   PackageSearch,
-  Search,
-  Filter,
   ChevronDown,
   ChevronRight,
+  User,
+  Truck,
+  CreditCard,
 } from "lucide-react";
-import { store } from "../../../state/store";
+import { store } from "../../../state/store"; // Adjust path if needed
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Helper function to create an API client with auth token
 const createApiClient = () => {
   const api = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000",
@@ -29,7 +30,8 @@ const createApiClient = () => {
   return api;
 };
 
-// StatusBadge component (can be shared in a common file)
+// --- Sub-components ---
+
 const StatusBadge = ({ status }) => {
   const statusStyles = {
     paid: "bg-green-100 text-green-700 ring-green-600/20",
@@ -53,6 +55,27 @@ const StatusBadge = ({ status }) => {
   );
 };
 
+const InfoCard = ({ title, icon: Icon, children }) => (
+  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div className="flex items-center gap-3 mb-3 border-b border-gray-100 pb-2">
+      <Icon className="h-5 w-5 text-gray-400" />
+      <h5 className="font-semibold text-gray-700 text-base">{title}</h5>
+    </div>
+    <div className="space-y-1 text-sm text-gray-600">{children}</div>
+  </div>
+);
+
+const DetailRow = ({ label, value }) => (
+  <div className="flex justify-between items-start py-1">
+    <span className="text-gray-500">{label}:</span>
+    <strong className="text-gray-800 text-right font-medium">
+      {value || "N/A"}
+    </strong>
+  </div>
+);
+
+// --- Main Component ---
+
 const UserOrderManagement = () => {
   const [myOrders, setMyOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,10 +88,16 @@ const UserOrderManagement = () => {
       setError(null);
       try {
         const api = createApiClient();
-        // NOTE: You will need a backend endpoint like this that returns orders for the logged-in user.
-        // For now, we'll assume it's the same as the admin one for display purposes.
-        const response = await api.get("/api/v1/cart/orders/");
-        setMyOrders(response.data);
+        // This endpoint fetches only the orders for the currently logged-in user
+        const response = await api.get("/api/v1/cart/my-orders/"); // Assumes a user-specific endpoint
+        const ordersData = response.data.results
+          ? response.data.results
+          : response.data;
+        if (Array.isArray(ordersData)) {
+          setMyOrders(ordersData);
+        } else {
+          setMyOrders([]);
+        }
       } catch (err) {
         const errorMessage =
           err.response?.data?.detail || "Failed to fetch your orders.";
@@ -85,18 +114,21 @@ const UserOrderManagement = () => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="p-10 text-center">
         <Loader2 className="h-10 w-10 animate-spin text-indigo-600 mx-auto" />
       </div>
     );
-  if (error)
+  }
+
+  if (error) {
     return (
       <div className="p-8 text-center bg-red-50 text-red-700 rounded-lg">
         <p>Error: {error}</p>
       </div>
     );
+  }
 
   return (
     <div className="p-3 md:p-6">
@@ -111,10 +143,8 @@ const UserOrderManagement = () => {
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               {myOrders.length > 0 ? (
                 <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                  {/* The table structure is identical to your admin OrderManagement component */}
                   <table className="min-w-full divide-y divide-gray-300">
                     <thead className="bg-gray-50">
-                      {/* Table Headers */}
                       <tr>
                         <th scope="col" className="w-12"></th>
                         <th
@@ -156,7 +186,7 @@ const UserOrderManagement = () => {
                       >
                         <tr
                           onClick={() => handleToggleExpand(order.oid)}
-                          className="cursor-pointer hover:bg-gray-50"
+                          className="cursor-pointer hover:bg-gray-50 transition-colors"
                         >
                           <td className="pl-4">
                             {expandedOrderId === order.oid ? (
@@ -188,8 +218,121 @@ const UserOrderManagement = () => {
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
                             >
-                              <td colSpan="6" className="p-0">
-                                {/* ... (Expanded row JSX from your original component) ... */}
+                              <td colSpan="6" className="p-0 bg-slate-50">
+                                <div className="p-4 sm:p-6">
+                                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                    <div className="lg:col-span-1 space-y-6">
+                                      <InfoCard
+                                        title="Customer Details"
+                                        icon={User}
+                                      >
+                                        <DetailRow
+                                          label="Name"
+                                          value={order.full_name}
+                                        />
+                                        <DetailRow
+                                          label="Email"
+                                          value={order.email}
+                                        />
+                                        <DetailRow
+                                          label="Phone"
+                                          value={order.mobile}
+                                        />
+                                      </InfoCard>
+                                      <InfoCard
+                                        title="Delivery Information"
+                                        icon={Truck}
+                                      >
+                                        <p className="text-gray-800 font-medium">
+                                          {order.address}
+                                        </p>
+                                        <p className="text-gray-600">
+                                          {order.city}, {order.state}
+                                        </p>
+                                        <p className="text-gray-600">
+                                          {order.country}
+                                        </p>
+                                      </InfoCard>
+                                    </div>
+                                    <div className="lg:col-span-2 space-y-6">
+                                      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                                        <h5 className="font-semibold text-gray-700 text-base p-4 border-b border-gray-100">
+                                          Order Items
+                                        </h5>
+                                        <table className="min-w-full">
+                                          <tbody className="divide-y divide-gray-100">
+                                            {order.orderitem.map((item) => (
+                                              <tr key={item.id}>
+                                                <td className="p-3">
+                                                  <div className="flex items-center">
+                                                    <img
+                                                      className="h-12 w-12 rounded-md object-cover flex-shrink-0"
+                                                      src={
+                                                        item.product
+                                                          .image_url ||
+                                                        "/placeholder.png"
+                                                      }
+                                                      alt={
+                                                        item.product
+                                                          .product_name
+                                                      }
+                                                    />
+                                                    <div className="ml-4 text-sm font-medium text-gray-800">
+                                                      {
+                                                        item.product
+                                                          .product_name
+                                                      }
+                                                    </div>
+                                                  </div>
+                                                </td>
+                                                <td className="p-3 text-sm text-gray-500 text-center">
+                                                  {item.qty} x €
+                                                  {Number(item.price).toFixed(
+                                                    2
+                                                  )}
+                                                </td>
+                                                <td className="p-3 text-sm font-medium text-gray-900 text-right">
+                                                  €
+                                                  {Number(item.total).toFixed(
+                                                    2
+                                                  )}
+                                                </td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                      <InfoCard
+                                        title="Financial Summary"
+                                        icon={CreditCard}
+                                      >
+                                        <DetailRow
+                                          label="Subtotal"
+                                          value={`€${(
+                                            Number(order.total) -
+                                            (Number(order.delivery_cost) || 0)
+                                          ).toFixed(2)}`}
+                                        />
+                                        <DetailRow
+                                          label="Delivery Cost"
+                                          value={`€${Number(
+                                            order.delivery_cost || 0
+                                          ).toFixed(2)}`}
+                                        />
+                                        <hr className="my-2 border-dashed" />
+                                        <div className="flex justify-between items-center font-bold text-base pt-1">
+                                          <span>Grand Total:</span>
+                                          <span className="text-indigo-600">
+                                            €
+                                            {Number(
+                                              order.grand_total || order.total
+                                            ).toFixed(2)}
+                                          </span>
+                                        </div>
+                                      </InfoCard>
+                                    </div>
+                                  </div>
+                                </div>
                               </td>
                             </motion.tr>
                           )}

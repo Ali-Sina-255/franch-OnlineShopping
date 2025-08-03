@@ -31,7 +31,6 @@ const Sidebar = ({ setActiveComponent, activeComponent }) => {
     });
   };
 
-  // Define all possible menu items with an 'adminOnly' flag
   const allMenuItems = [
     {
       name: "Dashboard",
@@ -45,6 +44,7 @@ const Sidebar = ({ setActiveComponent, activeComponent }) => {
       icon: <LucideUserRoundPlus className="text-blue-500" />,
       adminOnly: true,
     },
+
     {
       name: "Attribute",
       value: "attribute",
@@ -68,13 +68,14 @@ const Sidebar = ({ setActiveComponent, activeComponent }) => {
       value: "orders",
       icon: <FaBoxOpen className="text-purple-500" />,
       adminOnly: false,
-    }, // Will be used for both roles
+    }, 
     {
       name: "Profile",
       value: "profile",
       icon: <FaUser className="text-blue-500" />,
       adminOnly: false,
     },
+
     {
       name: "Logout",
       value: "signout",
@@ -83,15 +84,14 @@ const Sidebar = ({ setActiveComponent, activeComponent }) => {
     },
   ];
 
-  // Filter the list based on the user's role
   const accessibleComponents = allMenuItems.filter((item) => {
-    // If user is not an admin, hide admin-only items
     if (currentUser?.role !== "admin" && item.adminOnly) {
       return false;
     }
     return true;
   });
 
+  
   return (
     <div className="h-full transition-all duration-300 ease-in-out w-[70px] md:w-[80px] lg:w-64 bg-white">
       <header className="flex items-center justify-center lg:justify-start gap-5 p-5 font-bold text-xl">

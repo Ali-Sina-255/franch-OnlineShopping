@@ -12,13 +12,10 @@ import OrderManagement from "./pages/OrderManagement.jsx";
 
 const MainContent = ({ activeComponent, setActiveComponent }) => {
   const { profile } = useSelector((state) => state.user);
-
   const isAdmin = profile?.role === "admin";
-
   const renderContent = () => {
     switch (activeComponent) {
       case "dashboard":
-        // Only admins can see the main dashboard
         return isAdmin ? <Dashboard /> : <OrderManagement userOnly={true} />;
       case "category":
         return isAdmin ? <CategoryManagement /> : null;
@@ -31,12 +28,10 @@ const MainContent = ({ activeComponent, setActiveComponent }) => {
           <ProductList setActiveComponent={setActiveComponent} />
         ) : null;
       case "orders":
-        // If the user is an admin, show all orders. Otherwise, show only their orders.
         return <OrderManagement userOnly={!isAdmin} />;
       case "profile":
         return <Profile />;
       default:
-        // Default for admin is dashboard, for user is their orders.
         return isAdmin ? <Dashboard /> : <OrderManagement userOnly={true} />;
     }
   };

@@ -7,12 +7,14 @@ import {
   Filter,
   ChevronDown,
   ChevronRight,
+  User,
+  Truck,
+  CreditCard,
 } from "lucide-react";
 import { store } from "../../../state/store";
 import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion"; // Import for animations
+import { motion, AnimatePresence } from "framer-motion";
 
-// This function creates an API client that automatically includes the auth token.
 const createApiClient = () => {
   const api = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000",
@@ -52,15 +54,31 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-// --- Main Component ---
-const OrderManagement = () => {
+const InfoCard = ({ title, icon: Icon, children }) => (
+  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div className="flex items-center gap-3 mb-3 border-b border-gray-100 pb-2">
+      <Icon className="h-5 w-5 text-gray-400" />
+      <h5 className="font-semibold text-gray-700 text-base">{title}</h5>
+    </div>
+    <div className="space-y-1 text-sm text-gray-600">{children}</div>
+  </div>
+);
+
+const DetailRow = ({ label, value }) => (
+  <div className="flex justify-between items-start py-1">
+    <span className="text-gray-500">{label}:</span>
+    <strong className="text-gray-800 text-right font-medium">
+      {value || "N/A"}
+    </strong>
+  </div>
+);
+
+const OrderManagement = ({ userOnly = false }) => {
   const [allOrders, setAllOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-
-  // --- NEW: State to track which order row is expanded ---
   const [expandedOrderId, setExpandedOrderId] = useState(null);
 
   useEffect(() => {
@@ -69,8 +87,27 @@ const OrderManagement = () => {
       setError(null);
       try {
         const api = createApiClient();
-        const response = await api.get("/api/v1/cart/orders/");
-        setAllOrders(response.data);
+        const endpoint = userOnly
+          ? "/api/v1/cart/my-orders/"
+          : "/api/v1/cart/orders/";
+        const response = await api.get(endpoint);
+
+        // ========================================================================
+        // THE FIX: Check if the response data is paginated.
+        // If it has a 'results' key, use that. Otherwise, use the data directly.
+        // ========================================================================
+        const ordersData = response.data.results
+          ? response.data.results
+          : response.data;
+        if (Array.isArray(ordersData)) {
+          setAllOrders(ordersData);
+        } else {
+          console.error(
+            "API did not return an array of orders:",
+            response.data
+          );
+          setAllOrders([]); // Default to empty array on invalid data
+        }
       } catch (err) {
         const errorMessage =
           err.response?.data?.detail || "Failed to fetch your orders.";
@@ -81,9 +118,11 @@ const OrderManagement = () => {
       }
     };
     fetchOrders();
-  }, []);
+  }, [userOnly]);
 
   const filteredOrders = useMemo(() => {
+    // Safety check to ensure allOrders is always an array
+    if (!Array.isArray(allOrders)) return [];
     return allOrders
       .filter((order) => {
         if (
@@ -95,9 +134,7 @@ const OrderManagement = () => {
         return true;
       })
       .filter((order) => {
-        if (searchTerm.trim() === "") {
-          return true;
-        }
+        if (searchTerm.trim() === "") return true;
         const lowercasedSearch = searchTerm.toLowerCase();
         return (
           order.oid.toLowerCase().includes(lowercasedSearch) ||
@@ -106,23 +143,22 @@ const OrderManagement = () => {
       });
   }, [allOrders, searchTerm, statusFilter]);
 
-  const paymentStatuses = useMemo(
-    () => [
+  const paymentStatuses = useMemo(() => {
+    if (!Array.isArray(allOrders)) return ["all"];
+    return [
       "all",
       ...new Set(allOrders.map((o) => o.payment_status.toLowerCase())),
-    ],
-    [allOrders]
-  );
+    ];
+  }, [allOrders]);
 
-  // --- NEW: Function to handle expanding/collapsing a row ---
   const handleToggleExpand = (orderId) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-64 p-10">
-        <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
+      <div className="p-10">
+        <Loader2 className="h-10 w-10 animate-spin text-indigo-600 mx-auto" />
       </div>
     );
   if (error)
@@ -134,12 +170,16 @@ const OrderManagement = () => {
 
   return (
     <div className="p-3 md:p-6">
-      <div className="bg-white p-6 rounded-md shadow-md min-h-full">
+      <div className="bg-white p-6 rounded-lg shadow-md min-h-full">
         <div className="sm:flex sm:items-center sm:justify-between">
           <div className="sm:flex-auto">
-            <h1 className="text-2xl font-bold text-gray-900">Your Orders</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {userOnly ? "My Orders" : "Order Management"}
+            </h1>
             <p className="mt-2 text-sm text-gray-700">
-              A list of all the orders you have placed.
+              {userOnly
+                ? "A list of all the orders you have placed."
+                : "A list of all orders from customers."}
             </p>
           </div>
           <div className="mt-4 sm:mt-0 sm:ml-4 flex flex-col md:flex-row items-center gap-4">
@@ -177,8 +217,7 @@ const OrderManagement = () => {
                   <table className="min-w-full divide-y divide-gray-300">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th scope="col" className="w-12"></th>{" "}
-                        {/* Column for expand icon */}
+                        <th scope="col" className="w-12"></th>
                         <th
                           scope="col"
                           className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
@@ -217,7 +256,6 @@ const OrderManagement = () => {
                         </th>
                       </tr>
                     </thead>
-                    {/* Map over orders to create a tbody for each */}
                     {filteredOrders.map((order) => (
                       <tbody
                         key={order.oid}
@@ -225,7 +263,7 @@ const OrderManagement = () => {
                       >
                         <tr
                           onClick={() => handleToggleExpand(order.oid)}
-                          className="cursor-pointer hover:bg-gray-50"
+                          className="cursor-pointer hover:bg-gray-50 transition-colors"
                         >
                           <td className="pl-4">
                             {expandedOrderId === order.oid ? (
@@ -253,76 +291,127 @@ const OrderManagement = () => {
                             {order.order_status}
                           </td>
                         </tr>
-                        {/* --- NEW: Expandable Row for Order Details --- */}
                         <AnimatePresence>
                           {expandedOrderId === order.oid && (
                             <motion.tr
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
-                              transition={{ duration: 0.2 }}
                             >
-                              <td colSpan="7" className="p-0">
-                                {" "}
-                                {/* Use colSpan to span all columns */}
-                                <div className="bg-indigo-50/50 p-4">
-                                  <h4 className="font-semibold text-gray-800 mb-3">
-                                    Order Items
-                                  </h4>
-                                  <table className="min-w-full bg-white rounded-md">
-                                    <thead className="bg-gray-100">
-                                      <tr>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                          Product
-                                        </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                          Quantity
-                                        </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                          Unit Price
-                                        </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                          Subtotal
-                                        </th>
-                                      </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200">
-                                      {order.orderitem.map((item) => (
-                                        <tr key={item.id}>
-                                          <td className="px-4 py-3 whitespace-nowrap">
-                                            <div className="flex items-center">
-                                              <div className="flex-shrink-0 h-10 w-10">
-                                                <img
-                                                  className="h-10 w-10 rounded-md object-cover"
-                                                  src={
-                                                    item.product.image_url ||
-                                                    "https://via.placeholder.com/40"
-                                                  }
-                                                  alt={
-                                                    item.product.product_name
-                                                  }
-                                                />
-                                              </div>
-                                              <div className="ml-4">
-                                                <div className="text-sm font-medium text-gray-900">
-                                                  {item.product.product_name}
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </td>
-                                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                                            {item.qty}
-                                          </td>
-                                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                                            €{Number(item.price).toFixed(2)}
-                                          </td>
-                                          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">
-                                            €{Number(item.total).toFixed(2)}
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
+                              <td colSpan="7" className="p-0 bg-slate-50">
+                                <div className="p-4 sm:p-6">
+                                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                    <div className="lg:col-span-1 space-y-6">
+                                      <InfoCard
+                                        title="Customer Details"
+                                        icon={User}
+                                      >
+                                        <DetailRow
+                                          label="Name"
+                                          value={order.full_name}
+                                        />
+                                        <DetailRow
+                                          label="Email"
+                                          value={order.email}
+                                        />
+                                        <DetailRow
+                                          label="Phone"
+                                          value={order.mobile}
+                                        />
+                                      </InfoCard>
+                                      <InfoCard
+                                        title="Delivery Information"
+                                        icon={Truck}
+                                      >
+                                        <p className="text-gray-800 font-medium">
+                                          {order.address}
+                                        </p>
+                                        <p className="text-gray-600">
+                                          {order.city}, {order.state}
+                                        </p>
+                                        <p className="text-gray-600">
+                                          {order.country}
+                                        </p>
+                                      </InfoCard>
+                                    </div>
+                                    <div className="lg:col-span-2 space-y-6">
+                                      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                                        <h5 className="font-semibold text-gray-700 text-base p-4 border-b border-gray-100">
+                                          Order Items
+                                        </h5>
+                                        <table className="min-w-full">
+                                          <tbody className="divide-y divide-gray-100">
+                                            {order.orderitem.map((item) => (
+                                              <tr key={item.id}>
+                                                <td className="p-3">
+                                                  <div className="flex items-center">
+                                                    <img
+                                                      className="h-12 w-12 rounded-md object-cover flex-shrink-0"
+                                                      src={
+                                                        item.product
+                                                          .image_url ||
+                                                        "/placeholder.png"
+                                                      }
+                                                      alt={
+                                                        item.product
+                                                          .product_name
+                                                      }
+                                                    />
+                                                    <div className="ml-4 text-sm font-medium text-gray-800">
+                                                      {
+                                                        item.product
+                                                          .product_name
+                                                      }
+                                                    </div>
+                                                  </div>
+                                                </td>
+                                                <td className="p-3 text-sm text-gray-500 text-center">
+                                                  {item.qty} x €
+                                                  {Number(item.price).toFixed(
+                                                    2
+                                                  )}
+                                                </td>
+                                                <td className="p-3 text-sm font-medium text-gray-900 text-right">
+                                                  €
+                                                  {Number(item.total).toFixed(
+                                                    2
+                                                  )}
+                                                </td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                      <InfoCard
+                                        title="Financial Summary"
+                                        icon={CreditCard}
+                                      >
+                                        <DetailRow
+                                          label="Subtotal"
+                                          value={`€${(
+                                            Number(order.total) -
+                                            (Number(order.delivery_cost) || 0)
+                                          ).toFixed(2)}`}
+                                        />
+                                        <DetailRow
+                                          label="Delivery Cost"
+                                          value={`€${Number(
+                                            order.delivery_cost || 0
+                                          ).toFixed(2)}`}
+                                        />
+                                        <hr className="my-2 border-dashed" />
+                                        <div className="flex justify-between items-center font-bold text-base pt-1">
+                                          <span>Grand Total:</span>
+                                          <span className="text-indigo-600">
+                                            €
+                                            {Number(
+                                              order.grand_total || order.total
+                                            ).toFixed(2)}
+                                          </span>
+                                        </div>
+                                      </InfoCard>
+                                    </div>
+                                  </div>
                                 </div>
                               </td>
                             </motion.tr>
@@ -339,7 +428,9 @@ const OrderManagement = () => {
                     No Orders Found
                   </h3>
                   <p className="mt-1 text-sm text-gray-500">
-                    Your search or filter criteria did not match any orders.
+                    {userOnly
+                      ? "You haven't placed any orders yet."
+                      : "No orders match the current criteria."}
                   </p>
                 </div>
               )}

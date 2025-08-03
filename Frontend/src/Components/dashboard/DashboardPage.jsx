@@ -40,23 +40,7 @@ const Dashboard = () => {
 
           <div className="flex items-center gap-4">
             
-            {/* Notification and Message Icons */}
-            {/* <div className="relative">
-              <FaBell className="text-gray-600 text-xl cursor-pointer" />
-              {notificationsCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                  {notificationsCount}
-                </span>
-              )}
-            </div>
-            <div className="relative">
-              <FaEnvelope className="text-gray-600 text-xl cursor-pointer" />
-              {messagesCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                  {messagesCount}
-                </span>
-              )}
-            </div> */}
+          
 
             <div className="flex items-center gap-2 cursor-pointer">
               <AnimatePresence mode="wait">
@@ -112,5 +96,4 @@ const Dashboard = () => {
     </div>
   );
 };
-
 export default Dashboard;

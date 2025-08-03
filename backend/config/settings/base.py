@@ -11,11 +11,6 @@ BASE_DIR = ROOT_DIR / "apps"
 
 ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1", "api"]
 
-local_env_file = path.join(ROOT_DIR, ".env")
-if path.isfile(local_env_file):
-    load_dotenv(local_env_file)
-else:
-    logger.warning(f".env.local file not found at {local_env_file}")
 
 # Application definition
 DJANGO_APPS = [

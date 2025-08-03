@@ -221,7 +221,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
               <button
                 onClick={handleAddToCart}
                 disabled={isPageLoading || cartLoading}
-                className="flex-1 flex items-center justify-center rounded-md border border-transparent bg-gray-900 px-8 py-3 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-white hover:border hover:border-primary hover:text-primary focus:outline-none  transition-colors duration-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {cartLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -232,7 +232,7 @@ const ProductDetailPage = ({ wishlist = [], onToggleWishlist = () => {} }) => {
               <button
                 onClick={() => onToggleWishlist(product.id)}
                 disabled={isPageLoading}
-                className="flex items-center justify-center rounded-md p-3 text-gray-400 border border-gray-300 hover:bg-gray-100 hover:text-red-500 transition-colors disabled:opacity-50"
+                className="flex items-center justify-center rounded-md p-3 text-primary border border-primary hover:bg-gray-100 hover:text-red-500 transition-colors disabled:opacity-50"
               >
                 <Heart
                   className={isWishlisted ? "text-red-500" : "text-gray-500"}

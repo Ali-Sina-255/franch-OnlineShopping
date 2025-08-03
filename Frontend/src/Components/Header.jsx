@@ -83,13 +83,13 @@ const Header = ({
               </button>
             </div>
 
-            <div className="flex items-center">
+            <div className=" items-center hidden md:flex">
               <Link to="/" className="flex items-center">
                 {/* Replaced text with logo */}
                 <img
                   src={logo}
                   alt="Website Logo"
-                  className="h-16  w-auto" // Adjust height as needed
+                  className="h-12  w-auto" // Adjust height as needed
                 />
               </Link>
             </div>

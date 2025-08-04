@@ -10,10 +10,6 @@ BASE_DIR = ROOT_DIR / "apps"
 
 ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1", "api"]
 
-<<<<<<< HEAD
-=======
-
->>>>>>> aukto
 # Application definition
 DJANGO_APPS = [
     "jazzmin",

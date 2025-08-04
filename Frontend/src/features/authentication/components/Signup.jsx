@@ -48,7 +48,7 @@ const SignUpPage = () => {
 
   return (
     <div
-      className="w-full min-h-screen flex justify-center items-center py-8"
+      className="w-full min-h-screen flex p-6 justify-center items-center py-8"
       style={{
         backgroundImage: 'url("/eur.png")',
         backgroundSize: "cover",
@@ -56,7 +56,7 @@ const SignUpPage = () => {
         backgroundAttachment: "fixed",
       }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
+      {/* <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div> */}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

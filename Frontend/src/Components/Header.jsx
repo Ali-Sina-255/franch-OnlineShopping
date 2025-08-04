@@ -76,7 +76,7 @@ const Header = ({
             <div className="flex items-center lg:hidden">
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="p-2 text-indigo-700 hover:text-indigo-900"
+                className="p-2 text-primary"
               >
                 <Menu size={24} />
               </button>
@@ -141,6 +141,7 @@ const Header = ({
               </Link>
               <Link
                 to="/wishlist"
+                onClick={() => scrollTo(0, 0)}
                 className="flex items-center p-2 text-primary transition-colors duration-200"
               >
                 <Heart size={24} />

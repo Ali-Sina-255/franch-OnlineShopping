@@ -38,7 +38,7 @@ const LoginPage = () => {
 
   return (
     <div
-      className="w-full h-screen flex justify-center items-center parallax-bg"
+      className="w-full  md:h-screen flex justify-center p-6 items-center parallax-bg"
       style={{
         backgroundImage: 'url("/1.jpg")',
         backgroundSize: "cover",
@@ -46,10 +46,10 @@ const LoginPage = () => {
         backgroundAttachment: "fixed",
       }}
     >
-      <div
+      {/* <div
         className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"
         style={{ zIndex: 1 }}
-      ></div>
+      ></div> */}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

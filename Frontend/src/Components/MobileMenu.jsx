@@ -65,17 +65,19 @@ const MobileMenu = ({
         className="fixed top-0 left-0 h-full w-4/5 max-w-sm bg-gradient-to-b from-indigo-50 to-white z-50 p-6 border-r border-indigo-100"
       >
         <div className="flex justify-between items-center mb-8">
-          <img src="44.png" alt="" className="h-10" />
+          <Link to="/" onClick={() => setMobileMenuOpen(false)}>
+            <img src="44.png" alt="" className="h-10 cursor-pointer" />
+          </Link>
           <div className="flex items-center gap-x-2 ">
             <Link
               to="/account"
-              className="p-2 text-indigo-700 hover:text-indigo-900  transition-colors duration-200"
+              className="p-2 text-primary  transition-colors duration-200"
             >
               <User size={24} />
             </Link>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-1 text-indigo-700 hover:text-indigo-900"
+              className="p-1 text-primary"
             >
               <X size={24} />
             </button>

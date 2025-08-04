@@ -97,7 +97,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
         className="flex items-center gap-2 bg-white border hover:bg-gray-300 rounded-full px-1.5 md:px-4 py-1.5 transition-all duration-300 cursor-pointer"
         onClick={handleSearchClick}
       >
-        <FiSearch size={24} className="text-gray-500" />
+        <FiSearch size={24} className="text-primary" />
         <span className="hidden md:block bg-transparent outline-none w-32 text-gray-500 text-sm truncate">
           {searchQuery || "Rechercher..."}
         </span>
@@ -126,7 +126,10 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
               <div className="md:flex justify-between items-center border-gray-200 px-4">
                 <div className="flex items-center justify-between gap-x-1 mb-3 md:mb-0">
                   {/* Your website name is preserved */}
-                  <p className="text-xl md:text-2xl font-bold">ChiqFirg</p>
+                  <div className="flex items-center gap-x-4">
+                    <img src="44.png" alt="logo" className="h-10" />
+                    <p className="text-xl font-semibold ">Chiq Frip</p>
+                  </div>
                   <button
                     onClick={handleCancelClick}
                     className="md:hidden py-2 text-gray-800 font-semibold hover:text-gray-500 text-lg transition"

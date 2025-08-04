@@ -6,22 +6,23 @@ import logo from "../../public/44.png"; // Make sure this path matches your logo
 const Footer = () => {
   return (
     <footer className="bg-primary text-white" aria-labelledby="footer-heading">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <div className="mx-auto max-w-7xl px-6 py-12 sm:px-6 lg:px-8 lg:py-12">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
-          <div className="space-y-8 xl:col-span-1">
+          <div className="space-y-4 md:space-y-8  xl:col-span-1">
             {/* Replaced text with logo */}
-            <Link to="/" className="flex items-center">
+            <Link to="/" className="flex items-center gap-x-5">
               <img
                 src="footer_logo1.png"
                 alt="Website Logo"
-                className="h-28 w-auto" // Adjust height to match your header logo
+                className="h-20 md:h-28 w-auto" // Adjust height to match your header logo
               />
+              <p className="text-3xl block md:hidden">Chiq Frip</p>
             </Link>
             <p className="text-base text-black">
               La mode durable, un article à la fois. Découvrez des pièces
               uniques d'occasion et offrez-leur une seconde vie.
             </p>
-            <div className="flex space-x-6">
+            <div className="flex justify-center md:justify-start space-x-6">
               <a href="#" className="text-black hover:text-white">
                 <span className="sr-only">Facebook</span>
                 <Facebook />
@@ -39,8 +40,8 @@ const Footer = () => {
               </a>
             </div>
           </div>
-          <div className="mt-12 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
-            <div className="md:grid md:grid-cols-2 md:gap-8">
+          <div className="mt-12 md:grid md:grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
+            <div className="md:grid flex justify-between  md:grid-cols-2 md:gap-8">
               <div>
                 <h3 className="text-sm font-semibold text-black tracking-wider uppercase">
                   Boutique
@@ -80,7 +81,7 @@ const Footer = () => {
                   </li>
                 </ul>
               </div>
-              <div className="mt-12 md:mt-0">
+              <div className=" md:mt-0">
                 <h3 className="text-sm text-black font-semibold tracking-wider uppercase">
                   Support
                 </h3>
@@ -112,7 +113,7 @@ const Footer = () => {
                 </ul>
               </div>
             </div>
-            <div className="md:grid md:grid-cols-1 md:gap-8">
+            <div className="mt-6 md:mt-0 md:grid md:grid-cols-1 md:gap-8">
               <div>
                 <h3 className="text-sm text-black font-semibold tracking-wider uppercase">
                   Abonnez-vous à notre newsletter
@@ -138,7 +139,7 @@ const Footer = () => {
                   <div className="mt-3 sm:mt-0 sm:ml-4 sm:flex-shrink-0">
                     <button
                       type="submit"
-                      className="flex w-full items-center justify-center rounded-md bg-white text-black px-3 py-2 text-sm font-semibold  shadow-sm   focus-visible:outline-2 focus-visible:outline-offset-2 "
+                      className="flex w-full items-center justify-center rounded-md bg-white text-primary px-3 py-2 text-sm font-semibold  shadow-sm   focus-visible:outline-2 focus-visible:outline-offset-2 "
                     >
                       S’abonner
                     </button>

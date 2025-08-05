@@ -107,7 +107,7 @@ const StatusUpdater = ({ order, statusType, onUpdate }) => {
       const api = createApiClient();
       const payload = { [statusType]: newStatus };
       const response = await api.patch(
-        `/api/v1/cart/orders/${order.id}/`,
+        `/api/v1/cart/orders/update/${order.id}/`,
         payload
       );
 

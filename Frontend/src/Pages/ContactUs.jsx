@@ -45,9 +45,6 @@ const ContactUs = () => {
     e.preventDefault();
     setFormStatus(null);
     setLoading(true);
-
-    // --- THIS IS THE UPDATED PART ---
-    // Construct the full API URL from the environment variable and the specific endpoint
     const apiUrl = `${
       import.meta.env.VITE_BASE_URL
     }/api/v1/notification/contacts/`;
@@ -59,13 +56,11 @@ const ContactUs = () => {
         type: "success",
         message: "Your message has been sent successfully!",
       });
-      // Clear form fields
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       console.error("Error submitting form:", error);
       let errorMessage = "An error occurred. Please try again later.";
       if (error.response && error.response.data && error.response.data.email) {
-        // Example of handling a specific backend validation error
         errorMessage = `Error: ${error.response.data.email[0]}`;
       }
       setFormStatus({
@@ -73,7 +68,7 @@ const ContactUs = () => {
         message: errorMessage,
       });
     } finally {
-      setLoading(false); // Stop loading regardless of outcome
+      setLoading(false); 
     }
   };
 
@@ -133,7 +128,6 @@ const ContactUs = () => {
                   </p>
                 </div>
               </div>
-
               <div className="gap-4">
                 <div className="flex items-center gap-x-2 justify-center bg-indigo-100 p-3 rounded-full">
                   <Mail className="text-indigo-600" size={30} />

@@ -33,7 +33,7 @@ const createApiClient = () => {
   return api;
 };
 
-// --- Sub-components ---
+// --- Sub-components (No changes here) ---
 
 const StatusBadge = ({ status }) => {
   const statusStyles = {
@@ -77,7 +77,6 @@ const DetailRow = ({ label, value }) => (
   </div>
 );
 
-// New component for updating statuses, visible only to admins
 const StatusUpdater = ({ order, statusType, onUpdate }) => {
   const [currentStatus, setCurrentStatus] = useState(order[statusType]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -110,14 +109,12 @@ const StatusUpdater = ({ order, statusType, onUpdate }) => {
         `/api/v1/cart/orders/${order.id}/`,
         payload
       );
-
       setCurrentStatus(response.data[statusType]);
       onUpdate(order.oid, response.data);
-
       toast.success(`${statusType.replace("_", " ")} updated successfully!`);
     } catch (error) {
       toast.error(`Failed to update ${statusType.replace("_", " ")}.`);
-      setCurrentStatus(order[statusType]);
+      setCurrentStatus(order[statusType]); // Revert on failure
     } finally {
       setIsUpdating(false);
     }
@@ -166,7 +163,6 @@ const OrderManagement = () => {
         const api = createApiClient();
         const endpoint = "/api/v1/cart/orders/";
         const response = await api.get(endpoint);
-
         const ordersData = response.data.results
           ? response.data.results
           : response.data;
@@ -364,18 +360,20 @@ const OrderManagement = () => {
                           <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-900">
                             €{Number(order.total).toFixed(2)}
                           </td>
+
+                          {/* ======================================================================== */}
+                          {/* THE FIX IS HERE: The logic for the "Payment Status" column is updated. */}
+                          {/* ======================================================================== */}
                           <td className="whitespace-nowrap px-3 py-4 text-sm">
-                            {isAdmin ? (
-                              <StatusUpdater
-                                order={order}
-                                statusType="payment_status"
-                                onUpdate={handleOrderUpdate}
-                              />
-                            ) : (
-                              <StatusBadge status={order.payment_status} />
-                            )}
+                            {/* For both admin and regular users, we now ONLY show the status badge. */}
+                            <StatusBadge status={order.payment_status} />
                           </td>
+                          {/* ======================================================================== */}
+                          {/* END OF FIX */}
+                          {/* ======================================================================== */}
+
                           <td className="whitespace-nowrap px-3 py-4 text-sm">
+                            {/* The "Order Status" column remains updatable for admins. */}
                             {isAdmin ? (
                               <StatusUpdater
                                 order={order}

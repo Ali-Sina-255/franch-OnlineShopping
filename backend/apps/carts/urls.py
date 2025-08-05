@@ -10,6 +10,7 @@ from .views import (
     CreateOrderView,
     OrderDeleteAPIView,
     OrderDetailAPIView,
+    OrderUpdateAPIView,
     PaymentSuccessView,
     ProductSalesStatsAPIView,
     ProductSalesSummaryListAPIView,
@@ -18,10 +19,15 @@ from .views import (
 )
 
 urlpatterns = [
+    # Create or update a cart item
     path("cart/", CartApiView.as_view(), name="cart-create-update"),
+    # Get all items for a specific cart ID (with optional user)
     path("cart/<str:cart_id>/", CartListView.as_view(), name="cart-list"),
+    # Get total for a specific cart ID (with optional user)
     path("cart/<str:cart_id>/total/", CartTotalView.as_view(), name="cart-total"),
+    # Get cart detail (aggregated summary)
     path("cart/<str:cart_id>/detail/", CartDetailView.as_view(), name="cart-detail"),
+    # Delete a specific cart item by item ID and cart ID
     path(
         "cart/<str:cart_id>/delete/<int:item_id>/",
         CartItemDeleteView.as_view(),
@@ -36,7 +42,7 @@ urlpatterns = [
     path("checkout/<str:order_id>/", CheckoutAPIView.as_view(), name="checkout-view"),
     path("payment-success/", PaymentSuccessView.as_view(), name="payment-success"),
     path("orders/", OrderDetailAPIView.as_view(), name="list_orders"),
-    path("orders/<int:pk>/delete/", OrderDeleteAPIView.as_view(), name="order-delete"),
+ path('orders/update/<int:pk>/', OrderUpdateAPIView.as_view(), name='order-update'),    path("orders/<int:pk>/delete/", OrderDeleteAPIView.as_view(), name="order-delete"),
     path(
         "wishlist/create/",
         WishlistCreateAPIView.as_view(),

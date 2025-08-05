@@ -1,5 +1,5 @@
 from decimal import Decimal
-
+from rest_framework.exceptions import NotFound, PermissionDenied
 import requests
 from apps.carts.models import Cart
 from apps.carts.permission import IsAdminOrOwner
@@ -213,6 +213,27 @@ class OrderDetailAPIView(generics.GenericAPIView):
             orders = CartOrder.objects.all()
 
         serializer = self.get_serializer(orders, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        # Expecting 'pk' in URL kwargs to identify the order to update
+        pk = kwargs.get('pk')
+        if not pk:
+            return Response({"detail": "Missing order ID (pk)."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            order = CartOrder.objects.get(pk=pk)
+        except CartOrder.DoesNotExist:
+            raise NotFound("Order not found.")
+
+        # Optional: restrict update only to owner of the order
+        if request.user.is_authenticated and order.user != request.user:
+            raise PermissionDenied("You do not have permission to update this order.")
+
+        serializer = self.get_serializer(order, data=request.data, partial=True)  # partial=True to allow partial updates
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

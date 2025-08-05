@@ -203,35 +203,28 @@ class OrderDetailAPIView(generics.GenericAPIView):
     serializer_class = CartOrderSerializer
     permission_classes = [IsAuthenticated, IsAdminOrOwner]
     queryset = CartOrder.objects.all()
-
     def get(self, request, *args, **kwargs):
         user = request.user
-
         if user.is_staff:
             orders = CartOrder.objects.all().order_by("-date")  # Admin sees all
         else:
             orders = CartOrder.objects.filter(user=user).order_by("-date")  # Regular user sees only their own
-
         serializer = self.get_serializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
 class CheckoutAPIView(generics.RetrieveAPIView):
     serializer_class = CartOrderSerializer
     lookup_field = "order_id"
-
     def get_object(self):
         order_id = self.kwargs["order_id"]
         order = CartOrder.objects.get(oid=order_id)
-
         return order
-
-
+    
 def get_access_token(client_id, secret_key):
-    # Function to get access token from PayPal API
     token_url = "https://api.sandbox.paypal.com/v1/oauth2/token"
     data = {"grant_type": "client_credentials"}
     auth = (client_id, secret_key)
     response = requests.post(token_url, data=data, auth=auth)
-
     if response.status_code == 200:
         print("access_token ====", response.json()["access_token"])
         return response.json()["access_token"]
@@ -239,12 +232,9 @@ def get_access_token(client_id, secret_key):
         raise Exception(
             f"Failed to get access token from PayPal. Status code: {response.status_code}"
         )
-
-
 class PaymentSuccessView(generics.CreateAPIView):
     serializer_class = CartOrderSerializer
     queryset = CartOrder.objects.all()
-
     def create(self, request, *args, **kwargs):
         payload = request.data
         order_oid = payload["order_oid"]

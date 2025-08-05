@@ -4,13 +4,9 @@ from os import getenv, path
 from pathlib import Path
 
 
-
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 BASE_DIR = ROOT_DIR / "apps"
-
 ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1", "api"]
-
-# Application definition
 DJANGO_APPS = [
     "jazzmin",
     "django.contrib.admin",
@@ -22,7 +18,6 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django_extensions",
 ]
-
 LOCAL_APPS = [
     "apps.users",
     "apps.common",
@@ -32,7 +27,6 @@ LOCAL_APPS = [
     "apps.carts",
     "apps.notification",
 ]
-
 THIRD_PARTY_APPS = [
     "drf_spectacular",
     "rest_framework",
@@ -40,11 +34,9 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "taggit",
 ]
-
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
-
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # ✅ Put this FIRST
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -55,9 +47,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
 ROOT_URLCONF = "config.urls"
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -74,16 +64,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
-# Database settings
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": ROOT_DIR / "db.sqlite3",
     }
 }
-
-# Password validation settings
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -98,51 +84,33 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
-
-# Localization settings
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = "/static/"
 STATIC_ROOT = str(ROOT_DIR / "staticfiles")
-
-# Media files (uploads)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = str(ROOT_DIR / "mediafile")
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# CORS settings
-# CORS_URLS_REGEX = r"^api/.*$"
-
-# Custom User model
 AUTH_USER_MODEL = "users.User"
 
-# Static files storage (Optional)
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Email settings (remove if not required)
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://chiqfrip.hzcitycenter.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-
-
-# Rest framework settings with JWT
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -155,7 +123,6 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
-
 # Simple JWT settings
 SIMPLE_JWT = {
     "AUTH_HDEFAULT_FROM_EMAILEADER_TYPES": (
@@ -172,8 +139,6 @@ SIMPLE_JWT = {
 SITE_ID = 1
 PAYPAL_CLIENT_ID = os.getenv("CLIENT_ID")
 PAYPAL_SECRET_ID = os.getenv("SECRET_KEY")
-
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -195,55 +160,35 @@ LOGGING = {
     },
 }
 
-
 DEFAULT_FROM_EMAIL = "alisinasultani255@gmail.com"
-
-
 JAZZMIN_SETTINGS = {
-    # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "Chiq Frip Admin",
-    # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_header": "Chiq Frip",
-    # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "Chiq Frip",
-    # Logo to use for your site, must be present in static files, used for brand on top left
-    # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
     "login_logo": None,
-    # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
-    # CSS classes that are applied to the logo above
     "site_logo_classes": "img-circle",
-    # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
     "site_icon": None,
-    # Welcome text on the login screen
     "welcome_sign": "Welcome to the Chiq Frip",
-    # Copyright on the footer
     "copyright": "Chiq Frip Ltd",
-    # List of model admins to search from the search bar, search bar omitted if excluded
-    # If you want to use a single search field you dont need to use a list, you can use a simple string
     "search_model": ["auth.User"],
     "show_sidebar": True,
-    # Whether to aut expand the menu
     "navigation_expanded": True,
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
     },
-    # Icons that are used when one is not manually specified
     "default_icon_parents": "fas fa-chevron-circle-right",
     "default_icon_children": "fas fa-circle",
     "related_modal_active": False,
     "show_ui_builder": False,
     "changeform_format": "horizontal_tabs",
-    # override change forms on a per modeladmin basis
     "changeform_format_overrides": {
         "auth.user": "collapsible",
         "auth.group": "vertical_tabs",
     },
 }
-
-
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": True,
     "footer_small_text": False,

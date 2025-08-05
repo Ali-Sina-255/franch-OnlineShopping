@@ -147,14 +147,14 @@ const ContactUs = () => {
                       href="mailto:info@chigfrip.com"
                       className="hover:text-indigo-600 transition-colors"
                     >
-                      info@chigfrip.com
+                      chigfrip@outlook.fr
                     </a>
                     <br />
                     <a
                       href="mailto:support@chigfrip.com"
                       className="hover:text-indigo-600 transition-colors"
                     >
-                      support@chigfrip.com
+                      chigfrip@outlook.fr
                     </a>
                   </p>
                 </div>

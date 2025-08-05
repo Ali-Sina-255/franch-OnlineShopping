@@ -8,6 +8,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   theme: themeReducer,
   checkout: checkoutReducer,
+  userSettings: userReducer,
 });
 const persistConfig = {
   key: "root",

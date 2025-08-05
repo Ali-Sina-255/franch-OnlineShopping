@@ -27,7 +27,7 @@ class BrandAPIViewSet(generics.ListCreateAPIView):
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.filter(is_available=True)
     serializer_class = ProductSerializer
     parser_classes = [MultiPartParser, FormParser]
     pagination_class = ProductPageNumberPagination

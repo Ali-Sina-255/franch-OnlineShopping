@@ -4,13 +4,9 @@ from os import getenv, path
 from pathlib import Path
 
 
-
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 BASE_DIR = ROOT_DIR / "apps"
-
 ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1", "api"]
-
-# Application definition
 DJANGO_APPS = [
     "jazzmin",
     "django.contrib.admin",
@@ -22,7 +18,6 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django_extensions",
 ]
-
 LOCAL_APPS = [
     "apps.users",
     "apps.common",
@@ -32,7 +27,6 @@ LOCAL_APPS = [
     "apps.carts",
     "apps.notification",
 ]
-
 THIRD_PARTY_APPS = [
     "drf_spectacular",
     "rest_framework",
@@ -40,11 +34,9 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "taggit",
 ]
-
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
-
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # ✅ Put this FIRST
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -55,9 +47,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
 ROOT_URLCONF = "config.urls"
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -74,16 +64,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
-# Database settings
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": ROOT_DIR / "db.sqlite3",
     }
 }
-
-# Password validation settings
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -98,51 +84,33 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
-
-# Localization settings
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = "/static/"
 STATIC_ROOT = str(ROOT_DIR / "staticfiles")
-
-# Media files (uploads)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = str(ROOT_DIR / "mediafile")
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# CORS settings
-# CORS_URLS_REGEX = r"^api/.*$"
-
-# Custom User model
 AUTH_USER_MODEL = "users.User"
 
-# Static files storage (Optional)
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Email settings (remove if not required)
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://chiqfrip.hzcitycenter.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-
-
-# Rest framework settings with JWT
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -155,7 +123,6 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
-
 # Simple JWT settings
 SIMPLE_JWT = {
     "AUTH_HDEFAULT_FROM_EMAILEADER_TYPES": (
@@ -172,8 +139,6 @@ SIMPLE_JWT = {
 SITE_ID = 1
 PAYPAL_CLIENT_ID = os.getenv("CLIENT_ID")
 PAYPAL_SECRET_ID = os.getenv("SECRET_KEY")
-
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -195,10 +160,7 @@ LOGGING = {
     },
 }
 
-
 DEFAULT_FROM_EMAIL = "alisinasultani255@gmail.com"
-
-
 JAZZMIN_SETTINGS = {
     "site_title": "Chiq Frip Admin",
     "site_header": "Chiq Frip",
@@ -227,8 +189,6 @@ JAZZMIN_SETTINGS = {
         "auth.group": "vertical_tabs",
     },
 }
-
-
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": True,
     "footer_small_text": False,
@@ -260,4 +220,3 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-outline-success",
     },
 }
-

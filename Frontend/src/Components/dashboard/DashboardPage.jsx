@@ -6,8 +6,6 @@ import { useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
-
-// Note: I've renamed this to DashboardPage to avoid confusion with the inner Dashboard component.
 const DashboardPage = () => {
   const [activeComponent, setActiveComponent] = useState("dashboard");
   const [isFocused, setIsFocused] = useState(false);
@@ -81,7 +79,6 @@ const DashboardPage = () => {
           </div>
         </div>
         <main className="flex-1 overflow-y-auto custom-scrollbar">
-          {/* This is the only change in this file */}
           <MainContent
             activeComponent={activeComponent}
             setActiveComponent={setActiveComponent}
@@ -92,4 +89,4 @@ const DashboardPage = () => {
   );
 };
 
-export default DashboardPage; // Renamed export
+export default DashboardPage;

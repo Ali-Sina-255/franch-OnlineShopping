@@ -163,6 +163,7 @@ const checkoutSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
+      
       .addCase(fetchOrderForCheckout.fulfilled, (state, action) => {
         state.loading = false;
         state.order = action.payload;

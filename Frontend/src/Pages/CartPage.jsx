@@ -166,19 +166,11 @@ const CartPage = () => {
   const handleRemoveItem = (itemId) => {
     dispatch(removeItemFromCart(itemId));
   };
-
-  // ========================================================================
-  // THE FIX: Send the CHANGE in quantity (+1 or -1), not the new total.
-  // ========================================================================
   const handleQuantityChange = (productId, change) => {
-    // We no longer need to calculate the new quantity on the frontend.
-    // We just send the product ID and the amount to change the quantity by.
     dispatch(addItemToCart({ product_id: productId, qty: change }));
   };
-  // ========================================================================
-  // END OF FIX
-  // ========================================================================
 
+  
   if (cartLoading && cartItems.length === 0) {
     return <LoadingCart />;
   }
@@ -186,7 +178,7 @@ const CartPage = () => {
   if (cartItems.length === 0) {
     return <EmptyCart />;
   }
-
+  
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 pt-16 pb-24 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -225,5 +217,4 @@ const CartPage = () => {
     </div>
   );
 };
-
 export default CartPage;

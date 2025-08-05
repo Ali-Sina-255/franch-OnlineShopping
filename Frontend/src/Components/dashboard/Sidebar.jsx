@@ -76,7 +76,7 @@ const Sidebar = ({ setActiveComponent, activeComponent }) => {
       value: "orders",
       icon: <FaBoxOpen className="text-purple-500" />,
       adminOnly: false,
-    }, 
+    },
     {
       name: "Profile",
       value: "profile",
@@ -99,7 +99,6 @@ const Sidebar = ({ setActiveComponent, activeComponent }) => {
     return true;
   });
 
-  
   return (
     <>
       {/* Sidebar */}
@@ -113,7 +112,7 @@ const Sidebar = ({ setActiveComponent, activeComponent }) => {
             to="/"
             className="flex items-center justify-center p-2 bg-gray-300 h-8 w-8 md:h-10 md:w-10 rounded-full"
           >
-     <img src="44.png" alt="logo" className="" />
+            <img src="44.png" alt="logo" className="" />
           </Link>
           <Link
             to="/"

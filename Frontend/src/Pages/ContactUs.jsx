@@ -76,7 +76,10 @@ const ContactUs = () => {
     <div className="bg-gradient-to-b from-indigo-50/20 to-white min-h-screen">
       {/* Hero Section */}
 
-      <section className="relative bg-[url('about.png')] bg-cover bg-center bg-no-repeat text-white py-20 h-[400px]">
+      <section
+        style={{ backgroundImage: `url('about.png')` }}
+        className="relative  bg-cover bg-center bg-no-repeat text-white py-20 h-[400px]"
+      >
         <div className="absolute inset-0 bg-black opacity-50 z-0" />
         <div className="container mx-auto px-6 text-center relative z-10">
           <motion.h1
@@ -114,8 +117,8 @@ const ContactUs = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-x-10 gap-y-10 mb-8 pt-5">
               <div className=" text-center gap-4">
-                <div className="flex items-center gap-x-2  justify-center bg-indigo-100 p-3 rounded-full">
-                  <MapPin className="text-indigo-600" size={30} />
+                <div className="flex items-center gap-x-2  justify-center bg-primary/50 p-3 rounded-full">
+                  <MapPin className="" size={30} />
                   <h3 className="font-semibold text-lg text-gray-900">
                     Notre adresse
                   </h3>
@@ -129,8 +132,8 @@ const ContactUs = () => {
                 </div>
               </div>
               <div className="gap-4">
-                <div className="flex items-center gap-x-2 justify-center bg-indigo-100 p-3 rounded-full">
-                  <Mail className="text-indigo-600" size={30} />
+                <div className="flex items-center gap-x-2 justify-center bg-primary/50 p-3 rounded-full">
+                  <Mail className="" size={30} />
                   <h3 className="font-semibold text-lg text-gray-900">
                     Nous écrire
                   </h3>
@@ -155,8 +158,8 @@ const ContactUs = () => {
               </div>
 
               <div className="gap-4">
-                <div className="flex items-center gap-x-2 justify-center bg-indigo-100 p-3 rounded-full">
-                  <Phone className="text-indigo-600" size={30} />
+                <div className="flex items-center gap-x-2 justify-center bg-primary/50 p-3 rounded-full">
+                  <Phone className="" size={30} />
                   <h3 className="font-semibold text-lg text-gray-900">
                     Appelez-nous
                   </h3>
@@ -176,8 +179,8 @@ const ContactUs = () => {
               </div>
 
               <div className="gap-4">
-                <div className="flex items-center gap-x-2 justify-center bg-indigo-100 p-3 rounded-full">
-                  <Clock className="text-indigo-600" size={30} />
+                <div className="flex items-center gap-x-2 justify-center bg-primary/50 p-3 rounded-full">
+                  <Clock className="" size={30} />
                   <h3 className="font-semibold text-lg text-gray-900">
                     Heures d’ouverture
                   </h3>
@@ -301,7 +304,7 @@ const ContactUs = () => {
                 </div>
               </form>
             </div>
-            <div className="col-span-1 flex items-center bg-white rounded-xl shadow-sm p-8">
+            <div className="col-span-1 flex items-center bg-white  p-8">
               <FAQSection />
             </div>
           </div>

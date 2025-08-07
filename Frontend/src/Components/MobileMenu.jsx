@@ -69,7 +69,8 @@ const MobileMenu = ({
           </Link>
           <div className="flex items-center gap-x-2">
             <Link
-              to="/account"
+              to="/dashboard"
+              onClick={() => setMobileMenuOpen(false)}
               className="p-2 text-primary transition-colors duration-200"
             >
               <User size={24} />

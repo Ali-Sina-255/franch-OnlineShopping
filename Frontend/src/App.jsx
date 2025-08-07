@@ -25,6 +25,7 @@ import CookieConsentBanner from "./Components/CookieConsentBanner";
 import AuthContainer from "./features/authentication/components/AuthContainer";
 import ForgotPassword from "./Pages/ForgotPassword";
 import CreateNewPassword from "./Pages/CreatePassword";
+import NotFound from "./Pages/NotFound";
 
 function App() {
   const [wishlist, setWishlist] = useState([]);
@@ -127,7 +128,7 @@ function App() {
           />
           <Route path="/cookie-policy" element={<CookiePolicyPage />} />
           <Route element={<PrivateRoute />}>
-            <Route path="/dashboard/*" element={<DashboardPage />} />
+            <Route path="/dashboard/" element={<DashboardPage />} />
             <Route path="/shipping-details" element={<ShippingDetailsPage />} />
             <Route path="/checkout/:orderId" element={<CheckoutPage />} />
             <Route
@@ -138,10 +139,11 @@ function App() {
 
           <Route path="/sign-in" element={<Signin />} />
           <Route path="/sign-up" element={<SignUp />} />
-          <Route path="*" element={<Signin />} />
+          {/* <Route path="*" element={<Signin />} /> */}
           <Route path="/logee" element={<AuthContainer />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/create-new-password" element={<CreateNewPassword />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 

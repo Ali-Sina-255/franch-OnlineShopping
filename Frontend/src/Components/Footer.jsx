@@ -16,7 +16,11 @@ const Footer = () => {
                 alt="Website Logo"
                 className="h-20 md:h-28 w-auto" // Adjust height to match your header logo
               />
-              <p className="text-3xl block md:hidden">Chiq Frip</p>
+
+              <span className="text-3xl block font-semibold  tracking-wide">
+                <span className="overline decoration-2">Chiq</span>{" "}
+                <span className="underline decoration-2">Frip</span>
+              </span>
             </Link>
             <p className="text-base text-black">
               La mode durable, un article à la fois. Découvrez des pièces

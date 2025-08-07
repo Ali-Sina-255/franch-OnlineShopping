@@ -206,7 +206,7 @@ const ProductListPage = forwardRef(
 
     return (
       <div className="bg-gradient-to-b from-indigo-50/20 to-white">
-        <main className="mx-auto max-w-[95%] px-8 sm:px-6 lg:px-8">
+        <main className="mx-auto max-w-[95%] px-5 sm:px-5 lg:px-8">
           <div className="flex items-baseline justify-between border-b border-indigo-100 pb-6 pt-12">
             <h1 className=" text-xl md:text-2xl lg:text-4xl font-bold tracking-tight text-indigo-900 capitalize">
               {activeCategory
@@ -305,20 +305,21 @@ const ProductListPage = forwardRef(
                           <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="lg:col-span-3 text-center py-20"
+                            className=" w-full col-span-3 lg:col-span-4 text-center "
                           >
-                            <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-8 rounded-xl">
+                            <div className="bg-primary/10 p-5 sm:p-10 md:py-12  lg:p-16 rounded-xl">
                               <h3 className="text-xl font-medium text-gray-900">
-                                No Products Found
+                                Aucun produit trouvé
                               </h3>
                               <p className="text-indigo-600 mt-2">
-                                Try adjusting your search or filter criteria.
+                                Essayez de modifier vos critères de recherche ou
+                                de filtrage.
                               </p>
                               <button
                                 onClick={resetFilters}
-                                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                                className="rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-white hover:border hover:border-primary hover:text-primary focus:outline-none cursor-pointer  transition-colors duration-500  mt-10"
                               >
-                                Reset All Filters
+                                Réinitialiser tous les filtres
                               </button>
                             </div>
                           </motion.div>

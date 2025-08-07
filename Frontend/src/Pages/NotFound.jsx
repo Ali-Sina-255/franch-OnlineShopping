@@ -1,49 +1,41 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const NotFound = () => {
   const navigate = useNavigate();
 
-  // Redirect to home page after 5 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate("/"); // Redirects to home page
+      navigate("/");
     }, 5000);
-
-    // Cleanup the timer on component unmount
     return () => clearTimeout(timer);
   }, [navigate]);
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-white to-gray-200 text-slate-900 px-6">
-      {/* تصویر */}
+    <div className="flex flex-col items-center pt-20 sm:pt-10 md:pt-0 md:justify-center min-h-screen bg-white px-6 text-center text-gray-800">
       <img
-        src='notfound.png' // جایگزین با تصویر دلخواه شما
-        alt="404 Not Found"
-        className="w-64 md:w-96 mb-6 animate-pulse"
+        src="/not-found.png" // Assurez-vous que cette image existe
+        alt="Page non trouvée"
+        className="w-36 md:w-80 mb-6 animate-pulse"
       />
 
-      {/* متن */}
-      <h1 className="text-6xl font-extrabold mb-4">۴۰۴</h1>
-      <p className="text-2xl font-semibold mb-4">
-        اوه! صفحه مورد نظر یافت نشد.
+      <h1 className="text-5xl font-bold mb-2">404</h1>
+      <p className="text-xl font-medium mb-3">
+        Oups ! Cette page n’existe pas.
       </p>
-      <p className="text-lg mb-4 text-slate-900">
-        متأسفیم، اما صفحه‌ای که به دنبال آن هستید وجود ندارد.
-      </p>
-
-      {/* پیام هدایت */}
-      <p className="text-sm text-slate-900 mb-6">
-        در حال هدایت به صفحه اصلی در ۵ ثانیه...
+      <p className="text-base mb-6 text-gray-600">
+        Nous sommes désolés, la page que vous recherchez est introuvable.
       </p>
 
-      {/* دکمه بازگشت به خانه */}
+      <p className="text-sm text-gray-500 mb-6">
+        Redirection vers la page d’accueil dans 5 secondes...
+      </p>
+
       <button
         onClick={() => navigate("/")}
-        className="bg-green text-white px-6 py-3 rounded-lg text-lg transition duration-300 shadow-md"
+        className="rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-white hover:border hover:border-primary hover:text-primary focus:outline-none cursor-pointer  transition-colors duration-500 "
       >
-        بازگشت به صفحه اصلی
+        Retour à l’accueil
       </button>
     </div>
   );

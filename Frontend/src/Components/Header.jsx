@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Search, User, ShoppingBag, Menu, X, Heart } from "lucide-react";
+import { RiMenu2Fill } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
@@ -65,7 +66,7 @@ const Header = ({
   return (
     <>
       <header
-        className={`sticky top-0 z-30 transition-all duration-300 ${
+        className={`sticky  top-0 z-30 transition-all duration-300 ${
           isScrolled
             ? "bg-white/80 backdrop-blur-lg border-indigo-100 shadow-sm"
             : "bg-gradient-to-r from-indigo-50 via-white to-blue-50 backdrop-blur-sm border-indigo-100"
@@ -73,16 +74,20 @@ const Header = ({
       >
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center lg:hidden">
+            <div className="flex items-center gap-x-2 lg:hidden">
               <button
                 onClick={() => setMobileMenuOpen(true)}
                 className="p-2 text-primary"
               >
-                <Menu size={24} />
+                <RiMenu2Fill size={24} />
               </button>
+              <span className="text-base font-semibold text-primary tracking-wide">
+                <span className="overline decoration-2">Chiq</span>{" "}
+                <span className="underline decoration-2">Frip</span>
+              </span>
             </div>
 
-            <div className="items-center hidden md:flex">
+            <div className="items-center hidden lg:flex">
               <Link to="/" className="flex items-center">
                 {/* Replaced text with logo */}
                 <img
@@ -134,7 +139,7 @@ const Header = ({
                 setSearchQuery={setSearchQuery}
               />
               <Link
-                to="/account"
+                to="/dashboard"
                 className="p-2 text-primary hidden lg:block transition-colors duration-200"
               >
                 <User size={24} />

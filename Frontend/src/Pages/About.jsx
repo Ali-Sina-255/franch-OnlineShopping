@@ -35,7 +35,10 @@ const About = () => {
   return (
     <div className="bg-gradient-to-b from-indigo-50/20 to-white min-h-screen ">
       {/* Hero Section */}
-      <section className="relative bg-[url('about.png')] bg-cover bg-center bg-no-repeat text-white py-20 h-[400px]">
+      <section
+        style={{ backgroundImage: `url('about.png')` }}
+        className="relative  bg-cover bg-center bg-no-repeat text-white py-20 h-[400px]"
+      >
         <div className="absolute inset-0 bg-black opacity-50 z-0" />
         <div className="container mx-auto px-6 text-center relative z-10">
           <motion.h1
@@ -63,7 +66,7 @@ const About = () => {
       </section>
 
       {/* Main Content */}
-      <div className="container max-w-[90%] mx-auto px-6 py-16">
+      <div className="container max-w-[90%] mx-auto px-5 py-16">
         {/* Our Story */}
         <section className="mb-20">
           <div className="flex flex-col lg:flex-row gap-12 ">
@@ -135,29 +138,29 @@ const About = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
-                icon: <ShieldCheck size={40} className="text-indigo-600" />,
+                icon: <ShieldCheck size={40} className="text-black" />,
                 title: "Authenticité",
                 desc: "Chaque article est rigoureusement vérifié pour garantir son authenticité avant mise en vente.",
               },
               {
-                icon: <Truck size={40} className="text-indigo-600" />,
+                icon: <Truck size={40} className="text-black" />,
                 title: "Livraison Rapide",
                 desc: "Expédition sous 1-2 jours ouvrés avec suivi de colis fourni.",
               },
               {
-                icon: <CreditCard size={40} className="text-indigo-600" />,
+                icon: <CreditCard size={40} className="text-black" />,
                 title: "Paiements Sécurisés",
                 desc: "Vos informations de paiement sont toujours protégées.",
               },
               {
-                icon: <Headphones size={40} className="text-indigo-600" />,
+                icon: <Headphones size={40} className="text-black" />,
                 title: "Support 24/7",
                 desc: "Notre service client est disponible à tout moment pour vous aider.",
               },
             ].map((item, index) => (
               <div
                 key={index}
-                className=" p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center bg-indigo-200"
+                className=" p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center bg-primary/50"
               >
                 <div className="flex justify-center mb-4 text-white">
                   {item.icon}
@@ -172,14 +175,14 @@ const About = () => {
         </section>
 
         {/* Payment Methods - Focus on PayPal */}
-        <section className="mb-20 bg-white  p-8 lg:p-12  border-gray-100">
-          <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 mb-10 text-center">
+        <section className="mb-10 md:mb-20 bg-white  p-5 lg:p-12  border-gray-100">
+          <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-indigo-900 mb-10 text-center">
             Options de Paiement Sécurisées
           </h2>
 
           <div className="flex flex-col-reverse lg:flex-row gap-12 items-center">
             {/* Text Section */}
-            <div className="lg:w-1/2">
+            <div className="lg:w-1/2 w-full">
               <h3 className="text-2xl font-semibold mb-5 text-gray-900 flex items-center">
                 <FaPaypal size={36} className="text-blue-500 mr-3" />
                 Paiements PayPal

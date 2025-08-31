@@ -1,6 +1,5 @@
 {
   "name": "vite-project",
-  "homepage": "https://app.tamadonprintingpress.com/",
   "private": true,
   "version": "0.0.0",
   "type": "module",

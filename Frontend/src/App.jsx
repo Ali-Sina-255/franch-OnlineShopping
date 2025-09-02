@@ -29,7 +29,6 @@ import NotFound from "./Pages/NotFound";
 
 function App() {
   const [wishlist, setWishlist] = useState([]);
-  // THE SEARCH STATE IS MANAGED HERE AT THE TOP LEVEL
   const [searchQuery, setSearchQuery] = useState("");
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -38,7 +37,6 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    // Only clear search query when navigating away from the homepage
     if (location.pathname !== "/") {
       setSearchQuery("");
     }
@@ -58,7 +56,23 @@ function App() {
     });
   };
 
-  const hideLayout = location.pathname.startsWith("/dashboard");
+  // --- SOLUTION START ---
+
+  // 1. Define all paths where the Header and Footer should be hidden.
+  const authPages = [
+    "/sign-in",
+    "/sign-up",
+    "/logee", // Your AuthContainer route
+    "/forgot-password",
+    "/create-new-password",
+  ];
+
+  // 2. Check if the current path is the dashboard OR one of the auth pages.
+  const isDashboard = location.pathname.startsWith("/dashboard");
+  const isAuthPage = authPages.includes(location.pathname);
+  const hideLayout = isDashboard || isAuthPage;
+
+  // --- SOLUTION END ---
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -79,10 +93,10 @@ function App() {
         onAnimationComplete={() => setAnimationData(null)}
       />
 
+      {/* This condition now hides the Header on auth pages too */}
       {!hideLayout && (
         <Header
           wishlistCount={wishlist.length}
-          // PASS THE SEARCH STATE AND SETTER DOWN TO THE HEADER
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onCartClick={() => setIsCartOpen(true)}
@@ -95,7 +109,6 @@ function App() {
           <Route
             path="/"
             element={
-              // PASS THE SEARCH QUERY DOWN TO THE HOMEPAGE/PRODUCT LIST
               <HomePage
                 searchQuery={searchQuery}
                 onQuickView={setQuickViewProduct}
@@ -137,16 +150,18 @@ function App() {
             />
           </Route>
 
+          {/* Authentication Pages */}
           <Route path="/sign-in" element={<Signin />} />
           <Route path="/sign-up" element={<SignUp />} />
-          {/* <Route path="*" element={<Signin />} /> */}
           <Route path="/logee" element={<AuthContainer />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/create-new-password" element={<CreateNewPassword />} />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 
+      {/* This condition now hides the Footer on auth pages */}
       {!hideLayout && <Footer />}
       <CookieConsentBanner />
     </div>

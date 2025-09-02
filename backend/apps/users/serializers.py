@@ -46,9 +46,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CustomRegisterSerializer(serializers.ModelSerializer):
-    role = serializers.ChoiceField(
-        choices=User.ROLE_CHOICES.choices,
-    )
+    # role = serializers.ChoiceField(
+    #     choices=User.ROLE_CHOICES.choices,
+    # )
     username = serializers.CharField(required=True)
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
@@ -63,7 +63,7 @@ class CustomRegisterSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "role",
+            # "role",
             "password1",
             "password2",
         ]

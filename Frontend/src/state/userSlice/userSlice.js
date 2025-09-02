@@ -37,6 +37,79 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// New async thunk to refresh token
+export const refreshAccessToken = createAsyncThunk(
+  "user/refreshAccessToken",
+  async (_, { getState, rejectWithValue, dispatch }) => {
+    const { refreshToken } = getState().user;
+    if (!refreshToken) {
+      // No refresh token available, user needs to re-login
+      dispatch(signOutSuccess());
+      return rejectWithValue("No refresh token available.");
+    }
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/api/v1/auth/token/refresh/`,
+        {
+          refresh: refreshToken,
+        }
+      );
+      const { access } = response.data;
+      // If your backend also returns a new refresh token with refresh endpoint,
+      // you would handle it here:
+      // const { access, refresh: newRefreshToken } = response.data;
+      // return { access, newRefreshToken };
+      return access;
+    } catch (error) {
+      // Refresh token failed, user needs to re-login
+      dispatch(signOutSuccess());
+      toast.error("Session expired. Please log in again.");
+      return rejectWithValue(getErrorMessage(error));
+    }
+  }
+);
+
+// Use an interceptor to handle 401 errors and automatically refresh tokens
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    // Check if the error is 401 (Unauthorized) and if we haven't already retried this request
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true; // Mark this request as being retried
+
+      const state = store.getState(); // Get the latest state
+      const currentAccessToken = state.user.accessToken;
+
+      // Ensure the original request was actually using the expired access token
+      // and not, for example, a request to refresh the token itself.
+      if (
+        currentAccessToken &&
+        originalRequest.headers.Authorization === `Bearer ${currentAccessToken}`
+      ) {
+        try {
+          // Dispatch the refreshAccessToken thunk and unwrap its payload
+          const newAccessToken = await store
+            .dispatch(refreshAccessToken())
+            .unwrap();
+
+          // Update the authorization header for the original request with the new access token
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+          // Retry the original request with the new token
+          return api(originalRequest);
+        } catch (refreshError) {
+          // If refreshing fails, the refreshAccessToken thunk should have dispatched signOutSuccess
+          // Propagate the error to the original caller
+          return Promise.reject(refreshError);
+        }
+      }
+    }
+    // For all other errors, or if it's a 401 that couldn't be refreshed/retried
+    return Promise.reject(error);
+  }
+);
+
 // --- ASYNC THUNKS FOR PROFILE MANAGEMENT ---
 
 export const fetchUserProfile = createAsyncThunk(
@@ -239,7 +312,7 @@ const userSlice = createSlice({
           email: actualProfile.email,
           first_name: actualProfile.first_name,
           last_name: actualProfile.last_name,
-          role:actualProfile.role,
+          role: actualProfile.role,
         };
       })
       .addCase(signIn.rejected, (state, action) => {
@@ -256,6 +329,15 @@ const userSlice = createSlice({
       .addCase(createUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // New: Handle successful token refresh
+      .addCase(refreshAccessToken.fulfilled, (state, action) => {
+        state.accessToken = action.payload; // Update with the new access token
+        state.loading = false; // Ensure loading state is false after refresh
+      })
+      .addCase(refreshAccessToken.rejected, (state, action) => {
+        // The thunk itself dispatches signOutSuccess, so no further state change here
+        state.loading = false;
       })
 
       // Cart Reducers
@@ -296,7 +378,6 @@ const userSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
-        // ===== FIX: Unwrap the nested profile object from the API response =====
         const actualProfile = action.payload.profile;
         state.profile = actualProfile;
         state.currentUser = {
@@ -338,5 +419,3 @@ export default userSlice.reducer;
 export const injectStore = (_store) => {
   store = _store;
 };
-
-

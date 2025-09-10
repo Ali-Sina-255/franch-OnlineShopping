@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Payment Confirmation</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+        padding: 30px;
+      }
+      .container {
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+      }
+      .header {
+        text-align: center;
+        padding-bottom: 20px;
+      }
+      .header h1 {
+        color: #28a745;
+      }
+      .content p {
+        font-size: 15px;
+        margin-bottom: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      table th,
+      table td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: left;
+      }
+      table th {
+        background-color: #f1f1f1;
+      }
+      .footer {
+        margin-top: 30px;
+        font-size: 13px;
+        color: #999;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Thank you for your payment!</h1>
+      </div>
+      <div class="content">
+        <p>Hi {{ full_name }},</p>
+        <p>
+          Your payment for order <strong>{{ order_id }}</strong> has been
+          successfully processed.
+        </p>
+
+        <h3>Order Details:</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order_items %}
+            <tr>
+              <td>{{ item.product_name }}</td>
+              <td>${{ item.price }}</td>
+              <td>${{ item.total }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <p><strong>Order Total: ${{ order_total }}</strong></p>
+
+        <p>We appreciate your business and hope you enjoy your purchase.</p>
+        <p>
+          If you have any questions, contact us at
+          <a href="mailto:{{ support_email }}">{{ support_email }}</a>.
+        </p>
+
+        <p>Best regards,<br />ChigFrip support Team</p>
+      </div>
+      <div class="footer">&copy; {{ year }} ChigFrip. All rights reserved.</div>
+    </div>
+  </body>
+</html>
